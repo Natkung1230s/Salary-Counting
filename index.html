@@ -2,8 +2,8 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Salary Counting — ระบบบันทึกเวลา คำนวณเงินเดือน & ระบบล็อกอิน</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Salary Counting — ระบบบันทึกเวลา คำนวณเงินเดือน & Cloud Database</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -21,7 +21,7 @@
     --muted:#7A6F53;
     --text:#241D0E;
   }
-  *{box-sizing:border-box;}
+  *{-webkit-tap-highlight-color:transparent;box-sizing:border-box;}
   body{
     margin:0;
     font-family:'Sarabun',sans-serif;
@@ -49,7 +49,7 @@
     justify-content:space-between;
     align-items:center;
     flex-wrap:wrap;
-    gap:16px;
+    gap:14px;
   }
   .eyebrow{
     font-family:'IBM Plex Mono',monospace;
@@ -68,7 +68,7 @@
     box-shadow: inset 0 4px 6px rgba(0,0,0,.35);
   }
 
-  /* User Badge in Header */
+  /* User Badge */
   .user-badge-wrap{
     display:flex;
     align-items:center;
@@ -80,16 +80,16 @@
   }
   .user-info{text-align:right;}
   .user-name{font-size:13px;font-weight:700;color:#FFF;}
-  .user-role{font-size:11px;color:var(--amber);font-family:'IBM Plex Mono',monospace;}
+  .user-role{font-size:10.5px;color:var(--amber);font-family:'IBM Plex Mono',monospace;word-break:break-all;}
 
-  main{max-width:980px;margin:0 auto;padding:32px 16px 80px;}
+  main{max-width:980px;margin:0 auto;padding:26px 16px 80px;}
 
   .card{
     background:var(--card);
     border:1px solid var(--line);
-    border-radius:6px;
-    padding:22px;
-    margin-bottom:22px;
+    border-radius:8px;
+    padding:20px;
+    margin-bottom:18px;
     position:relative;
     box-shadow:0 2px 0 var(--line), 0 10px 24px -14px rgba(30,42,56,.35);
   }
@@ -101,14 +101,14 @@
     color:var(--muted);
     font-weight:600;
   }
-  .card .hint{font-size:12.5px;color:var(--muted);margin:0 0 16px;}
+  .card .hint{font-size:12.5px;color:var(--muted);margin:0 0 14px;}
 
   /* Toolbar */
   .toolbar{
     display:flex;
     flex-wrap:wrap;
     gap:10px;
-    margin-bottom:20px;
+    margin-bottom:18px;
     justify-content:space-between;
     align-items:center;
   }
@@ -121,18 +121,19 @@
     align-items:center;
     cursor:pointer;
     user-select:none;
+    gap:8px;
   }
   .settings-summary-badge{
-    font-size:13px;
+    font-size:12.5px;
     color:var(--ink-2);
     margin-top:4px;
     font-family:'IBM Plex Mono','Sarabun',sans-serif;
+    line-height:1.4;
   }
   .settings-body{
-    margin-top:16px;
+    margin-top:14px;
     border-top:1px dashed var(--line);
-    padding-top:16px;
-    transition:all .3s ease;
+    padding-top:14px;
   }
   .settings-body.collapsed{display:none;}
 
@@ -143,18 +144,18 @@
     color:var(--ink-2);
     border-bottom:1px solid var(--line);
     padding-bottom:4px;
-    margin-top:8px;
+    margin-top:6px;
   }
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px;}
-  label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600;}
   input,select{
     width:100%;
     font-family:'Sarabun',sans-serif;
-    font-size:13.5px;
+    font-size:14px;
     padding:8px 10px;
     border:1px solid var(--line);
-    border-radius:4px;
+    border-radius:5px;
     background:#FFFDF7;
     color:var(--text);
   }
@@ -164,13 +165,14 @@
   button{
     font-family:'Sarabun',sans-serif;
     font-weight:600;
-    font-size:13.5px;
+    font-size:13px;
     border:none;
-    border-radius:4px;
-    padding:8px 15px;
+    border-radius:5px;
+    padding:8px 14px;
     cursor:pointer;
     display:inline-flex;
     align-items:center;
+    justify-content:center;
     gap:6px;
     transition:transform .08s ease, background-color .15s ease;
   }
@@ -191,28 +193,28 @@
     background:#FFFDF7;
     border:1px solid var(--line);
     border-radius:6px;
-    padding:14px 16px;
+    padding:12px 14px;
     margin-bottom:16px;
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:12px;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:10px;
   }
-  .quota-item{border-left:3px solid var(--amber);padding-left:10px;}
+  .quota-item{border-left:3px solid var(--amber);padding-left:8px;}
   .quota-item.sick{border-left-color:var(--amber-dark);}
   .quota-item.biz{border-left-color:#6B21A8;}
   .quota-item.vac{border-left-color:var(--teal);}
-  .quota-item .q-title{font-size:12px;color:var(--muted);font-weight:600;}
-  .quota-item .q-count{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:var(--text);margin-top:2px;}
-  .quota-item .q-remain{font-size:11.5px;color:var(--muted);}
+  .quota-item .q-title{font-size:11.5px;color:var(--muted);font-weight:600;}
+  .quota-item .q-count{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:var(--text);margin-top:2px;}
+  .quota-item .q-remain{font-size:11px;color:var(--muted);}
 
   /* Calendar */
   .monthbar{
     display:flex;align-items:center;justify-content:space-between;
-    margin-bottom:14px;
+    margin-bottom:12px;
   }
-  .monthbar .nav{display:flex;align-items:center;gap:8px;}
-  .monthbar button{background:var(--ink);color:#F1E9D2;padding:6px 14px;font-family:'IBM Plex Mono',monospace;}
-  .monthbar .label{font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:700;min-width:160px;text-align:center;}
+  .monthbar .nav{display:flex;align-items:center;gap:6px;}
+  .monthbar button{background:var(--ink);color:#F1E9D2;padding:5px 12px;font-family:'IBM Plex Mono',monospace;}
+  .monthbar .label{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;min-width:140px;text-align:center;}
 
   .calendar-wrapper{
     background:#FFFDF7;
@@ -226,9 +228,9 @@
     background:var(--ink-2);
     color:#F1E9D2;
     text-align:center;
-    font-size:13px;
+    font-size:12px;
     font-weight:600;
-    padding:8px 0;
+    padding:6px 0;
   }
   .calendar-grid{
     display:grid;
@@ -236,10 +238,10 @@
     border-top:1px solid var(--line);
   }
   .cal-cell{
-    min-height:92px;
+    min-height:86px;
     border-right:1px solid var(--line);
     border-bottom:1px solid var(--line);
-    padding:6px;
+    padding:4px 3px;
     position:relative;
     cursor:pointer;
     transition:background .12s ease;
@@ -254,25 +256,25 @@
   .cal-cell.is-offday::after{
     content:"วันหยุด";
     position:absolute;
-    bottom:4px;right:6px;
-    font-size:10px;
+    bottom:2px;right:4px;
+    font-size:9.5px;
     color:var(--muted);
-    opacity:.5;
+    opacity:.4;
   }
   .cal-cell.is-today .day-num{
     background:var(--ink);
     color:#FFF;
     border-radius:50%;
-    width:22px;height:22px;
+    width:20px;height:20px;
     display:flex;align-items:center;justify-content:center;
   }
 
   .day-num{
     font-family:'IBM Plex Mono',monospace;
-    font-size:12px;
+    font-size:11.5px;
     font-weight:700;
     color:var(--text);
-    margin-bottom:3px;
+    margin-bottom:2px;
     width:fit-content;
   }
 
@@ -285,12 +287,12 @@
 
   .badge{
     display:inline-block;
-    padding:2px 4px;
-    border-radius:4px;
-    font-size:10.5px;
+    padding:1.5px 3px;
+    border-radius:3px;
+    font-size:10px;
     font-weight:600;
     text-align:center;
-    line-height:1.2;
+    line-height:1.15;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -308,7 +310,7 @@
     display:flex;
     justify-content:space-between;
     font-family:'IBM Plex Mono',monospace;
-    font-size:10px;
+    font-size:9.5px;
     font-weight:700;
     margin-top:auto;
   }
@@ -316,29 +318,29 @@
   .late-tag{color:var(--red);}
 
   /* Summary Grid */
-  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:12px;margin-bottom:18px;}
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;margin-bottom:16px;}
   .stat{
-    background:#FFFDF7;border:1px solid var(--line);border-radius:5px;padding:12px 14px;
+    background:#FFFDF7;border:1px solid var(--line);border-radius:5px;padding:10px 12px;
   }
-  .stat .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;}
-  .stat .v{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;}
+  .stat .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+  .stat .v{font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;}
   .stat.deduct .v{color:var(--red);}
   .stat.total{
     grid-column:1/-1;
     background:linear-gradient(180deg, var(--ink-2), var(--ink));
-    color:#F1E9D2;border:none;padding:18px 20px;
+    color:#F1E9D2;border:none;padding:16px;border-radius:6px;
   }
   .stat.total .k{color:#C9BC98;}
-  .stat.total .v{font-size:28px;color:var(--amber);}
+  .stat.total .v{font-size:26px;color:var(--amber);}
 
   /* Stamp */
-  .stamp-wrap{position:absolute;top:18px;right:22px;}
+  .stamp-wrap{position:absolute;top:16px;right:18px;}
   .stamp{
     font-family:'IBM Plex Mono',monospace;
-    font-weight:700;font-size:12px;letter-spacing:.03em;
-    border:3px solid var(--teal);color:var(--teal);
+    font-weight:700;font-size:11.5px;letter-spacing:.03em;
+    border:2.5px solid var(--teal);color:var(--teal);
     border-radius:50%;
-    width:92px;height:92px;
+    width:84px;height:84px;
     display:flex;align-items:center;justify-content:center;text-align:center;
     transform:rotate(-9deg);
     mix-blend-mode:multiply;
@@ -348,7 +350,7 @@
   }
   .stamp.broken{border-color:var(--red);color:var(--red);}
   .stamp::before{
-    content:"";position:absolute;inset:5px;border:1px solid currentColor;border-radius:50%;opacity:.5;
+    content:"";position:absolute;inset:4px;border:1px solid currentColor;border-radius:50%;opacity:.5;
   }
 
   /* Tax Box */
@@ -356,25 +358,25 @@
     background:#FFFDF7;
     border:1px dashed var(--line);
     border-radius:6px;
-    padding:16px;
-    margin-top:14px;
+    padding:14px;
+    margin-top:12px;
   }
-  .tax-box h3{margin:0 0 8px;font-size:14px;color:var(--ink);}
-  .tax-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;font-size:13px;}
-  .tax-item{background:var(--card);padding:10px;border-radius:4px;border:1px solid var(--line);}
-  .tax-item .label{font-size:11px;color:var(--muted);}
-  .tax-item .val{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:var(--ink-2);margin-top:2px;}
+  .tax-box h3{margin:0 0 8px;font-size:13.5px;color:var(--ink);}
+  .tax-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;font-size:12px;}
+  .tax-item{background:var(--card);padding:8px 10px;border-radius:4px;border:1px solid var(--line);}
+  .tax-item .label{font-size:10.5px;color:var(--muted);}
+  .tax-item .val{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:var(--ink-2);margin-top:2px;}
 
   /* Modals */
   .modal-overlay{
     position:fixed;top:0;left:0;right:0;bottom:0;
-    background:rgba(30,42,56,.55);
+    background:rgba(30,42,56,.65);
     backdrop-filter:blur(2px);
     display:none;
     align-items:center;
     justify-content:center;
     z-index:999;
-    padding:16px;
+    padding:12px;
   }
   .modal-overlay.open{display:flex;}
   .modal{
@@ -383,17 +385,17 @@
     border-radius:8px;
     max-width:440px;
     width:100%;
-    padding:22px;
+    padding:20px;
     box-shadow:0 12px 32px rgba(0,0,0,.25);
+    max-height:92vh;
+    overflow-y:auto;
   }
-  .modal h3{margin:0 0 4px;font-size:17px;color:var(--ink);}
-  .modal .modal-sub{font-size:12.5px;color:var(--muted);margin-bottom:16px;}
+  .modal h3{margin:0 0 4px;font-size:16px;color:var(--ink);}
+  .modal .modal-sub{font-size:12px;color:var(--muted);margin-bottom:14px;}
   .modal .form-group{margin-bottom:12px;}
-  .modal-actions{display:flex;justify-content:space-between;gap:8px;margin-top:18px;}
+  .modal-actions{display:flex;justify-content:space-between;gap:8px;margin-top:16px;}
 
-  /* =========================================
-     AUTH / LOGIN SCREEN STYLES
-     ========================================= */
+  /* Auth Screen */
   .auth-overlay{
     position:fixed;top:0;left:0;right:0;bottom:0;
     background:linear-gradient(135deg, var(--ink), var(--ink-2));
@@ -401,27 +403,27 @@
     align-items:center;
     justify-content:center;
     z-index:2000;
-    padding:20px;
+    padding:16px;
   }
   .auth-overlay.open{display:flex;}
   .auth-box{
     background:var(--card);
     border:2px solid var(--line);
     border-radius:8px;
-    max-width:400px;
+    max-width:380px;
     width:100%;
-    padding:28px 24px;
+    padding:24px 20px;
     box-shadow:0 16px 40px rgba(0,0,0,.45);
   }
   .auth-tabs{
     display:flex;
     gap:10px;
     border-bottom:2px solid var(--line);
-    margin-bottom:20px;
+    margin-bottom:16px;
   }
   .auth-tab{
-    padding:8px 12px;
-    font-size:14px;
+    padding:6px 10px;
+    font-size:13.5px;
     font-weight:700;
     cursor:pointer;
     color:var(--muted);
@@ -437,20 +439,30 @@
     font-size:12px;
     margin-top:8px;
     display:none;
+    line-height:1.3;
   }
+  .forgot-link{
+    display:inline-block;
+    margin-top:6px;
+    font-size:12px;
+    color:var(--amber-dark);
+    text-decoration:none;
+    font-weight:600;
+  }
+  .forgot-link:hover{text-decoration:underline;}
 
   /* Payslip */
   .payslip-modal{
-    max-width:700px;
+    max-width:680px;
     background:#FFF;
     color:#222;
-    padding:28px;
-    max-height:90vh;
+    padding:20px;
+    max-height:92vh;
     overflow-y:auto;
   }
   .payslip-container{
     border:2px solid #2B3A4D;
-    padding:20px;
+    padding:16px;
     font-family:'Sarabun',sans-serif;
     color:#222;
     background:#FFF;
@@ -458,34 +470,34 @@
   .ps-header{
     text-align:center;
     border-bottom:2px solid #2B3A4D;
-    padding-bottom:12px;
-    margin-bottom:14px;
+    padding-bottom:10px;
+    margin-bottom:12px;
   }
-  .ps-header h2{margin:0;font-size:20px;color:#1E2A38;}
-  .ps-header p{margin:4px 0 0;font-size:13px;color:#555;}
+  .ps-header h2{margin:0;font-size:18px;color:#1E2A38;}
+  .ps-header p{margin:3px 0 0;font-size:12.5px;color:#555;}
   .ps-info-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:8px 20px;
-    font-size:13.5px;
-    margin-bottom:14px;
-    padding-bottom:10px;
+    gap:6px 14px;
+    font-size:13px;
+    margin-bottom:12px;
+    padding-bottom:8px;
     border-bottom:1px dashed #C9BC98;
   }
   .ps-table{
     width:100%;
     border-collapse:collapse;
-    margin-bottom:16px;
-    font-size:13px;
+    margin-bottom:14px;
+    font-size:12.5px;
   }
   .ps-table th{
     background:#2B3A4D;
     color:#FFF;
-    padding:8px 10px;
+    padding:6px 8px;
     font-weight:600;
   }
   .ps-table td{
-    padding:6px 10px;
+    padding:5px 8px;
     border-bottom:1px solid #EEE;
   }
   .ps-table .right{text-align:right;}
@@ -498,27 +510,87 @@
   .ps-net-box{
     background:#1E2A38;
     color:#FFF;
-    padding:12px 16px;
+    padding:10px 14px;
     display:flex;
     justify-content:space-between;
     align-items:center;
-    font-size:16px;
+    font-size:15px;
     font-weight:700;
-    margin-bottom:24px;
+    margin-bottom:20px;
   }
-  .ps-net-box .val{font-family:'IBM Plex Mono',monospace;font-size:22px;color:var(--amber);}
+  .ps-net-box .val{font-family:'IBM Plex Mono',monospace;font-size:20px;color:var(--amber);}
   .ps-sign-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:40px;
+    gap:20px;
     text-align:center;
-    margin-top:30px;
-    font-size:13px;
+    margin-top:20px;
+    font-size:12px;
   }
   .ps-sign-line{
     border-bottom:1px dotted #333;
-    width:180px;
-    margin:35px auto 6px;
+    width:140px;
+    margin:25px auto 4px;
+  }
+
+  /* =========================================
+     MOBILE RESPONSIVE BREAKPOINTS (iOS/Android)
+     ========================================= */
+  @media (max-width: 680px) {
+    header{padding:16px 12px 24px;}
+    header .wrap{flex-direction:column;align-items:flex-start;gap:10px;}
+    h1{font-size:20px;}
+    .user-badge-wrap{width:100%;justify-content:space-between;}
+    .user-info{text-align:left;}
+
+    main{padding:14px 10px 60px;}
+    .card{padding:14px 12px;margin-bottom:14px;border-radius:6px;}
+
+    /* Full width buttons & tools */
+    .toolbar{flex-direction:column;align-items:stretch;gap:8px;}
+    .toolbar-group{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+    .toolbar-group button{padding:9px 6px;font-size:12px;justify-content:center;}
+
+    /* Form Grid: 1 column on phone for easy typing */
+    .grid{grid-template-columns:1fr;gap:10px;}
+
+    /* Leave quota: 3 neat rows */
+    .leave-quota-card{grid-template-columns:1fr;gap:8px;padding:10px 12px;}
+
+    /* Calendar Grid Adjustments */
+    .cal-cell{min-height:64px;padding:2px 1.5px;}
+    .day-num{font-size:10.5px;margin-bottom:1px;}
+    .cal-cell.is-today .day-num{width:17px;height:17px;font-size:9.5px;}
+    .cal-cell.is-offday::after{display:none;} /* Hide watermark text on tiny screens */
+    .badge{font-size:8.5px;padding:1px 2px;letter-spacing:-0.03em;line-height:1.1;}
+    .tag-row{font-size:8px;flex-direction:column;gap:1px;}
+
+    /* Summary: 2 Columns Dashboard layout */
+    .summary-grid{grid-template-columns:1fr 1fr;gap:8px;}
+    .stat{padding:8px 10px;}
+    .stat .k{font-size:10px;line-height:1.2;}
+    .stat .v{font-size:15px;}
+    .stat.total{padding:12px 14px;}
+    .stat.total .v{font-size:21px;}
+    .stamp-wrap{top:8px;right:8px;}
+    .stamp{width:70px;height:70px;font-size:9.5px;border-width:2px;}
+
+    /* Tax projection */
+    .tax-grid{grid-template-columns:1fr 1fr;gap:6px;}
+    .tax-item{padding:6px 8px;}
+    .tax-item .label{font-size:9.5px;}
+    .tax-item .val{font-size:12.5px;}
+
+    /* Payslip Modal */
+    .payslip-modal{padding:12px 8px;width:96%;}
+    .payslip-container{padding:10px 6px;}
+    .ps-info-grid{grid-template-columns:1fr;gap:4px;font-size:11.5px;}
+    .ps-table{font-size:11px;}
+    .ps-table th, .ps-table td{padding:4px 5px;}
+    .ps-net-box{font-size:13px;padding:8px 10px;}
+    .ps-net-box .val{font-size:16px;}
+    .ps-sign-grid{gap:8px;}
+    .ps-sign-line{width:110px;margin:18px auto 2px;}
   }
 
   @media print{
@@ -530,7 +602,7 @@
     .payslip-container{border:1px solid #000;}
   }
 
-  footer.note{max-width:980px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:12px;}
+  footer.note{max-width:980px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:11.5px;text-align:center;}
 </style>
 </head>
 <body>
@@ -538,18 +610,18 @@
 <header>
   <div class="wrap">
     <div>
-      <div class="eyebrow">TIME · ATTENDANCE · PAYROLL & AUTH</div>
+      <div class="eyebrow">TIME · ATTENDANCE · PAYROLL & CLOUD SYNC</div>
       <h1>Salary Counting</h1>
-      <p>ระบบบันทึกเวลาทำงาน คำนวณเงินเดือน และจัดการบัญชีพนักงาน</p>
+      <p>ระบบบันทึกเวลาทำงาน คำนวณเงินเดือน เชื่อมต่อฐานข้อมูล Firebase Cloud</p>
     </div>
     
     <!-- USER PROFILE BAR IN HEADER -->
     <div class="user-badge-wrap" id="userBadgeWrap" style="display:none;">
       <div class="user-info">
         <div class="user-name" id="hdr_userName">พนักงาน</div>
-        <div class="user-role" id="hdr_userRole">EMPLOYEE</div>
+        <div class="user-role" id="hdr_userRole">CLOUD ACCOUNT</div>
       </div>
-      <button class="btn-ghost" style="padding:4px 10px;font-size:12px;color:#F1E9D2;border-color:rgba(255,255,255,.3);" onclick="handleLogout()">ออกจากระบบ</button>
+      <button class="btn-ghost" style="padding:4px 8px;font-size:11.5px;color:#F1E9D2;border-color:rgba(255,255,255,.3);" onclick="handleLogout()">ออกจากระบบ</button>
     </div>
   </div>
   <div class="slot"></div>
@@ -560,11 +632,11 @@
   <!-- DATA & ACTIONS TOOLBAR -->
   <div class="toolbar">
     <div class="toolbar-group">
-      <button class="btn-dark" onclick="openPayslipModal()">🖨️ พิมพ์สลิปเงินเดือน (Payslip)</button>
-      <button class="btn-ghost" onclick="exportMonthlyCSV()">📊 ส่งออก Excel (CSV)</button>
+      <button class="btn-dark" onclick="openPayslipModal()">🖨️ พิมพ์สลิปเงินเดือน</button>
+      <button class="btn-ghost" onclick="exportMonthlyCSV()">📊 ส่งออก Excel</button>
     </div>
     <div class="toolbar-group">
-      <button class="btn-ghost" onclick="backupData()">💾 สำรองข้อมูลบัญชีนี้ (JSON)</button>
+      <button class="btn-ghost" onclick="backupData()">💾 สำรองข้อมูล</button>
       <button class="btn-ghost" onclick="triggerRestore()">📂 กู้คืนข้อมูล</button>
       <input type="file" id="restoreFileInput" style="display:none" accept=".json" onchange="restoreData(event)">
     </div>
@@ -577,7 +649,7 @@
         <h2>⚙️ ตั้งค่าพนักงาน & สิทธิ์การลา</h2>
         <div id="settingsSummary" class="settings-summary-badge">กำลังโหลดข้อมูล...</div>
       </div>
-      <button type="button" class="btn-ghost" id="settingsToggleBtn">แก้ไขการตั้งค่า ▼</button>
+      <button type="button" class="btn-ghost" id="settingsToggleBtn" style="padding:4px 8px;font-size:11.5px;">แก้ไข ▼</button>
     </div>
 
     <div class="settings-body" id="settingsBody">
@@ -623,7 +695,7 @@
       </div>
       
       <div class="row-actions">
-        <span id="saveMsg" style="align-self:center;font-size:12.5px;color:var(--teal);opacity:0;transition:opacity .3s;">บันทึกแล้ว</span>
+        <span id="saveMsg" style="align-self:center;font-size:12px;color:var(--teal);opacity:0;transition:opacity .3s;">บันทึกแล้ว</span>
         <button class="btn-primary" onclick="saveSettings()">บันทึกและพับเก็บ</button>
       </div>
     </div>
@@ -653,12 +725,12 @@
     <div class="monthbar">
       <h2 style="margin:0;">ปฏิทินลงเวลา</h2>
       <div class="nav">
-        <button onclick="shiftMonth(-1)">‹ ก่อนหน้า</button>
+        <button onclick="shiftMonth(-1)">‹</button>
         <span class="label" id="monthLabel"></span>
-        <button onclick="shiftMonth(1)">ถัดไป ›</button>
+        <button onclick="shiftMonth(1)">›</button>
       </div>
     </div>
-    <p class="hint" style="margin-bottom:12px;">คลิกที่ช่องวันที่เพื่อบันทึกสถานะการทำงาน, นาทีมาสาย หรือระบุชั่วโมง OT</p>
+    <p class="hint" style="margin-bottom:10px;">แตะที่ช่องวันที่เพื่อบันทึกสถานะ, สาย หรือระบุชั่วโมง OT</p>
     
     <div class="calendar-wrapper">
       <div class="calendar-header">
@@ -675,19 +747,19 @@
     <div class="stamp-wrap" id="stampWrap"></div>
     
     <div class="summary-grid">
-      <div class="stat"><div class="k">วันมาทำงานจริง (ปกติ + วันหยุด)</div><div class="v" id="sum_worked">0 วัน</div></div>
-      <div class="stat"><div class="k">วันลาตามสิทธิ์ในเดือนนี้</div><div class="v" id="sum_paidLeave">0 วัน</div></div>
-      <div class="stat"><div class="k">ลาไม่รับเงิน / ขาดงาน</div><div class="v" id="sum_unpaidLeave">0 / 0 วัน</div></div>
-      <div class="stat"><div class="k">อัตราค่าแรง/วัน & ต่อ ชม.</div><div class="v" id="sum_dailyHourly">฿0 / ฿0</div></div>
+      <div class="stat"><div class="k">วันมาทำงานจริง</div><div class="v" id="sum_worked">0 วัน</div></div>
+      <div class="stat"><div class="k">วันลาตามสิทธิ์</div><div class="v" id="sum_paidLeave">0 วัน</div></div>
+      <div class="stat"><div class="k">ลาไม่รับเงิน/ขาด</div><div class="v" id="sum_unpaidLeave">0 / 0 วัน</div></div>
+      <div class="stat"><div class="k">ค่าแรง/วัน & ชม.</div><div class="v" id="sum_dailyHourly">฿0 / ฿0</div></div>
       
-      <div class="stat"><div class="k">เงินเดือนตามวันทำงาน + วันลา</div><div class="v" id="sum_base">฿0</div></div>
-      <div class="stat"><div class="k">โบนัสมาทำงานวันหยุด (<span id="sum_offDayCount">0</span> วัน)</div><div class="v" id="sum_offDayBonus">฿0</div></div>
-      <div class="stat"><div class="k">ค่าเดินทาง & ค่าเช่าบ้าน</div><div class="v" id="sum_allowance">฿0</div></div>
-      <div class="stat"><div class="k">ค่าโอทีรวม (<span id="sum_otHours">0</span> ชม.)</div><div class="v" id="sum_ot">฿0</div></div>
-      <div class="stat"><div class="k">ค่าอาหารโอที (<span id="sum_otMealDays">0</span> วัน)</div><div class="v" id="sum_otMeal">฿0</div></div>
-      <div class="stat"><div class="k">โบนัสมาครบไม่ขาดงาน</div><div class="v" id="sum_bonus">฿0</div></div>
+      <div class="stat"><div class="k">เงินเดือนตามวันทำงาน</div><div class="v" id="sum_base">฿0</div></div>
+      <div class="stat"><div class="k">โบนัสวันหยุด (<span id="sum_offDayCount">0</span>ว.)</div><div class="v" id="sum_offDayBonus">฿0</div></div>
+      <div class="stat"><div class="k">ค่าเดินทาง & เช่าบ้าน</div><div class="v" id="sum_allowance">฿0</div></div>
+      <div class="stat"><div class="k">ค่าโอที (<span id="sum_otHours">0</span>ชม.)</div><div class="v" id="sum_ot">฿0</div></div>
+      <div class="stat"><div class="k">ค่าอาหาร OT (<span id="sum_otMealDays">0</span>ว.)</div><div class="v" id="sum_otMeal">฿0</div></div>
+      <div class="stat"><div class="k">โบนัสไม่ขาดงาน</div><div class="v" id="sum_bonus">฿0</div></div>
 
-      <div class="stat deduct"><div class="k">หักมาสาย (<span id="sum_lateCount">0</span> ครั้ง / <span id="sum_lateHours">0</span> ชม.)</div><div class="v" id="sum_lateDeduct">-฿0</div></div>
+      <div class="stat deduct"><div class="k">หักสาย (<span id="sum_lateCount">0</span>ครั้ง/<span id="sum_lateHours">0</span>ชม.)</div><div class="v" id="sum_lateDeduct">-฿0</div></div>
       <div class="stat deduct"><div class="k">หักประกันสังคม</div><div class="v" id="sum_ssoDeduct">-฿0</div></div>
 
       <div class="stat total"><div class="k">ยอดรับสุทธิประจำเดือน</div><div class="v" id="sum_total">฿0</div></div>
@@ -695,30 +767,30 @@
 
     <!-- ANNUAL TAX PROJECTION -->
     <div class="tax-box">
-      <h3>📊 วิเคราะห์ภาษีเงินได้บุคคลธรรมดาโดยประมาณ (ประมาณการรายได้ทั้งปี)</h3>
+      <h3>📊 วิเคราะห์ภาษีเงินได้บุคคลธรรมดาโดยประมาณ (รายได้ทั้งปี)</h3>
       <div class="tax-grid">
         <div class="tax-item">
-          <div class="label">รายได้พึงประเมินทั้งปี (ประมาณการ)</div>
+          <div class="label">รายได้พึงประเมินทั้งปี</div>
           <div class="val" id="tax_annualGross">฿0</div>
         </div>
         <div class="tax-item">
-          <div class="label">หักค่าใช้จ่าย 50% (สูงสุด 1 แสน)</div>
+          <div class="label">หักค่าใช้จ่าย 50%</div>
           <div class="val" id="tax_expense">฿0</div>
         </div>
         <div class="tax-item">
-          <div class="label">หักลดหย่อน (ส่วนตัว 60k + ประกันสังคม)</div>
+          <div class="label">หักลดหย่อนส่วนตัว+สปส.</div>
           <div class="val" id="tax_allowance">฿0</div>
         </div>
         <div class="tax-item">
-          <div class="label">เงินได้สุทธิที่นำไปคิดภาษี</div>
+          <div class="label">เงินได้สุทธิคิดภาษี</div>
           <div class="val" id="tax_netTaxable">฿0</div>
         </div>
         <div class="tax-item" style="border-color:var(--amber);">
-          <div class="label">ภาษีที่ต้องชำระทั้งปี (ประมาณการ)</div>
+          <div class="label">ภาษีทั้งปีโดยประมาณ</div>
           <div class="val" style="color:var(--amber-dark);" id="tax_annualTotal">฿0</div>
         </div>
         <div class="tax-item" style="border-color:var(--teal);">
-          <div class="label">ภาษีหัก ณ ที่จ่ายเฉลี่ย/เดือน</div>
+          <div class="label">ภาษีหักเฉลี่ย/เดือน</div>
           <div class="val" style="color:var(--teal);" id="tax_monthlyWithhold">฿0</div>
         </div>
       </div>
@@ -732,10 +804,10 @@
      ========================================= -->
 <div class="auth-overlay" id="authScreen">
   <div class="auth-box">
-    <div style="text-align:center;margin-bottom:18px;">
-      <div class="eyebrow" style="color:var(--amber-dark);">AUTHENTICATION</div>
-      <h2 style="margin:0;font-size:22px;color:var(--ink);">Salary Counting</h2>
-      <p style="margin:4px 0 0;font-size:12.5px;color:var(--muted);">กรุณาเข้าสู่ระบบเพื่อจัดการข้อมูลเงินเดือน</p>
+    <div style="text-align:center;margin-bottom:16px;">
+      <div class="eyebrow" style="color:var(--amber-dark);">FIREBASE CLOUD AUTH</div>
+      <h2 style="margin:0;font-size:20px;color:var(--ink);">Salary Counting</h2>
+      <p style="margin:3px 0 0;font-size:12px;color:var(--muted);">เข้าสู่ระบบด้วยอีเมลเพื่อซิงค์ข้อมูลผ่าน Cloud</p>
     </div>
 
     <div class="auth-tabs">
@@ -746,29 +818,29 @@
     <!-- LOGIN FORM -->
     <form id="formLogin" onsubmit="handleLoginSubmit(event)">
       <div class="form-group">
-        <label>ชื่อผู้ใช้งาน / รหัสพนักงาน</label>
-        <input id="login_username" type="text" placeholder="เช่น admin หรือ รหัสพนักงาน" required>
+        <label>อีเมล (Email)</label>
+        <input id="login_username" type="email" placeholder="เช่น somchai@gmail.com" required>
       </div>
-      <div class="form-group">
-        <label>รหัสผ่าน / PIN (ตัวเลข)</label>
-        <input id="login_pin" type="password" placeholder="PIN 4-6 หลัก" required>
+      <div class="form-group" style="margin-bottom:4px;">
+        <label>รหัสผ่าน / PIN (อย่างน้อย 6 ตัวอักษร)</label>
+        <input id="login_pin" type="password" placeholder="รหัสผ่านอย่างน้อย 6 ตัวอักษร" required minlength="6">
       </div>
-      <div class="auth-error" id="loginError">ชื่อผู้ใช้หรือรหัส PIN ไม่ถูกต้อง</div>
-      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:16px;padding:10px;">เข้าสู่ระบบ</button>
-      <div style="font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;">
-        (บัญชีเริ่มต้น: <strong>admin</strong> | PIN: <strong>1234</strong>)
+      <div style="text-align:right;">
+        <a href="#" class="forgot-link" onclick="handleForgotPassword(event)">ลืมรหัสผ่าน?</a>
       </div>
+      <div class="auth-error" id="loginError">อีเมลหรือรหัสผ่านไม่ถูกต้อง</div>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:14px;padding:9px;">เข้าสู่ระบบ</button>
     </form>
 
     <!-- REGISTER FORM -->
     <form id="formRegister" style="display:none;" onsubmit="handleRegisterSubmit(event)">
       <div class="form-group">
-        <label>ชื่อผู้ใช้งาน (สำหรับ Login)</label>
-        <input id="reg_username" type="text" placeholder="เช่น somchai_01" required>
+        <label>อีเมล (สำหรับเข้าสู่ระบบและกู้คืนรหัสผ่าน)</label>
+        <input id="reg_username" type="email" placeholder="เช่น somchai@gmail.com" required>
       </div>
       <div class="form-group">
-        <label>ตั้งรหัสผ่าน / PIN (ตัวเลข 4-6 หลัก)</label>
-        <input id="reg_pin" type="password" placeholder="เช่น 1234" required>
+        <label>ตั้งรหัสผ่าน / PIN (อย่างน้อย 6 ตัวอักษร)</label>
+        <input id="reg_pin" type="password" placeholder="รหัสผ่านอย่างน้อย 6 ตัวอักษร" required minlength="6">
       </div>
       <div class="form-group">
         <label>ชื่อ-นามสกุล พนักงาน</label>
@@ -778,8 +850,8 @@
         <label>เงินเดือนฐาน (บาท)</label>
         <input id="reg_salary" type="number" placeholder="เช่น 25000" required>
       </div>
-      <div class="auth-error" id="regError">ชื่อผู้ใช้งานนี้มีอยู่ในระบบแล้ว</div>
-      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:16px;padding:10px;">สร้างบัญชีและเข้าใช้งาน</button>
+      <div class="auth-error" id="regError">เกิดข้อผิดพลาดในการลงทะเบียน</div>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:14px;padding:9px;">สร้างบัญชีและเข้าใช้งาน</button>
     </form>
   </div>
 </div>
@@ -804,7 +876,7 @@
         <option value="absent">ขาดงาน (ตัดค่าจ้างและโบนัส)</option>
         <option value="holiday">วันหยุดนักขัตฤกษ์ / บริษัท</option>
       </select>
-      <div id="modalLeaveHint" style="font-size:12px;color:var(--amber-dark);margin-top:4px;"></div>
+      <div id="modalLeaveHint" style="font-size:11.5px;color:var(--amber-dark);margin-top:4px;"></div>
     </div>
 
     <div class="form-group">
@@ -830,11 +902,11 @@
 <!-- PAYSLIP MODAL -->
 <div class="modal-overlay" id="payslipModal" onclick="handlePayslipOverlayClick(event)">
   <div class="modal payslip-modal">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-      <h3 style="margin:0;">ตัวอย่างใบจ่ายเงินเดือน (Payslip Preview)</h3>
-      <div style="display:flex;gap:8px;">
-        <button class="btn-primary" onclick="window.print()">🖨️ สั่งพิมพ์ / บันทึก PDF</button>
-        <button class="btn-ghost" onclick="closePayslipModal()">✕ ปิด</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <h3 style="margin:0;font-size:15px;">ตัวอย่างใบจ่ายเงินเดือน (Payslip Preview)</h3>
+      <div style="display:flex;gap:6px;">
+        <button class="btn-primary" style="padding:6px 10px;font-size:12px;" onclick="window.print()">🖨️ พิมพ์</button>
+        <button class="btn-ghost" style="padding:6px 10px;font-size:12px;" onclick="closePayslipModal()">✕ ปิด</button>
       </div>
     </div>
 
@@ -888,12 +960,12 @@
           <div>
             <div class="ps-sign-line"></div>
             <div>ลงชื่อผู้รับเงิน / พนักงาน</div>
-            <div style="font-size:11px;color:#666;">วันที่: _____/_____/_________</div>
+            <div style="font-size:10.5px;color:#666;">วันที่: _____/_____/_________</div>
           </div>
           <div>
             <div class="ps-sign-line"></div>
             <div>ลงชื่อผู้จ่ายเงิน / ผู้มีอำนาจ</div>
-            <div style="font-size:11px;color:#666;">วันที่: _____/_____/_________</div>
+            <div style="font-size:10.5px;color:#666;">วันที่: _____/_____/_________</div>
           </div>
         </div>
       </div>
@@ -901,741 +973,777 @@
   </div>
 </div>
 
-<footer class="note">ระบบบันทึกข้อมูลแยกตามบัญชีพนักงานใน LocalStorage</footer>
+<footer class="note">ข้อมูลถูกบันทึกและซิงค์ผ่าน Cloud Database (Firebase Firestore)</footer>
 
-<script>
-const appStorage = {
-  async get(key) {
-    if (window.storage && window.storage.get) return window.storage.get(key, false);
-    return { value: localStorage.getItem(key) };
-  },
-  async set(key, val) {
-    if (window.storage && window.storage.set) return window.storage.set(key, val, false);
-    localStorage.setItem(key, val);
+<!-- FIREBASE MODULE SCRIPT -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword, 
+    onAuthStateChanged, 
+    signOut,
+    sendPasswordResetEmail
+  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { 
+    getFirestore, 
+    doc, 
+    getDoc, 
+    setDoc 
+  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBDIqntSdjumeFL3iOgB_Om8StrQfSCSzg",
+    authDomain: "market-7facf.firebaseapp.com",
+    projectId: "market-7facf",
+    storageBucket: "market-7facf.firebasestorage.app",
+    messagingSenderId: "745468103573",
+    appId: "1:745468103573:web:55ed26cb533e168000449c"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let currentUserUID = null;
+  let currentUserEmail = null;
+
+  let settings = {
+    name: '',
+    position: '',
+    salary: 25000,
+    hours: 8,
+    ot: 1.5,
+    bonus: 1500,
+    sso: 875,
+    leaveCounts: 'no',
+    quotaSick: 30,
+    quotaBusiness: 3,
+    quotaAnnual: 6,
+    travel: 50,
+    housing: 45,
+    otMeal: 50,
+    offDay: 0,
+    offDayOt: 3
+  };
+
+  let entries = [];
+  let viewDate = new Date();
+  viewDate.setDate(1);
+  let isSettingsOpen = false;
+  let currentPayrollData = null;
+
+  const thMonths = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const dayNamesTh = ['วันอาทิตย์','วันจันทร์','วันอังคาร','วันพุธ','วันพฤหัสบดี','วันศุกร์','วันเสาร์'];
+
+  const statusLabel = {
+    work: 'มาทำงาน',
+    offday_work: 'ทำงานวันหยุด',
+    leave_sick: 'ลาป่วย',
+    leave_business: 'ลากิจ',
+    leave_annual: 'ลาพักร้อน',
+    leave_unpaid: 'ลาไม่รับเงิน',
+    absent: 'ขาดงาน',
+    holiday: 'วันหยุด'
+  };
+
+  const statusBadgeClass = {
+    work: 'badge-work',
+    offday_work: 'badge-offday-work',
+    leave_sick: 'badge-sick',
+    leave_business: 'badge-business',
+    leave_annual: 'badge-annual',
+    leave_unpaid: 'badge-unpaid',
+    absent: 'badge-absent',
+    holiday: 'badge-holiday'
+  };
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
-};
 
-/* =========================================
-   AUTHENTICATION & MULTI-USER STATE
-   ========================================= */
-let currentUser = null; // Current active username
-let usersList = [];     // Array of registered users: [{ username, pin, name, position }]
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUserUID = user.uid;
+      currentUserEmail = user.email;
 
-let settings = {
-  name: '',
-  position: '',
-  salary: 25000,
-  hours: 8,
-  ot: 1.5,
-  bonus: 1500,
-  sso: 875,
-  leaveCounts: 'no',
-  quotaSick: 30,
-  quotaBusiness: 3,
-  quotaAnnual: 6,
-  travel: 50,
-  housing: 45,
-  otMeal: 50,
-  offDay: 0,
-  offDayOt: 3
-};
+      document.getElementById('authScreen').classList.remove('open');
+      document.getElementById('appMain').style.display = 'block';
+      document.getElementById('userBadgeWrap').style.display = 'flex';
 
-let entries = [];
-let viewDate = new Date();
-viewDate.setDate(1);
-let isSettingsOpen = false;
-let currentPayrollData = null;
+      const shortName = user.email.split('@')[0];
+      document.getElementById('hdr_userName').textContent = shortName;
+      document.getElementById('hdr_userRole').textContent = user.email;
 
-const thMonths = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-const dayNamesTh = ['วันอาทิตย์','วันจันทร์','วันอังคาร','วันพุธ','วันพฤหัสบดี','วันศุกร์','วันเสาร์'];
-
-const statusLabel = {
-  work: 'มาทำงาน',
-  offday_work: 'ทำงานวันหยุด',
-  leave_sick: 'ลาป่วย',
-  leave_business: 'ลากิจ',
-  leave_annual: 'ลาพักร้อน',
-  leave_unpaid: 'ลาไม่รับเงิน',
-  absent: 'ขาดงาน',
-  holiday: 'วันหยุด'
-};
-
-const statusBadgeClass = {
-  work: 'badge-work',
-  offday_work: 'badge-offday-work',
-  leave_sick: 'badge-sick',
-  leave_business: 'badge-business',
-  leave_annual: 'badge-annual',
-  leave_unpaid: 'badge-unpaid',
-  absent: 'badge-absent',
-  holiday: 'badge-holiday'
-};
-
-// Initialize App & Auth Check
-async function initAuth(){
-  try{
-    const u = await appStorage.get('app_users');
-    if(u && u.value){
-      usersList = JSON.parse(u.value);
+      await loadCloudUserData(user.uid);
     } else {
-      // Default Demo User
-      usersList = [{
-        username: 'admin',
-        pin: '1234',
-        name: 'แอดมิน / ผู้จัดการ',
-        position: 'หัวหน้างาน'
-      }];
-      await appStorage.set('app_users', JSON.stringify(usersList));
+      currentUserUID = null;
+      currentUserEmail = null;
+      document.getElementById('authScreen').classList.add('open');
+      document.getElementById('appMain').style.display = 'none';
+      document.getElementById('userBadgeWrap').style.display = 'none';
     }
-  }catch(e){ console.error(e); }
+  });
 
-  const sessionUser = sessionStorage.getItem('current_auth_user');
-  if(sessionUser && usersList.some(u => u.username === sessionUser)){
-    await loginUser(sessionUser);
-  } else {
-    showAuthScreen();
-  }
-}
-
-function showAuthScreen(){
-  document.getElementById('authScreen').classList.add('open');
-  document.getElementById('appMain').style.display = 'none';
-  document.getElementById('userBadgeWrap').style.display = 'none';
-}
-
-function switchAuthTab(tab){
-  document.getElementById('tabLogin').classList.toggle('active', tab==='login');
-  document.getElementById('tabRegister').classList.toggle('active', tab==='register');
-  document.getElementById('formLogin').style.display = (tab==='login') ? 'block' : 'none';
-  document.getElementById('formRegister').style.display = (tab==='register') ? 'block' : 'none';
-  document.getElementById('loginError').style.display = 'none';
-  document.getElementById('regError').style.display = 'none';
-}
-
-async function handleLoginSubmit(e){
-  e.preventDefault();
-  const u = document.getElementById('login_username').value.trim();
-  const p = document.getElementById('login_pin').value.trim();
-
-  const user = usersList.find(x => x.username.toLowerCase() === u.toLowerCase() && String(x.pin) === String(p));
-  if(user){
-    sessionStorage.setItem('current_auth_user', user.username);
-    await loginUser(user.username);
-  } else {
-    document.getElementById('loginError').style.display = 'block';
-  }
-}
-
-async function handleRegisterSubmit(e){
-  e.preventDefault();
-  const u = document.getElementById('reg_username').value.trim();
-  const p = document.getElementById('reg_pin').value.trim();
-  const name = document.getElementById('reg_name').value.trim();
-  const salary = parseFloat(document.getElementById('reg_salary').value) || 20000;
-
-  if(usersList.some(x => x.username.toLowerCase() === u.toLowerCase())){
-    document.getElementById('regError').textContent = 'ชื่อผู้ใช้นี้มีในระบบแล้ว กรุณาเลือกชื่ออื่น';
-    document.getElementById('regError').style.display = 'block';
-    return;
-  }
-
-  const newUser = { username: u, pin: p, name, position: 'พนักงาน' };
-  usersList.push(newUser);
-  await appStorage.set('app_users', JSON.stringify(usersList));
-
-  // Initialize fresh user data
-  const initialSettings = Object.assign({}, settings, { name, salary });
-  await appStorage.set(`settings_${u}`, JSON.stringify(initialSettings));
-  await appStorage.set(`entries_${u}`, JSON.stringify([]));
-
-  sessionStorage.setItem('current_auth_user', u);
-  await loginUser(u);
-}
-
-async function loginUser(username){
-  currentUser = username;
-  const user = usersList.find(x => x.username === username);
-
-  document.getElementById('authScreen').classList.remove('open');
-  document.getElementById('appMain').style.display = 'block';
-  document.getElementById('userBadgeWrap').style.display = 'flex';
-  document.getElementById('hdr_userName').textContent = user ? user.name : username;
-  document.getElementById('hdr_userRole').textContent = `@${username.toUpperCase()}`;
-
-  await loadUserData(username);
-}
-
-function handleLogout(){
-  if(confirm('ต้องการออกจากระบบใช่หรือไม่?')){
-    sessionStorage.removeItem('current_auth_user');
-    currentUser = null;
-    showAuthScreen();
-  }
-}
-
-/* =========================================
-   USER-SPECIFIC DATA LOAD & SAVE
-   ========================================= */
-async function loadUserData(username){
-  try{
-    const s = await appStorage.get(`settings_${username}`);
-    if(s && s.value) {
-      settings = Object.assign(settings, JSON.parse(s.value));
-      isSettingsOpen = false;
-    } else {
+  async function loadCloudUserData(uid) {
+    try {
+      const userRef = doc(db, "users", uid);
+      const docSnap = await getDoc(userRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.settings) settings = Object.assign(settings, data.settings);
+        if (data.entries && Array.isArray(data.entries)) entries = data.entries;
+        else entries = [];
+        isSettingsOpen = false;
+      } else {
+        isSettingsOpen = true;
+        entries = [];
+      }
+    } catch (e) {
+      console.error("Load from Firestore error:", e);
       isSettingsOpen = true;
     }
-  }catch(e){ isSettingsOpen = true; }
 
-  try{
-    const e = await appStorage.get(`entries_${username}`);
-    if(e && e.value) entries = JSON.parse(e.value);
-    else entries = [];
-  }catch(e){ entries = []; }
-
-  fillSettingsForm();
-  updateSettingsUI();
-  render();
-}
-
-function fillSettingsForm(){
-  document.getElementById('s_name').value = settings.name || '';
-  document.getElementById('s_position').value = settings.position || '';
-  document.getElementById('s_salary').value = settings.salary;
-  document.getElementById('s_hours').value = settings.hours;
-  document.getElementById('s_ot').value = settings.ot;
-  document.getElementById('s_bonus').value = settings.bonus;
-  document.getElementById('s_sso').value = settings.sso !== undefined ? settings.sso : 875;
-  document.getElementById('s_leaveCounts').value = settings.leaveCounts;
-  document.getElementById('s_quota_sick').value = settings.quotaSick !== undefined ? settings.quotaSick : 30;
-  document.getElementById('s_quota_biz').value = settings.quotaBusiness !== undefined ? settings.quotaBusiness : 3;
-  document.getElementById('s_quota_annual').value = settings.quotaAnnual !== undefined ? settings.quotaAnnual : 6;
-  document.getElementById('s_travel').value = settings.travel;
-  document.getElementById('s_housing').value = settings.housing;
-  document.getElementById('s_otMeal').value = settings.otMeal;
-  document.getElementById('s_offDay').value = settings.offDay;
-  document.getElementById('s_offDayOt').value = settings.offDayOt;
-}
-
-function updateSettingsUI(){
-  const body = document.getElementById('settingsBody');
-  const btn = document.getElementById('settingsToggleBtn');
-  const summary = document.getElementById('settingsSummary');
-
-  if(isSettingsOpen){
-    body.classList.remove('collapsed');
-    btn.textContent = 'พับเก็บ ▲';
-  } else {
-    body.classList.add('collapsed');
-    btn.textContent = 'แก้ไขการตั้งค่า ▼';
+    fillSettingsForm();
+    updateSettingsUI();
+    render();
   }
 
-  const daily = settings.salary > 0 ? (settings.salary / 31) : 0;
-  const empName = settings.name ? settings.name : currentUser;
-  summary.textContent = `${empName} • เงินเดือน ฿${Number(settings.salary).toLocaleString('th-TH')} (เฉลี่ยวันละ ฿${Math.round(daily).toLocaleString('th-TH')}) • สิทธิ์ลา: ป่วย ${settings.quotaSick||30} / กิจ ${settings.quotaBusiness||3} / พักร้อน ${settings.quotaAnnual||6} วัน`;
-}
+  async function saveSettings() {
+    if (!currentUserUID) return;
 
-function toggleSettings(){
-  isSettingsOpen = !isSettingsOpen;
-  updateSettingsUI();
-}
+    settings = {
+      name: document.getElementById('s_name').value.trim(),
+      position: document.getElementById('s_position').value.trim(),
+      salary: parseFloat(document.getElementById('s_salary').value) || 0,
+      hours: parseFloat(document.getElementById('s_hours').value) || 8,
+      ot: parseFloat(document.getElementById('s_ot').value) || 1.5,
+      bonus: parseFloat(document.getElementById('s_bonus').value) || 0,
+      sso: parseFloat(document.getElementById('s_sso').value) || 0,
+      leaveCounts: document.getElementById('s_leaveCounts').value,
+      quotaSick: parseFloat(document.getElementById('s_quota_sick').value) || 0,
+      quotaBusiness: parseFloat(document.getElementById('s_quota_biz').value) || 0,
+      quotaAnnual: parseFloat(document.getElementById('s_quota_annual').value) || 0,
+      travel: parseFloat(document.getElementById('s_travel').value) || 0,
+      housing: parseFloat(document.getElementById('s_housing').value) || 0,
+      otMeal: parseFloat(document.getElementById('s_otMeal').value) || 0,
+      offDay: parseInt(document.getElementById('s_offDay').value, 10),
+      offDayOt: parseFloat(document.getElementById('s_offDayOt').value) || 3,
+    };
 
-async function saveSettings(){
-  if(!currentUser) return;
+    try {
+      const userRef = doc(db, "users", currentUserUID);
+      await setDoc(userRef, { settings, updatedAt: new Date().toISOString() }, { merge: true });
+      
+      document.getElementById('hdr_userName').textContent = settings.name || currentUserEmail.split('@')[0];
 
-  settings = {
-    name: document.getElementById('s_name').value.trim(),
-    position: document.getElementById('s_position').value.trim(),
-    salary: parseFloat(document.getElementById('s_salary').value)||0,
-    hours: parseFloat(document.getElementById('s_hours').value)||8,
-    ot: parseFloat(document.getElementById('s_ot').value)||1.5,
-    bonus: parseFloat(document.getElementById('s_bonus').value)||0,
-    sso: parseFloat(document.getElementById('s_sso').value)||0,
-    leaveCounts: document.getElementById('s_leaveCounts').value,
-    quotaSick: parseFloat(document.getElementById('s_quota_sick').value)||0,
-    quotaBusiness: parseFloat(document.getElementById('s_quota_biz').value)||0,
-    quotaAnnual: parseFloat(document.getElementById('s_quota_annual').value)||0,
-    travel: parseFloat(document.getElementById('s_travel').value)||0,
-    housing: parseFloat(document.getElementById('s_housing').value)||0,
-    otMeal: parseFloat(document.getElementById('s_otMeal').value)||0,
-    offDay: parseInt(document.getElementById('s_offDay').value,10),
-    offDayOt: parseFloat(document.getElementById('s_offDayOt').value)||3,
-  };
+      const msg = document.getElementById('saveMsg');
+      msg.style.opacity = 1;
+      setTimeout(() => msg.style.opacity = 0, 1600);
+    } catch (e) {
+      console.error("Save to Firestore error:", e);
+      alert("บันทึกข้อมูลไม่สำเร็จ: " + e.message);
+    }
 
-  try{
-    await appStorage.set(`settings_${currentUser}`, JSON.stringify(settings));
+    isSettingsOpen = false;
+    updateSettingsUI();
+    render();
+  }
+
+  async function persistEntries() {
+    if (!currentUserUID) return;
+    try {
+      const userRef = doc(db, "users", currentUserUID);
+      await setDoc(userRef, { entries, updatedAt: new Date().toISOString() }, { merge: true });
+    } catch (e) {
+      console.error("Save entries error:", e);
+    }
+  }
+
+  function fillSettingsForm() {
+    document.getElementById('s_name').value = settings.name || '';
+    document.getElementById('s_position').value = settings.position || '';
+    document.getElementById('s_salary').value = settings.salary;
+    document.getElementById('s_hours').value = settings.hours;
+    document.getElementById('s_ot').value = settings.ot;
+    document.getElementById('s_bonus').value = settings.bonus;
+    document.getElementById('s_sso').value = settings.sso !== undefined ? settings.sso : 875;
+    document.getElementById('s_leaveCounts').value = settings.leaveCounts;
+    document.getElementById('s_quota_sick').value = settings.quotaSick !== undefined ? settings.quotaSick : 30;
+    document.getElementById('s_quota_biz').value = settings.quotaBusiness !== undefined ? settings.quotaBusiness : 3;
+    document.getElementById('s_quota_annual').value = settings.quotaAnnual !== undefined ? settings.quotaAnnual : 6;
+    document.getElementById('s_travel').value = settings.travel;
+    document.getElementById('s_housing').value = settings.housing;
+    document.getElementById('s_otMeal').value = settings.otMeal;
+    document.getElementById('s_offDay').value = settings.offDay;
+    document.getElementById('s_offDayOt').value = settings.offDayOt;
+  }
+
+  function updateSettingsUI() {
+    const body = document.getElementById('settingsBody');
+    const btn = document.getElementById('settingsToggleBtn');
+    const summary = document.getElementById('settingsSummary');
+
+    if (isSettingsOpen) {
+      body.classList.remove('collapsed');
+      btn.textContent = 'พับเก็บ ▲';
+    } else {
+      body.classList.add('collapsed');
+      btn.textContent = 'แก้ไข ▼';
+    }
+
+    const daily = settings.salary > 0 ? (settings.salary / 31) : 0;
+    const empName = settings.name ? settings.name : (currentUserEmail ? currentUserEmail.split('@')[0] : 'พนักงาน');
+    summary.textContent = `${empName} • ฿${Number(settings.salary).toLocaleString('th-TH')} (เฉลี่ยวันละ ฿${Math.round(daily).toLocaleString('th-TH')}) • ลา: ป่วย ${settings.quotaSick||30} / กิจ ${settings.quotaBusiness||3} / พักร้อน ${settings.quotaAnnual||6} วัน`;
+  }
+
+  function toggleSettings() {
+    isSettingsOpen = !isSettingsOpen;
+    updateSettingsUI();
+  }
+
+  function switchAuthTab(tab) {
+    document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+    document.getElementById('formLogin').style.display = (tab === 'login') ? 'block' : 'none';
+    document.getElementById('formRegister').style.display = (tab === 'register') ? 'block' : 'none';
+    document.getElementById('loginError').style.display = 'none';
+    document.getElementById('regError').style.display = 'none';
+  }
+
+  async function handleLoginSubmit(e) {
+    e.preventDefault();
+    const email = document.getElementById('login_username').value.trim();
+    const p = document.getElementById('login_pin').value;
+
+    if (!isValidEmail(email)) {
+      document.getElementById('loginError').textContent = 'กรุณากรอกอีเมลให้ถูกต้องตามรูปแบบ (เช่น name@example.com)';
+      document.getElementById('loginError').style.display = 'block';
+      return;
+    }
+
+    try {
+      await signInWithEmailAndPassword(auth, email, p);
+    } catch (err) {
+      let msg = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+      if (err.code === 'auth/invalid-email') msg = 'รูปแบบอีเมลไม่ถูกต้อง';
+      else if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') msg = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+      document.getElementById('loginError').textContent = msg;
+      document.getElementById('loginError').style.display = 'block';
+    }
+  }
+
+  async function handleRegisterSubmit(e) {
+    e.preventDefault();
+    const email = document.getElementById('reg_username').value.trim();
+    const p = document.getElementById('reg_pin').value;
+    const name = document.getElementById('reg_name').value.trim();
+    const salary = parseFloat(document.getElementById('reg_salary').value) || 25000;
+
+    if (!isValidEmail(email)) {
+      document.getElementById('regError').textContent = 'กรุณากรอกอีเมลให้ถูกต้องตามรูปแบบ (เช่น name@example.com)';
+      document.getElementById('regError').style.display = 'block';
+      return;
+    }
+
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, p);
+      const initialSettings = Object.assign({}, settings, { name, salary });
+      
+      const userRef = doc(db, "users", cred.user.uid);
+      await setDoc(userRef, {
+        settings: initialSettings,
+        entries: [],
+        createdAt: new Date().toISOString()
+      });
+    } catch (err) {
+      let msg = 'ไม่สามารถสร้างบัญชีได้: ';
+      if (err.code === 'auth/email-already-in-use') msg = 'อีเมลนี้ถูกใช้งานลงทะเบียนแล้ว';
+      else if (err.code === 'auth/invalid-email') msg = 'รูปแบบอีเมลไม่ถูกต้อง';
+      else if (err.code === 'auth/weak-password') msg = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
+      else msg += err.message;
+      document.getElementById('regError').textContent = msg;
+      document.getElementById('regError').style.display = 'block';
+    }
+  }
+
+  async function handleForgotPassword(e) {
+    if (e) e.preventDefault();
+    const email = prompt("กรุณากรอกอีเมลของคุณเพื่อรับลิงก์ตั้งรหัสผ่านใหม่:");
+    if (!email) return;
+
+    const trimmedEmail = email.trim();
+    if (!isValidEmail(trimmedEmail)) {
+      alert("รูปแบบอีเมลไม่ถูกต้อง กรุณาระบุ เช่น name@example.com");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, trimmedEmail);
+      alert(`ระบบได้ส่งลิงก์สำหรับรีเซ็ตรหัสผ่านไปยัง ${trimmedEmail} เรียบร้อยแล้ว\n(กรุณาตรวจสอบในกล่องข้อความ หรือโฟลเดอร์ Junk/Spam)`);
+    } catch (err) {
+      let msg = "ไม่สามารถส่งอีเมลรีเซ็ตรหัสผ่านได้: ";
+      if (err.code === 'auth/user-not-found') msg = "ไม่พบอีเมลนี้ในระบบ";
+      else if (err.code === 'auth/invalid-email') msg = "รูปแบบอีเมลไม่ถูกต้อง";
+      else msg += err.message;
+      alert(msg);
+    }
+  }
+
+  async function handleLogout() {
+    if (confirm('ต้องการออกจากระบบใช่หรือไม่?')) {
+      await signOut(auth);
+    }
+  }
+
+  function shiftMonth(delta) {
+    viewDate.setMonth(viewDate.getMonth() + delta);
+    render();
+  }
+
+  function fmtBaht(n) {
+    return '฿' + Math.round(n).toLocaleString('th-TH');
+  }
+
+  function openModal(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    const dow = d.getDay();
+    const isOffDay = (dow === settings.offDay);
     
-    // Update user profile list display name
-    const uIdx = usersList.findIndex(x => x.username === currentUser);
-    if(uIdx > -1){
-      usersList[uIdx].name = settings.name;
-      usersList[uIdx].position = settings.position;
-      await appStorage.set('app_users', JSON.stringify(usersList));
-      document.getElementById('hdr_userName').textContent = settings.name || currentUser;
+    const existing = entries.find(e => e.date === dateStr);
+
+    document.getElementById('modalDate').value = dateStr;
+    document.getElementById('modalTitle').textContent = `บันทึกวันที่ ${d.getDate()} ${thMonths[d.getMonth()]} ${d.getFullYear()+543}`;
+    
+    let subText = `${dayNamesTh[dow]}`;
+    if (isOffDay) subText += ' (ตรงกับวันหยุดประจำสัปดาห์)';
+    document.getElementById('modalSub').textContent = subText;
+
+    if (existing) {
+      document.getElementById('modalStatus').value = existing.status;
+      document.getElementById('modalOt').value = existing.ot || 0;
+      document.getElementById('modalLate').value = existing.late || 0;
+      document.getElementById('btnDeleteModal').style.display = 'block';
+    } else {
+      document.getElementById('modalStatus').value = isOffDay ? 'offday_work' : 'work';
+      document.getElementById('modalOt').value = 0;
+      document.getElementById('modalLate').value = 0;
+      document.getElementById('btnDeleteModal').style.display = 'none';
     }
 
-    const msg = document.getElementById('saveMsg');
-    msg.style.opacity = 1;
-    setTimeout(()=>msg.style.opacity=0, 1600);
-  }catch(e){ console.error(e); }
-
-  isSettingsOpen = false;
-  updateSettingsUI();
-  render();
-}
-
-async function persistEntries(){
-  if(!currentUser) return;
-  try{
-    await appStorage.set(`entries_${currentUser}`, JSON.stringify(entries));
-  }catch(e){ console.error(e); }
-}
-
-function shiftMonth(delta){
-  viewDate.setMonth(viewDate.getMonth() + delta);
-  render();
-}
-
-function fmtBaht(n){
-  return '฿' + Math.round(n).toLocaleString('th-TH');
-}
-
-// Modal Handlers
-function openModal(dateStr){
-  const d = new Date(dateStr + 'T00:00:00');
-  const dow = d.getDay();
-  const isOffDay = (dow === settings.offDay);
-  
-  const existing = entries.find(e => e.date === dateStr);
-
-  document.getElementById('modalDate').value = dateStr;
-  document.getElementById('modalTitle').textContent = `บันทึกวันที่ ${d.getDate()} ${thMonths[d.getMonth()]} ${d.getFullYear()+543}`;
-  
-  let subText = `${dayNamesTh[dow]}`;
-  if(isOffDay) subText += ' (ตรงกับวันหยุดประจำสัปดาห์)';
-  document.getElementById('modalSub').textContent = subText;
-
-  if(existing){
-    document.getElementById('modalStatus').value = existing.status;
-    document.getElementById('modalOt').value = existing.ot || 0;
-    document.getElementById('modalLate').value = existing.late || 0;
-    document.getElementById('btnDeleteModal').style.display = 'block';
-  } else {
-    document.getElementById('modalStatus').value = isOffDay ? 'offday_work' : 'work';
-    document.getElementById('modalOt').value = 0;
-    document.getElementById('modalLate').value = 0;
-    document.getElementById('btnDeleteModal').style.display = 'none';
+    updateModalLeaveHint();
+    document.getElementById('entryModal').classList.add('open');
   }
 
-  updateModalLeaveHint();
-  document.getElementById('entryModal').classList.add('open');
-}
+  function updateModalLeaveHint() {
+    const status = document.getElementById('modalStatus').value;
+    const hintEl = document.getElementById('modalLeaveHint');
+    const y = viewDate.getFullYear();
+    const yearEntries = entries.filter(en => new Date(en.date+'T00:00:00').getFullYear() === y);
 
-function updateModalLeaveHint(){
-  const status = document.getElementById('modalStatus').value;
-  const hintEl = document.getElementById('modalLeaveHint');
-  const y = viewDate.getFullYear();
-  const yearEntries = entries.filter(en => new Date(en.date+'T00:00:00').getFullYear() === y);
-
-  if(status === 'leave_sick'){
-    const used = yearEntries.filter(e => e.status === 'leave_sick').length;
-    const quota = settings.quotaSick || 30;
-    hintEl.textContent = `ℹ️ โควตาลาป่วยปีนี้: ใช้ไปแล้ว ${used} / ${quota} วัน (คงเหลือ ${Math.max(0, quota - used)} วัน)`;
-  } else if(status === 'leave_business'){
-    const used = yearEntries.filter(e => e.status === 'leave_business').length;
-    const quota = settings.quotaBusiness || 3;
-    hintEl.textContent = `ℹ️ โควตาลากิจปีนี้: ใช้ไปแล้ว ${used} / ${quota} วัน (คงเหลือ ${Math.max(0, quota - used)} วัน)`;
-  } else if(status === 'leave_annual'){
-    const used = yearEntries.filter(e => e.status === 'leave_annual').length;
-    const quota = settings.quotaAnnual || 6;
-    hintEl.textContent = `ℹ️ โควตาลาพักร้อนปีนี้: ใช้ไปแล้ว ${used} / ${quota} วัน (คงเหลือ ${Math.max(0, quota - used)} วัน)`;
-  } else {
-    hintEl.textContent = '';
-  }
-}
-
-function closeModal(){
-  document.getElementById('entryModal').classList.remove('open');
-}
-
-function handleModalOverlayClick(e){
-  if(e.target.id === 'entryModal') closeModal();
-}
-
-async function saveModalEntry(){
-  const date = document.getElementById('modalDate').value;
-  const status = document.getElementById('modalStatus').value;
-  const ot = parseFloat(document.getElementById('modalOt').value) || 0;
-  const late = parseFloat(document.getElementById('modalLate').value) || 0;
-
-  entries = entries.filter(e => e.date !== date);
-  entries.push({date, status, ot, late});
-  entries.sort((a,b)=> a.date.localeCompare(b.date));
-  
-  await persistEntries();
-  closeModal();
-  render();
-}
-
-async function deleteModalEntry(){
-  const date = document.getElementById('modalDate').value;
-  entries = entries.filter(e => e.date !== date);
-  await persistEntries();
-  closeModal();
-  render();
-}
-
-// Calculate Annual PIT Tax
-function calculatePIT(annualGross, annualSSO){
-  const expense = Math.min(annualGross * 0.5, 100000);
-  const personalAllowance = 60000;
-  const totalAllowance = personalAllowance + annualSSO;
-  const netTaxable = Math.max(0, annualGross - expense - totalAllowance);
-
-  let tax = 0;
-  let remain = netTaxable;
-
-  const brackets = [
-    { cap: 150000, rate: 0 },
-    { cap: 150000, rate: 0.05 },
-    { cap: 200000, rate: 0.10 },
-    { cap: 250000, rate: 0.15 },
-    { cap: 250000, rate: 0.20 },
-    { cap: 1000000, rate: 0.25 },
-    { cap: 3000000, rate: 0.30 },
-    { cap: Infinity, rate: 0.35 },
-  ];
-
-  for(const b of brackets){
-    if(remain <= 0) break;
-    const taxableInBracket = Math.min(remain, b.cap);
-    tax += taxableInBracket * b.rate;
-    remain -= taxableInBracket;
-  }
-
-  return { expense, totalAllowance, netTaxable, annualTax: tax, monthlyWithhold: tax / 12 };
-}
-
-/* =========================================
-   BACKUP, RESTORE & CSV EXPORT
-   ========================================= */
-function backupData(){
-  const data = {
-    username: currentUser,
-    settings,
-    entries,
-    exportedAt: new Date().toISOString(),
-    version: '2.0'
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `salary_backup_${currentUser}_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function triggerRestore(){
-  document.getElementById('restoreFileInput').click();
-}
-
-function restoreData(event){
-  const file = event.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = async function(e){
-    try{
-      const data = JSON.parse(e.target.result);
-      if(data.settings) settings = Object.assign(settings, data.settings);
-      if(data.entries && Array.isArray(data.entries)) entries = data.entries;
-      
-      await appStorage.set(`settings_${currentUser}`, JSON.stringify(settings));
-      await appStorage.set(`entries_${currentUser}`, JSON.stringify(entries));
-      
-      fillSettingsForm();
-      updateSettingsUI();
-      render();
-      alert('นำเข้าข้อมูลสำเร็จเรียบร้อยแล้ว');
-    }catch(err){
-      alert('ไฟล์ไม่ถูกต้อง หรือโครงสร้างข้อมูลผิดพลาด');
+    if (status === 'leave_sick') {
+      const used = yearEntries.filter(e => e.status === 'leave_sick').length;
+      const quota = settings.quotaSick || 30;
+      hintEl.textContent = `ℹ️ ลาป่วยปีนี้: ใช้ไป ${used}/${quota} วัน (เหลือ ${Math.max(0, quota - used)} วัน)`;
+    } else if (status === 'leave_business') {
+      const used = yearEntries.filter(e => e.status === 'leave_business').length;
+      const quota = settings.quotaBusiness || 3;
+      hintEl.textContent = `ℹ️ ลากิจปีนี้: ใช้ไป ${used}/${quota} วัน (เหลือ ${Math.max(0, quota - used)} วัน)`;
+    } else if (status === 'leave_annual') {
+      const used = yearEntries.filter(e => e.status === 'leave_annual').length;
+      const quota = settings.quotaAnnual || 6;
+      hintEl.textContent = `ℹ️ ลาพักร้อนปีนี้: ใช้ไป ${used}/${quota} วัน (เหลือ ${Math.max(0, quota - used)} วัน)`;
+    } else {
+      hintEl.textContent = '';
     }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
-}
-
-function exportMonthlyCSV(){
-  const y = viewDate.getFullYear();
-  const m = viewDate.getMonth();
-  const monthEntries = entries.filter(en=>{
-    const d = new Date(en.date+'T00:00:00');
-    return d.getFullYear()===y && d.getMonth()===m;
-  }).sort((a,b)=>a.date.localeCompare(b.date));
-
-  if(monthEntries.length === 0){
-    alert('ไม่มีข้อมูลรายการในเดือนนี้');
-    return;
   }
 
-  let csv = 'วันที่,วันในสัปดาห์,สถานะ,ชั่วโมง OT,มาสาย (นาที)\n';
-  monthEntries.forEach(en=>{
-    const d = new Date(en.date+'T00:00:00');
-    const dayName = dayNamesTh[d.getDay()];
-    const stName = statusLabel[en.status] || en.status;
-    csv += `"${en.date}","${dayName}","${stName}",${en.ot || 0},${en.late || 0}\n`;
-  });
-
-  const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `attendance_${currentUser}_${thMonths[m]}_${y+543}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-/* =========================================
-   PAYSLIP POPUP BUILDER
-   ========================================= */
-function openPayslipModal(){
-  if(!currentPayrollData){
-    alert('ไม่พบข้อมูลเงินเดือนของเดือนนี้');
-    return;
-  }
-  const p = currentPayrollData;
-  const y = viewDate.getFullYear();
-  const m = viewDate.getMonth();
-
-  document.getElementById('ps_period').textContent = `ประจำงวด: ${thMonths[m]} ${y+543}`;
-  document.getElementById('ps_name').textContent = settings.name || currentUser;
-  document.getElementById('ps_position').textContent = settings.position || 'พนักงานทั่วไป';
-  document.getElementById('ps_salary').textContent = Number(settings.salary).toLocaleString('th-TH');
-  document.getElementById('ps_days_worked').textContent = p.payableDays;
-
-  let incomeHtml = `
-    <tr><td>เงินเดือนตามวันทำงานจริง (${p.payableDays} วัน)</td><td class="right">${fmtBaht(p.basePay)}</td></tr>
-  `;
-  if(p.offDayBonus > 0) incomeHtml += `<tr><td>โบนัสทำงานวันหยุด (${p.offDayWorkedDays} วัน)</td><td class="right">${fmtBaht(p.offDayBonus)}</td></tr>`;
-  if(p.otPay > 0) incomeHtml += `<tr><td>ค่าล่วงเวลา / OT (${p.totalOtHours} ชม.)</td><td class="right">${fmtBaht(p.otPay)}</td></tr>`;
-  if(p.allowancePay > 0) incomeHtml += `<tr><td>ค่าเดินทาง & ค่าเช่าบ้าน</td><td class="right">${fmtBaht(p.allowancePay)}</td></tr>`;
-  if(p.otMealPay > 0) incomeHtml += `<tr><td>ค่าอาหารล่วงเวลา (${p.otMealDays} วัน)</td><td class="right">${fmtBaht(p.otMealPay)}</td></tr>`;
-  if(p.bonusPay > 0) incomeHtml += `<tr><td>เบี้ยขยัน / โบนัสไม่ขาดงาน</td><td class="right">${fmtBaht(p.bonusPay)}</td></tr>`;
-  document.getElementById('ps_income_rows').innerHTML = incomeHtml;
-
-  let deductHtml = '';
-  if(p.lateDeduction > 0) deductHtml += `<tr><td>หักมาสาย (${p.lateOccurrences} ครั้ง / ${p.lateDeductedHours} ชม.)</td><td class="right">-${fmtBaht(p.lateDeduction)}</td></tr>`;
-  if(p.ssoDeduction > 0) deductHtml += `<tr><td>หักเงินสมทบประกันสังคม</td><td class="right">-${fmtBaht(p.ssoDeduction)}</td></tr>`;
-  if(!deductHtml) deductHtml = `<tr><td>ไม่มีรายการหัก</td><td class="right">฿0</td></tr>`;
-  document.getElementById('ps_deduct_rows').innerHTML = deductHtml;
-
-  document.getElementById('ps_gross').textContent = fmtBaht(p.grossPay);
-  document.getElementById('ps_total_deduct').textContent = '-' + fmtBaht(p.totalDeductions);
-  document.getElementById('ps_net').textContent = fmtBaht(p.netTotal);
-
-  document.getElementById('payslipModal').classList.add('open');
-}
-
-function closePayslipModal(){
-  document.getElementById('payslipModal').classList.remove('open');
-}
-
-function handlePayslipOverlayClick(e){
-  if(e.target.id === 'payslipModal') closePayslipModal();
-}
-
-/* =========================================
-   MAIN RENDER FUNCTION
-   ========================================= */
-function render(){
-  const y = viewDate.getFullYear();
-  const m = viewDate.getMonth();
-  document.getElementById('monthLabel').textContent = thMonths[m] + ' ' + (y + 543);
-
-  const monthEntries = entries.filter(en=>{
-    const d = new Date(en.date+'T00:00:00');
-    return d.getFullYear()===y && d.getMonth()===m;
-  });
-
-  const yearEntries = entries.filter(en=>{
-    const d = new Date(en.date+'T00:00:00');
-    return d.getFullYear()===y;
-  });
-
-  const entryMap = {};
-  monthEntries.forEach(en => { entryMap[en.date] = en; });
-
-  // Update Leave Quota Tracker
-  const usedSick = yearEntries.filter(e => e.status === 'leave_sick').length;
-  const usedBiz = yearEntries.filter(e => e.status === 'leave_business').length;
-  const usedVac = yearEntries.filter(e => e.status === 'leave_annual').length;
-
-  const qSick = settings.quotaSick || 30;
-  const qBiz = settings.quotaBusiness || 3;
-  const qVac = settings.quotaAnnual || 6;
-
-  document.getElementById('quota_sick_display').textContent = `${usedSick} / ${qSick} วัน`;
-  document.getElementById('quota_sick_remain').textContent = `คงเหลือ ${Math.max(0, qSick - usedSick)} วัน`;
-  document.getElementById('quota_biz_display').textContent = `${usedBiz} / ${qBiz} วัน`;
-  document.getElementById('quota_biz_remain').textContent = `คงเหลือ ${Math.max(0, qBiz - usedBiz)} วัน`;
-  document.getElementById('quota_vac_display').textContent = `${usedVac} / ${qVac} วัน`;
-  document.getElementById('quota_vac_remain').textContent = `คงเหลือ ${Math.max(0, qVac - usedVac)} วัน`;
-
-  // Render Calendar Grid
-  const calGrid = document.getElementById('calendarGrid');
-  calGrid.innerHTML = '';
-
-  const firstDayIndex = new Date(y, m, 1).getDay();
-  const totalDaysInMonth = new Date(y, m + 1, 0).getDate();
-
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-
-  for(let i=0; i<firstDayIndex; i++){
-    const empty = document.createElement('div');
-    empty.className = 'cal-cell empty';
-    calGrid.appendChild(empty);
+  function closeModal() {
+    document.getElementById('entryModal').classList.remove('open');
   }
 
-  for(let day=1; day<=totalDaysInMonth; day++){
-    const dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-    const dayObj = new Date(y, m, day);
-    const dow = dayObj.getDay();
-    const isOff = dow === settings.offDay;
-    const isToday = (dStr === todayStr);
+  function handleModalOverlayClick(e) {
+    if (e.target.id === 'entryModal') closeModal();
+  }
 
-    const cell = document.createElement('div');
-    cell.className = `cal-cell ${isOff ? 'is-offday' : ''} ${isToday ? 'is-today' : ''}`;
-    cell.onclick = () => openModal(dStr);
+  async function saveModalEntry() {
+    const date = document.getElementById('modalDate').value;
+    const status = document.getElementById('modalStatus').value;
+    const ot = parseFloat(document.getElementById('modalOt').value) || 0;
+    const late = parseFloat(document.getElementById('modalLate').value) || 0;
 
-    let cellInner = `<div class="day-num">${day}</div><div class="cell-content">`;
+    entries = entries.filter(e => e.date !== date);
+    entries.push({ date, status, ot, late });
+    entries.sort((a, b) => a.date.localeCompare(b.date));
+    
+    await persistEntries();
+    closeModal();
+    render();
+  }
 
-    if(entryMap[dStr]){
-      const en = entryMap[dStr];
-      cellInner += `<span class="badge ${statusBadgeClass[en.status] || 'badge-work'}">${statusLabel[en.status] || 'ทำงาน'}</span>`;
-      
-      let tagRow = '';
-      if(en.ot > 0) tagRow += `<span class="ot-tag">+${en.ot}h</span>`;
-      if(en.late > 0) tagRow += `<span class="late-tag">สาย ${en.late}น.</span>`;
-      if(tagRow) cellInner += `<div class="tag-row">${tagRow}</div>`;
+  async function deleteModalEntry() {
+    const date = document.getElementById('modalDate').value;
+    entries = entries.filter(e => e.date !== date);
+    await persistEntries();
+    closeModal();
+    render();
+  }
+
+  function calculatePIT(annualGross, annualSSO) {
+    const expense = Math.min(annualGross * 0.5, 100000);
+    const personalAllowance = 60000;
+    const totalAllowance = personalAllowance + annualSSO;
+    const netTaxable = Math.max(0, annualGross - expense - totalAllowance);
+
+    let tax = 0;
+    let remain = netTaxable;
+
+    const brackets = [
+      { cap: 150000, rate: 0 },
+      { cap: 150000, rate: 0.05 },
+      { cap: 200000, rate: 0.10 },
+      { cap: 250000, rate: 0.15 },
+      { cap: 250000, rate: 0.20 },
+      { cap: 1000000, rate: 0.25 },
+      { cap: 3000000, rate: 0.30 },
+      { cap: Infinity, rate: 0.35 },
+    ];
+
+    for (const b of brackets) {
+      if (remain <= 0) break;
+      const taxableInBracket = Math.min(remain, b.cap);
+      tax += taxableInBracket * b.rate;
+      remain -= taxableInBracket;
     }
-    cellInner += `</div>`;
-    cell.innerHTML = cellInner;
-    calGrid.appendChild(cell);
+
+    return { expense, totalAllowance, netTaxable, annualTax: tax, monthlyWithhold: tax / 12 };
   }
 
-  // Attendance Counts
-  const workedDays = monthEntries.filter(en=>en.status==='work').length;
-  const offDayWorkedDays = monthEntries.filter(en=>en.status==='offday_work').length;
-  const actualWorkedDays = workedDays + offDayWorkedDays;
-
-  const paidLeaveDays = monthEntries.filter(en => ['leave_sick','leave_business','leave_annual'].includes(en.status)).length;
-  const unpaidLeaveDays = monthEntries.filter(en => en.status==='leave_unpaid').length;
-  const absentDays = monthEntries.filter(en=>en.status==='absent').length;
-
-  const totalOtHours = monthEntries.reduce((sum,en)=> sum + (en.ot||0), 0);
-  const otMealDays = monthEntries.filter(en=>(en.ot||0) > 0).length;
-
-  // Late Penalty: Late > 1 min -> deduct 1 hour
-  const lateEntries = monthEntries.filter(en => (en.late || 0) > 1);
-  const lateOccurrences = lateEntries.length;
-  const lateDeductedHours = lateOccurrences * 1;
-
-  // Rates (หาร 31)
-  const dailyRate = settings.salary > 0 ? (settings.salary / 31) : 0;
-  const hourlyRate = settings.hours > 0 ? (dailyRate / settings.hours) : 0;
-
-  // Earnings
-  const payableDays = actualWorkedDays + paidLeaveDays;
-  const basePay = dailyRate * payableDays;
-  const offDayBonus = dailyRate * offDayWorkedDays;
-  const allowancePay = (settings.travel + settings.housing) * actualWorkedDays;
-
-  const otPay = monthEntries.reduce((sum,en)=>{
-    if(!en.ot) return sum;
-    const rate = en.status==='offday_work' ? settings.offDayOt : settings.ot;
-    return sum + en.ot * hourlyRate * rate;
-  }, 0);
-
-  const otMealPay = settings.otMeal * otMealDays;
-
-  const hasDisqualification = absentDays > 0 || unpaidLeaveDays > 0 || (settings.leaveCounts === 'yes' && paidLeaveDays > 0);
-  const qualifiesForBonus = !hasDisqualification && monthEntries.length > 0;
-  const bonusPay = qualifiesForBonus ? settings.bonus : 0;
-
-  const lateDeduction = lateDeductedHours * hourlyRate;
-  const ssoDeduction = settings.sso !== undefined ? settings.sso : 875;
-
-  const grossPay = basePay + offDayBonus + allowancePay + otPay + otMealPay + bonusPay;
-  const totalDeductions = lateDeduction + ssoDeduction;
-  const netTotal = Math.max(0, grossPay - totalDeductions);
-
-  currentPayrollData = {
-    payableDays,
-    actualWorkedDays,
-    offDayWorkedDays,
-    basePay,
-    offDayBonus,
-    allowancePay,
-    otPay,
-    totalOtHours,
-    otMealPay,
-    otMealDays,
-    bonusPay,
-    lateOccurrences,
-    lateDeductedHours,
-    lateDeduction,
-    ssoDeduction,
-    grossPay,
-    totalDeductions,
-    netTotal
-  };
-
-  // Update Summary UI
-  document.getElementById('sum_worked').textContent = actualWorkedDays + ' วัน';
-  document.getElementById('sum_paidLeave').textContent = paidLeaveDays + ' วัน';
-  document.getElementById('sum_unpaidLeave').textContent = unpaidLeaveDays + ' / ' + absentDays + ' วัน';
-  document.getElementById('sum_dailyHourly').textContent = `${fmtBaht(dailyRate)} / ฿${Math.round(hourlyRate)}`;
-  document.getElementById('sum_base').textContent = fmtBaht(basePay);
-  document.getElementById('sum_offDayCount').textContent = offDayWorkedDays;
-  document.getElementById('sum_offDayBonus').textContent = fmtBaht(offDayBonus);
-  document.getElementById('sum_allowance').textContent = fmtBaht(allowancePay);
-  document.getElementById('sum_otHours').textContent = totalOtHours;
-  document.getElementById('sum_ot').textContent = fmtBaht(otPay);
-  document.getElementById('sum_otMealDays').textContent = otMealDays;
-  document.getElementById('sum_otMeal').textContent = fmtBaht(otMealPay);
-  document.getElementById('sum_bonus').textContent = fmtBaht(bonusPay);
-  
-  document.getElementById('sum_lateCount').textContent = lateOccurrences;
-  document.getElementById('sum_lateHours').textContent = lateDeductedHours;
-  document.getElementById('sum_lateDeduct').textContent = '-' + fmtBaht(lateDeduction);
-  document.getElementById('sum_ssoDeduct').textContent = '-' + fmtBaht(ssoDeduction);
-  document.getElementById('sum_total').textContent = fmtBaht(netTotal);
-
-  const stampWrap = document.getElementById('stampWrap');
-  if(monthEntries.length === 0){
-    stampWrap.innerHTML = '';
-  } else if(qualifiesForBonus){
-    stampWrap.innerHTML = '<div class="stamp">ไม่ขาดงาน<br>รับโบนัส</div>';
-  } else {
-    stampWrap.innerHTML = '<div class="stamp broken">พลาดโบนัส<br>เดือนนี้</div>';
+  function backupData() {
+    const data = {
+      user: currentUserEmail,
+      settings,
+      entries,
+      exportedAt: new Date().toISOString(),
+      version: '3.0-firebase'
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `salary_backup_${currentUserEmail.split('@')[0]}_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
-  // Tax Projection
-  const estimatedAnnualGross = grossPay > 0 ? (grossPay * 12) : (settings.salary * 12);
-  const annualSSO = ssoDeduction * 12;
-  const taxResult = calculatePIT(estimatedAnnualGross, annualSSO);
+  function triggerRestore() {
+    document.getElementById('restoreFileInput').click();
+  }
 
-  document.getElementById('tax_annualGross').textContent = fmtBaht(estimatedAnnualGross);
-  document.getElementById('tax_expense').textContent = fmtBaht(taxResult.expense);
-  document.getElementById('tax_allowance').textContent = fmtBaht(taxResult.totalAllowance);
-  document.getElementById('tax_netTaxable').textContent = fmtBaht(taxResult.netTaxable);
-  document.getElementById('tax_annualTotal').textContent = fmtBaht(taxResult.annualTax);
-  document.getElementById('tax_monthlyWithhold').textContent = fmtBaht(taxResult.monthlyWithhold);
-}
+  function restoreData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (data.settings) settings = Object.assign(settings, data.settings);
+        if (data.entries && Array.isArray(data.entries)) entries = data.entries;
+        
+        if (currentUserUID) {
+          const userRef = doc(db, "users", currentUserUID);
+          await setDoc(userRef, { settings, entries, updatedAt: new Date().toISOString() }, { merge: true });
+        }
 
-// Start application
-initAuth();
+        fillSettingsForm();
+        updateSettingsUI();
+        render();
+        alert('นำเข้าข้อมูลสำเร็จเรียบร้อยแล้ว');
+      } catch (err) {
+        alert('ไฟล์ไม่ถูกต้อง หรือโครงสร้างข้อมูลผิดพลาด');
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  }
+
+  function exportMonthlyCSV() {
+    const y = viewDate.getFullYear();
+    const m = viewDate.getMonth();
+    const monthEntries = entries.filter(en => {
+      const d = new Date(en.date+'T00:00:00');
+      return d.getFullYear() === y && d.getMonth() === m;
+    }).sort((a, b) => a.date.localeCompare(b.date));
+
+    if (monthEntries.length === 0) {
+      alert('ไม่มีข้อมูลรายการในเดือนนี้');
+      return;
+    }
+
+    let csv = 'วันที่,วันในสัปดาห์,สถานะ,ชั่วโมง OT,มาสาย (นาที)\n';
+    monthEntries.forEach(en => {
+      const d = new Date(en.date+'T00:00:00');
+      const dayName = dayNamesTh[d.getDay()];
+      const stName = statusLabel[en.status] || en.status;
+      csv += `"${en.date}","${dayName}","${stName}",${en.ot || 0},${en.late || 0}\n`;
+    });
+
+    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `attendance_${currentUserEmail.split('@')[0]}_${thMonths[m]}_${y+543}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function openPayslipModal() {
+    if (!currentPayrollData) {
+      alert('ไม่พบข้อมูลเงินเดือนของเดือนนี้');
+      return;
+    }
+    const p = currentPayrollData;
+    const y = viewDate.getFullYear();
+    const m = viewDate.getMonth();
+
+    document.getElementById('ps_period').textContent = `ประจำงวด: ${thMonths[m]} ${y+543}`;
+    document.getElementById('ps_name').textContent = settings.name || currentUserEmail.split('@')[0];
+    document.getElementById('ps_position').textContent = settings.position || 'พนักงานทั่วไป';
+    document.getElementById('ps_salary').textContent = Number(settings.salary).toLocaleString('th-TH');
+    document.getElementById('ps_days_worked').textContent = p.payableDays;
+
+    let incomeHtml = `
+      <tr><td>เงินเดือนตามวันทำงาน (${p.payableDays} วัน)</td><td class="right">${fmtBaht(p.basePay)}</td></tr>
+    `;
+    if (p.offDayBonus > 0) incomeHtml += `<tr><td>โบนัสวันหยุด (${p.offDayWorkedDays} วัน)</td><td class="right">${fmtBaht(p.offDayBonus)}</td></tr>`;
+    if (p.otPay > 0) incomeHtml += `<tr><td>ค่าล่วงเวลา / OT (${p.totalOtHours} ชม.)</td><td class="right">${fmtBaht(p.otPay)}</td></tr>`;
+    if (p.allowancePay > 0) incomeHtml += `<tr><td>ค่าเดินทาง & ค่าเช่าบ้าน</td><td class="right">${fmtBaht(p.allowancePay)}</td></tr>`;
+    if (p.otMealPay > 0) incomeHtml += `<tr><td>ค่าอาหาร OT (${p.otMealDays} วัน)</td><td class="right">${fmtBaht(p.otMealPay)}</td></tr>`;
+    if (p.bonusPay > 0) incomeHtml += `<tr><td>เบี้ยขยัน / ไม่ขาดงาน</td><td class="right">${fmtBaht(p.bonusPay)}</td></tr>`;
+    document.getElementById('ps_income_rows').innerHTML = incomeHtml;
+
+    let deductHtml = '';
+    if (p.lateDeduction > 0) deductHtml += `<tr><td>หักมาสาย (${p.lateOccurrences} ครั้ง / ${p.lateDeductedHours} ชม.)</td><td class="right">-${fmtBaht(p.lateDeduction)}</td></tr>`;
+    if (p.ssoDeduction > 0) deductHtml += `<tr><td>หักประกันสังคม</td><td class="right">-${fmtBaht(p.ssoDeduction)}</td></tr>`;
+    if (!deductHtml) deductHtml = `<tr><td>ไม่มีรายการหัก</td><td class="right">฿0</td></tr>`;
+    document.getElementById('ps_deduct_rows').innerHTML = deductHtml;
+
+    document.getElementById('ps_gross').textContent = fmtBaht(p.grossPay);
+    document.getElementById('ps_total_deduct').textContent = '-' + fmtBaht(p.totalDeductions);
+    document.getElementById('ps_net').textContent = fmtBaht(p.netTotal);
+
+    document.getElementById('payslipModal').classList.add('open');
+  }
+
+  function closePayslipModal() {
+    document.getElementById('payslipModal').classList.remove('open');
+  }
+
+  function handlePayslipOverlayClick(e) {
+    if (e.target.id === 'payslipModal') closePayslipModal();
+  }
+
+  function render() {
+    const y = viewDate.getFullYear();
+    const m = viewDate.getMonth();
+    document.getElementById('monthLabel').textContent = thMonths[m] + ' ' + (y + 543);
+
+    const monthEntries = entries.filter(en => {
+      const d = new Date(en.date+'T00:00:00');
+      return d.getFullYear() === y && d.getMonth() === m;
+    });
+
+    const yearEntries = entries.filter(en => {
+      const d = new Date(en.date+'T00:00:00');
+      return d.getFullYear() === y;
+    });
+
+    const entryMap = {};
+    monthEntries.forEach(en => { entryMap[en.date] = en; });
+
+    const usedSick = yearEntries.filter(e => e.status === 'leave_sick').length;
+    const usedBiz = yearEntries.filter(e => e.status === 'leave_business').length;
+    const usedVac = yearEntries.filter(e => e.status === 'leave_annual').length;
+
+    const qSick = settings.quotaSick || 30;
+    const qBiz = settings.quotaBusiness || 3;
+    const qVac = settings.quotaAnnual || 6;
+
+    document.getElementById('quota_sick_display').textContent = `${usedSick} / ${qSick} วัน`;
+    document.getElementById('quota_sick_remain').textContent = `คงเหลือ ${Math.max(0, qSick - usedSick)} วัน`;
+    document.getElementById('quota_biz_display').textContent = `${usedBiz} / ${qBiz} วัน`;
+    document.getElementById('quota_biz_remain').textContent = `คงเหลือ ${Math.max(0, qBiz - usedBiz)} วัน`;
+    document.getElementById('quota_vac_display').textContent = `${usedVac} / ${qVac} วัน`;
+    document.getElementById('quota_vac_remain').textContent = `คงเหลือ ${Math.max(0, qVac - usedVac)} วัน`;
+
+    const calGrid = document.getElementById('calendarGrid');
+    calGrid.innerHTML = '';
+
+    const firstDayIndex = new Date(y, m, 1).getDay();
+    const totalDaysInMonth = new Date(y, m + 1, 0).getDate();
+
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+    for (let i = 0; i < firstDayIndex; i++) {
+      const empty = document.createElement('div');
+      empty.className = 'cal-cell empty';
+      calGrid.appendChild(empty);
+    }
+
+    for (let day = 1; day <= totalDaysInMonth; day++) {
+      const dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const dayObj = new Date(y, m, day);
+      const dow = dayObj.getDay();
+      const isOff = dow === settings.offDay;
+      const isToday = (dStr === todayStr);
+
+      const cell = document.createElement('div');
+      cell.className = `cal-cell ${isOff ? 'is-offday' : ''} ${isToday ? 'is-today' : ''}`;
+      cell.onclick = () => openModal(dStr);
+
+      let cellInner = `<div class="day-num">${day}</div><div class="cell-content">`;
+
+      if (entryMap[dStr]) {
+        const en = entryMap[dStr];
+        cellInner += `<span class="badge ${statusBadgeClass[en.status] || 'badge-work'}">${statusLabel[en.status] || 'ทำงาน'}</span>`;
+        
+        let tagRow = '';
+        if (en.ot > 0) tagRow += `<span class="ot-tag">+${en.ot}h</span>`;
+        if (en.late > 0) tagRow += `<span class="late-tag">สาย ${en.late}น.</span>`;
+        if (tagRow) cellInner += `<div class="tag-row">${tagRow}</div>`;
+      }
+      cellInner += `</div>`;
+      cell.innerHTML = cellInner;
+      calGrid.appendChild(cell);
+    }
+
+    const workedDays = monthEntries.filter(en => en.status === 'work').length;
+    const offDayWorkedDays = monthEntries.filter(en => en.status === 'offday_work').length;
+    const actualWorkedDays = workedDays + offDayWorkedDays;
+
+    const paidLeaveDays = monthEntries.filter(en => ['leave_sick','leave_business','leave_annual'].includes(en.status)).length;
+    const unpaidLeaveDays = monthEntries.filter(en => en.status === 'leave_unpaid').length;
+    const absentDays = monthEntries.filter(en => en.status === 'absent').length;
+
+    const totalOtHours = monthEntries.reduce((sum, en) => sum + (en.ot || 0), 0);
+    const otMealDays = monthEntries.filter(en => (en.ot || 0) > 0).length;
+
+    const lateEntries = monthEntries.filter(en => (en.late || 0) > 1);
+    const lateOccurrences = lateEntries.length;
+    const lateDeductedHours = lateOccurrences * 1;
+
+    const dailyRate = settings.salary > 0 ? (settings.salary / 31) : 0;
+    const hourlyRate = settings.hours > 0 ? (dailyRate / settings.hours) : 0;
+
+    const payableDays = actualWorkedDays + paidLeaveDays;
+    const basePay = dailyRate * payableDays;
+    const offDayBonus = dailyRate * offDayWorkedDays;
+    const allowancePay = (settings.travel + settings.housing) * actualWorkedDays;
+
+    const otPay = monthEntries.reduce((sum, en) => {
+      if (!en.ot) return sum;
+      const rate = en.status === 'offday_work' ? settings.offDayOt : settings.ot;
+      return sum + en.ot * hourlyRate * rate;
+    }, 0);
+
+    const otMealPay = settings.otMeal * otMealDays;
+
+    const hasDisqualification = absentDays > 0 || unpaidLeaveDays > 0 || (settings.leaveCounts === 'yes' && paidLeaveDays > 0);
+    const qualifiesForBonus = !hasDisqualification && monthEntries.length > 0;
+    const bonusPay = qualifiesForBonus ? settings.bonus : 0;
+
+    const lateDeduction = lateDeductedHours * hourlyRate;
+    const ssoDeduction = settings.sso !== undefined ? settings.sso : 875;
+
+    const grossPay = basePay + offDayBonus + allowancePay + otPay + otMealPay + bonusPay;
+    const totalDeductions = lateDeduction + ssoDeduction;
+    const netTotal = Math.max(0, grossPay - totalDeductions);
+
+    currentPayrollData = {
+      payableDays,
+      actualWorkedDays,
+      offDayWorkedDays,
+      basePay,
+      offDayBonus,
+      allowancePay,
+      otPay,
+      totalOtHours,
+      otMealPay,
+      otMealDays,
+      bonusPay,
+      lateOccurrences,
+      lateDeductedHours,
+      lateDeduction,
+      ssoDeduction,
+      grossPay,
+      totalDeductions,
+      netTotal
+    };
+
+    document.getElementById('sum_worked').textContent = actualWorkedDays + ' วัน';
+    document.getElementById('sum_paidLeave').textContent = paidLeaveDays + ' วัน';
+    document.getElementById('sum_unpaidLeave').textContent = unpaidLeaveDays + ' / ' + absentDays + ' วัน';
+    document.getElementById('sum_dailyHourly').textContent = `${fmtBaht(dailyRate)} / ฿${Math.round(hourlyRate)}`;
+    document.getElementById('sum_base').textContent = fmtBaht(basePay);
+    document.getElementById('sum_offDayCount').textContent = offDayWorkedDays;
+    document.getElementById('sum_offDayBonus').textContent = fmtBaht(offDayBonus);
+    document.getElementById('sum_allowance').textContent = fmtBaht(allowancePay);
+    document.getElementById('sum_otHours').textContent = totalOtHours;
+    document.getElementById('sum_ot').textContent = fmtBaht(otPay);
+    document.getElementById('sum_otMealDays').textContent = otMealDays;
+    document.getElementById('sum_otMeal').textContent = fmtBaht(otMealPay);
+    document.getElementById('sum_bonus').textContent = fmtBaht(bonusPay);
+    
+    document.getElementById('sum_lateCount').textContent = lateOccurrences;
+    document.getElementById('sum_lateHours').textContent = lateDeductedHours;
+    document.getElementById('sum_lateDeduct').textContent = '-' + fmtBaht(lateDeduction);
+    document.getElementById('sum_ssoDeduct').textContent = '-' + fmtBaht(ssoDeduction);
+    document.getElementById('sum_total').textContent = fmtBaht(netTotal);
+
+    const stampWrap = document.getElementById('stampWrap');
+    if (monthEntries.length === 0) {
+      stampWrap.innerHTML = '';
+    } else if (qualifiesForBonus) {
+      stampWrap.innerHTML = '<div class="stamp">ไม่ขาดงาน<br>รับโบนัส</div>';
+    } else {
+      stampWrap.innerHTML = '<div class="stamp broken">พลาดโบนัส<br>เดือนนี้</div>';
+    }
+
+    const estimatedAnnualGross = grossPay > 0 ? (grossPay * 12) : (settings.salary * 12);
+    const annualSSO = ssoDeduction * 12;
+    const taxResult = calculatePIT(estimatedAnnualGross, annualSSO);
+
+    document.getElementById('tax_annualGross').textContent = fmtBaht(estimatedAnnualGross);
+    document.getElementById('tax_expense').textContent = fmtBaht(taxResult.expense);
+    document.getElementById('tax_allowance').textContent = fmtBaht(taxResult.totalAllowance);
+    document.getElementById('tax_netTaxable').textContent = fmtBaht(taxResult.netTaxable);
+    document.getElementById('tax_annualTotal').textContent = fmtBaht(taxResult.annualTax);
+    document.getElementById('tax_monthlyWithhold').textContent = fmtBaht(taxResult.monthlyWithhold);
+  }
+
+  window.toggleSettings = toggleSettings;
+  window.saveSettings = saveSettings;
+  window.shiftMonth = shiftMonth;
+  window.openModal = openModal;
+  window.closeModal = closeModal;
+  window.saveModalEntry = saveModalEntry;
+  window.deleteModalEntry = deleteModalEntry;
+  window.updateModalLeaveHint = updateModalLeaveHint;
+  window.handleModalOverlayClick = handleModalOverlayClick;
+  window.openPayslipModal = openPayslipModal;
+  window.closePayslipModal = closePayslipModal;
+  window.handlePayslipOverlayClick = handlePayslipOverlayClick;
+  window.exportMonthlyCSV = exportMonthlyCSV;
+  window.backupData = backupData;
+  window.triggerRestore = triggerRestore;
+  window.restoreData = restoreData;
+  window.switchAuthTab = switchAuthTab;
+  window.handleLoginSubmit = handleLoginSubmit;
+  window.handleRegisterSubmit = handleRegisterSubmit;
+  window.handleForgotPassword = handleForgotPassword;
+  window.handleLogout = handleLogout;
 </script>
 
 </body>
