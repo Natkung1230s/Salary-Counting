@@ -195,7 +195,7 @@
   }
   input[type="number"],input[type="password"]{font-family:'IBM Plex Mono',monospace;}
 
-  /* IMPROVED TAX FIELD & TIP BOX DESIGN */
+  /* TAX FIELD & TIP BOX DESIGN */
   .tax-field-group{
     display:flex;
     flex-direction:column;
@@ -406,7 +406,7 @@
   }
   .stamp.broken{border-color:var(--red);color:var(--red);}
 
-  /* TAX RESULT DASHBOARD CARD (REFINED) */
+  /* TAX RESULT DASHBOARD CARD */
   .tax-dashboard{
     background:linear-gradient(140deg, #1A2430 0%, #253344 100%);
     color:#F1E9D2;
@@ -641,9 +641,7 @@
     <button class="tab-btn" id="btnTabTax" onclick="switchMainTab('tax')">📊 ระบบคำนวณ & วางแผนภาษี (PIT)</button>
   </div>
 
-  <!-- ================================================================= -->
-  <!-- CATEGORY 1: ATTENDANCE & PAYROLL PAGE                             -->
-  <!-- ================================================================= -->
+  <!-- CATEGORY 1: ATTENDANCE & PAYROLL PAGE -->
   <div id="attendanceView">
     <!-- DATA & ACTIONS TOOLBAR -->
     <div class="toolbar">
@@ -688,7 +686,7 @@
           </div>
 
           <div class="section-divider">🏖️ สิทธิ์วันลาประจำปีตามกฎหมาย (วัน/ปี)</div>
-          <div><label>สิทธิ์ลาป่วย (ได้รับค่าจ้าง)</label><input id="s_quota_sick" type="number" min="0" step="1" placeholder="เช่น 30"></div>
+          <div><label>สิทธิ์ลาป่วย</label><input id="s_quota_sick" type="number" min="0" step="1" placeholder="เช่น 30"></div>
           <div><label>สิทธิ์ลากิจ (ได้รับค่าจ้าง)</label><input id="s_quota_biz" type="number" min="0" step="1" placeholder="เช่น 3"></div>
           <div><label>สิทธิ์ลาพักร้อน (ได้รับค่าจ้าง)</label><input id="s_quota_annual" type="number" min="0" step="1" placeholder="เช่น 6"></div>
 
@@ -759,22 +757,24 @@
     <!-- SUMMARY PAYROLL -->
     <section class="card" id="summaryCard">
       <h2>สรุปเงินเดือนประจำเดือน</h2>
-      <p class="hint">คำนวณตามจริงรายวัน (ฐานเงินเดือน ÷ 30 วัน) พร้อมรายการหักสายและประกันสังคม</p>
+      <p class="hint">คำนวณยอดสุทธิ: (เงินเดือน + สวัสดิการ) - (จำนวนวันลาป่วย × (เงินเดือน ÷ 30)) - รายการหักอื่นๆ</p>
       <div class="stamp-wrap" id="stampWrap"></div>
       
       <div class="summary-grid">
         <div class="stat"><div class="k">วันมาทำงานจริง</div><div class="v" id="sum_worked">0 วัน</div></div>
-        <div class="stat"><div class="k">วันลาตามสิทธิ์</div><div class="v" id="sum_paidLeave">0 วัน</div></div>
+        <div class="stat"><div class="k">วันลาป่วย</div><div class="v" id="sum_sickLeave">0 วัน</div></div>
+        <div class="stat"><div class="k">วันลาตามสิทธิ์อื่น</div><div class="v" id="sum_paidLeave">0 วัน</div></div>
         <div class="stat"><div class="k">ลาไม่รับเงิน/ขาด</div><div class="v" id="sum_unpaidLeave">0 / 0 วัน</div></div>
         <div class="stat"><div class="k">ค่าแรง/วัน & ชม.</div><div class="v" id="sum_dailyHourly">฿0 / ฿0</div></div>
         
-        <div class="stat"><div class="k">เงินเดือนตามวันทำงาน</div><div class="v" id="sum_base">฿0</div></div>
+        <div class="stat"><div class="k">เงินเดือนฐานประจำเดือน</div><div class="v" id="sum_base">฿0</div></div>
         <div class="stat"><div class="k">โบนัสวันหยุด (<span id="sum_offDayCount">0</span>ว.)</div><div class="v" id="sum_offDayBonus">฿0</div></div>
         <div class="stat"><div class="k">ค่าเดินทาง & เช่าบ้าน</div><div class="v" id="sum_allowance">฿0</div></div>
         <div class="stat"><div class="k">ค่าโอที (<span id="sum_otHours">0</span>ชม.)</div><div class="v" id="sum_ot">฿0</div></div>
         <div class="stat"><div class="k">ค่าอาหาร OT (<span id="sum_otMealDays">0</span>ว.)</div><div class="v" id="sum_otMeal">฿0</div></div>
         <div class="stat"><div class="k">โบนัสไม่ขาดงาน</div><div class="v" id="sum_bonus">฿0</div></div>
 
+        <div class="stat deduct"><div class="k">หักลาป่วย (<span id="sum_sickCount">0</span>วัน)</div><div class="v" id="sum_sickDeduct">-฿0</div></div>
         <div class="stat deduct"><div class="k">หักสาย (<span id="sum_lateCount">0</span>ครั้ง/<span id="sum_lateHours">0</span>ชม.)</div><div class="v" id="sum_lateDeduct">-฿0</div></div>
         <div class="stat deduct"><div class="k">หักประกันสังคม</div><div class="v" id="sum_ssoDeduct">-฿0</div></div>
 
@@ -783,9 +783,7 @@
     </section>
   </div>
 
-  <!-- ================================================================= -->
-  <!-- CATEGORY 2: DEDICATED TAX PLANNING & DEDUCTION PAGE (PIT)         -->
-  <!-- ================================================================= -->
+  <!-- CATEGORY 2: DEDICATED TAX PLANNING & DEDUCTION PAGE (PIT) -->
   <div id="taxView" style="display:none;">
     
     <!-- TAX SUMMARY DASHBOARD -->
@@ -826,7 +824,7 @@
       </div>
     </div>
 
-    <!-- TAX INPUT FORM (4 MAIN CATEGORIES WITH DETAILED TIPS) -->
+    <!-- TAX INPUT FORM -->
     <section class="card">
       
       <!-- หมวดที่ 1: รายได้พึงประเมิน & ลดหย่อนส่วนตัวและครอบครัว -->
@@ -1083,7 +1081,7 @@
       <select id="modalStatus" onchange="updateModalLeaveHint()">
         <option value="work">มาทำงานปกติ</option>
         <option value="offday_work">มาทำงานวันหยุดประจำสัปดาห์ (โบนัส 1 เท่า + OT 3 เท่า)</option>
-        <option value="leave_sick">ลาป่วย (ได้รับค่าจ้าง)</option>
+        <option value="leave_sick">ลาป่วย</option>
         <option value="leave_business">ลากิจ (ได้รับค่าจ้าง)</option>
         <option value="leave_annual">ลาพักร้อน (ได้รับค่าจ้าง)</option>
         <option value="leave_unpaid">ลาไม่รับค่าจ้าง (Unpaid Leave)</option>
@@ -1135,7 +1133,7 @@
           <div><strong>ชื่อพนักงาน:</strong> <span id="ps_name">-</span></div>
           <div><strong>ตำแหน่ง:</strong> <span id="ps_position">-</span></div>
           <div><strong>เงินเดือนฐาน:</strong> <span id="ps_salary">-</span> บาท</div>
-          <div><strong>วันทำงาน/วันลาที่จ่าย:</strong> <span id="ps_days_worked">-</span> วัน</div>
+          <div><strong>วันทำงาน/วันลาตามสิทธิ์:</strong> <span id="ps_days_worked">-</span> วัน</div>
         </div>
 
         <table class="ps-table">
@@ -1250,7 +1248,13 @@
     absent: 'badge-absent', holiday: 'badge-holiday'
   };
 
-  // SWITCH MAIN TABS
+  function getNumInput(id, defaultValue = 0) {
+    const el = document.getElementById(id);
+    if (!el || el.value.trim() === '') return defaultValue;
+    const val = parseFloat(el.value);
+    return isNaN(val) ? defaultValue : val;
+  }
+
   function switchMainTab(tab) {
     document.getElementById('btnTabAttendance').classList.toggle('active', tab === 'attendance');
     document.getElementById('btnTabTax').classList.toggle('active', tab === 'tax');
@@ -1268,7 +1272,7 @@
       document.getElementById('userBadgeWrap').style.display = 'flex';
 
       const shortName = user.email.split('@')[0];
-      document.getElementById('hdr_userName').textContent = shortName;
+      document.getElementById('hdr_userName').textContent = settings.name || shortName;
       document.getElementById('hdr_userRole').textContent = user.email;
 
       await loadCloudUserData(user.uid);
@@ -1307,20 +1311,20 @@
     settings = {
       name: document.getElementById('s_name').value.trim(),
       position: document.getElementById('s_position').value.trim(),
-      salary: parseFloat(document.getElementById('s_salary').value) || 0,
-      hours: parseFloat(document.getElementById('s_hours').value) || 8,
-      ot: parseFloat(document.getElementById('s_ot').value) || 1.5,
-      bonus: parseFloat(document.getElementById('s_bonus').value) || 0,
-      sso: parseFloat(document.getElementById('s_sso').value) || 0,
+      salary: getNumInput('s_salary', 0),
+      hours: getNumInput('s_hours', 8),
+      ot: getNumInput('s_ot', 1.5),
+      bonus: getNumInput('s_bonus', 0),
+      sso: getNumInput('s_sso', 750),
       leaveCounts: document.getElementById('s_leaveCounts').value,
-      quotaSick: parseFloat(document.getElementById('s_quota_sick').value) || 0,
-      quotaBusiness: parseFloat(document.getElementById('s_quota_biz').value) || 0,
-      quotaAnnual: parseFloat(document.getElementById('s_quota_annual').value) || 0,
-      travel: parseFloat(document.getElementById('s_travel').value) || 0,
-      housing: parseFloat(document.getElementById('s_housing').value) || 0,
-      otMeal: parseFloat(document.getElementById('s_otMeal').value) || 0,
+      quotaSick: getNumInput('s_quota_sick', 30),
+      quotaBusiness: getNumInput('s_quota_biz', 3),
+      quotaAnnual: getNumInput('s_quota_annual', 6),
+      travel: getNumInput('s_travel', 0),
+      housing: getNumInput('s_housing', 0),
+      otMeal: getNumInput('s_otMeal', 0),
       offDay: parseInt(document.getElementById('s_offDay').value, 10),
-      offDayOt: parseFloat(document.getElementById('s_offDayOt').value) || 3,
+      offDayOt: getNumInput('s_offDayOt', 3),
     };
 
     try {
@@ -1328,8 +1332,8 @@
       await setDoc(userRef, { settings, updatedAt: new Date().toISOString() }, { merge: true });
       document.getElementById('hdr_userName').textContent = settings.name || currentUserEmail.split('@')[0];
       const msg = document.getElementById('saveMsg');
-      msg.style.opacity = 1;
-      setTimeout(() => msg.style.opacity = 0, 1600);
+      msg.style.opacity = '1';
+      setTimeout(() => msg.style.opacity = '0', 1600);
     } catch (e) {
       alert("บันทึกข้อมูลไม่สำเร็จ: " + e.message);
     }
@@ -1338,10 +1342,9 @@
     render();
   }
 
-  // COMPREHENSIVE PIT TAX CALCULATION FUNCTION
   function calculateFullTax() {
-    const income = parseFloat(document.getElementById('t_income').value) || (settings.salary * 12);
-    const withheld = parseFloat(document.getElementById('t_withheld').value) || 0;
+    const income = getNumInput('t_income', settings.salary * 12);
+    const withheld = getNumInput('t_withheld', 0);
     
     // 1. Expense Deduction (50% max 100,000)
     const expense = Math.min(income * 0.5, 100000);
@@ -1349,33 +1352,33 @@
     // 2. Category 1 Deductions
     const personal = 60000;
     const spouse = parseFloat(document.getElementById('t_spouse').value) || 0;
-    const childrenCount = parseFloat(document.getElementById('t_children').value) || 0;
+    const childrenCount = getNumInput('t_children', 0);
     const childrenDeduction = childrenCount * 30000;
-    const parentsCount = Math.min(parseFloat(document.getElementById('t_parents').value) || 0, 4);
+    const parentsCount = Math.min(getNumInput('t_parents', 0), 4);
     const parentsDeduction = parentsCount * 30000;
-    const disabledCount = parseFloat(document.getElementById('t_disabled').value) || 0;
+    const disabledCount = getNumInput('t_disabled', 0);
     const disabledDeduction = disabledCount * 60000;
 
     // 3. Category 2 Deductions
-    const sso = Math.min(parseFloat(document.getElementById('t_sso').value) || (settings.sso * 12), 9000);
-    const lifeIns = Math.min(parseFloat(document.getElementById('t_lifeIns').value) || 0, 100000);
-    const healthIns = Math.min(parseFloat(document.getElementById('t_healthIns').value) || 0, 25000);
+    const sso = Math.min(getNumInput('t_sso', settings.sso * 12), 9000);
+    const lifeIns = Math.min(getNumInput('t_lifeIns', 0), 100000);
+    const healthIns = Math.min(getNumInput('t_healthIns', 0), 25000);
     const combinedLifeHealth = Math.min(lifeIns + healthIns, 100000);
 
-    const parentsHealth = Math.min(parseFloat(document.getElementById('t_parentsHealth').value) || 0, 15000);
-    const pvd = Math.min(parseFloat(document.getElementById('t_pvd').value) || 0, income * 0.15);
-    const rmf = Math.min(parseFloat(document.getElementById('t_rmf').value) || 0, income * 0.30);
-    const ssf = Math.min(parseFloat(document.getElementById('t_ssf').value) || 0, income * 0.30);
-    const pensionIns = Math.min(parseFloat(document.getElementById('t_pensionIns').value) || 0, income * 0.15, 200000);
+    const parentsHealth = Math.min(getNumInput('t_parentsHealth', 0), 15000);
+    const pvd = Math.min(getNumInput('t_pvd', 0), income * 0.15);
+    const rmf = Math.min(getNumInput('t_rmf', 0), income * 0.30);
+    const ssf = Math.min(getNumInput('t_ssf', 0), income * 0.30);
+    const pensionIns = Math.min(getNumInput('t_pensionIns', 0), income * 0.15, 200000);
 
     // 4. Category 3 Deductions
-    const homeLoan = Math.min(parseFloat(document.getElementById('t_homeLoan').value) || 0, 100000);
-    const donateGeneral = parseFloat(document.getElementById('t_donateGeneral').value) || 0;
-    const donateEdu = (parseFloat(document.getElementById('t_donateEdu').value) || 0) * 2;
-    const donatePolitical = Math.min(parseFloat(document.getElementById('t_donatePolitical').value) || 0, 10000);
+    const homeLoan = Math.min(getNumInput('t_homeLoan', 0), 100000);
+    const donateGeneral = getNumInput('t_donateGeneral', 0);
+    const donateEdu = getNumInput('t_donateEdu', 0) * 2;
+    const donatePolitical = Math.min(getNumInput('t_donatePolitical', 0), 10000);
 
     // 5. Category 4 Deductions
-    const easyReceipt = Math.min(parseFloat(document.getElementById('t_easyReceipt').value) || 0, 50000);
+    const easyReceipt = Math.min(getNumInput('t_easyReceipt', 0), 50000);
 
     // Total Deductions Before Donations
     const baseDeductions = personal + spouse + childrenDeduction + parentsDeduction + disabledDeduction
@@ -1615,7 +1618,7 @@
     const status = document.getElementById('modalStatus').value;
     const hintEl = document.getElementById('modalLeaveHint');
     const y = viewDate.getFullYear();
-    const yearEntries = entries.filter(en => new Date(en.date+'T00:00:00').getFullYear() === y);
+    const yearEntries = entries.filter(en => en.date && parseInt(en.date.split('-')[0], 10) === y);
 
     if (status === 'leave_sick') {
       const used = yearEntries.filter(e => e.status === 'leave_sick').length;
@@ -1637,8 +1640,8 @@
   async function saveModalEntry() {
     const date = document.getElementById('modalDate').value;
     const status = document.getElementById('modalStatus').value;
-    const ot = parseFloat(document.getElementById('modalOt').value) || 0;
-    const late = parseFloat(document.getElementById('modalLate').value) || 0;
+    const ot = getNumInput('modalOt', 0);
+    const late = getNumInput('modalLate', 0);
 
     entries = entries.filter(e => e.date !== date);
     entries.push({ date, status, ot, late });
@@ -1695,8 +1698,9 @@
     const y = viewDate.getFullYear();
     const m = viewDate.getMonth();
     const monthEntries = entries.filter(en => {
-      const d = new Date(en.date+'T00:00:00');
-      return d.getFullYear() === y && d.getMonth() === m;
+      if (!en.date) return false;
+      const p = en.date.split('-');
+      return parseInt(p[0], 10) === y && (parseInt(p[1], 10) - 1) === m;
     });
 
     let csv = 'วันที่,สถานะ,ชั่วโมง OT,มาสาย (นาที)\n';
@@ -1724,7 +1728,7 @@
     document.getElementById('ps_salary').textContent = Number(settings.salary).toLocaleString('th-TH');
     document.getElementById('ps_days_worked').textContent = p.payableDays;
 
-    let incomeHtml = `<tr><td>เงินเดือนตามวันทำงาน (${p.payableDays} วัน)</td><td class="right">${fmtBaht(p.basePay)}</td></tr>`;
+    let incomeHtml = `<tr><td>เงินเดือนฐานประจำเดือน</td><td class="right">${fmtBaht(p.basePay)}</td></tr>`;
     if (p.offDayBonus > 0) incomeHtml += `<tr><td>โบนัสวันหยุด (${p.offDayWorkedDays} วัน)</td><td class="right">${fmtBaht(p.offDayBonus)}</td></tr>`;
     if (p.otPay > 0) incomeHtml += `<tr><td>ค่าล่วงเวลา / OT (${p.totalOtHours} ชม.)</td><td class="right">${fmtBaht(p.otPay)}</td></tr>`;
     if (p.allowancePay > 0) incomeHtml += `<tr><td>ค่าเดินทาง & ค่าเช่าบ้าน</td><td class="right">${fmtBaht(p.allowancePay)}</td></tr>`;
@@ -1732,6 +1736,8 @@
     document.getElementById('ps_income_rows').innerHTML = incomeHtml;
 
     let deductHtml = '';
+    if (p.sickDeduction > 0) deductHtml += `<tr><td>หักวันลาป่วย (${p.sickLeaveDays} วัน)</td><td class="right">-${fmtBaht(p.sickDeduction)}</td></tr>`;
+    if (p.unpaidDeduction > 0) deductHtml += `<tr><td>หักลาไม่รับเงิน/ขาดงาน</td><td class="right">-${fmtBaht(p.unpaidDeduction)}</td></tr>`;
     if (p.lateDeduction > 0) deductHtml += `<tr><td>หักมาสาย</td><td class="right">-${fmtBaht(p.lateDeduction)}</td></tr>`;
     if (p.ssoDeduction > 0) deductHtml += `<tr><td>หักประกันสังคม</td><td class="right">-${fmtBaht(p.ssoDeduction)}</td></tr>`;
     document.getElementById('ps_deduct_rows').innerHTML = deductHtml || `<tr><td>ไม่มีรายการหัก</td><td class="right">฿0</td></tr>`;
@@ -1751,9 +1757,30 @@
     const m = viewDate.getMonth();
     document.getElementById('monthLabel').textContent = thMonths[m] + ' ' + (y + 543);
 
+    // Timezone-safe Annual Quota Tracker calculation
+    const yearEntries = entries.filter(en => en.date && parseInt(en.date.split('-')[0], 10) === y);
+    const usedSickYear = yearEntries.filter(e => e.status === 'leave_sick').length;
+    const usedBizYear = yearEntries.filter(e => e.status === 'leave_business').length;
+    const usedVacYear = yearEntries.filter(e => e.status === 'leave_annual').length;
+
+    const qSick = settings.quotaSick !== undefined ? settings.quotaSick : 30;
+    const qBiz = settings.quotaBusiness !== undefined ? settings.quotaBusiness : 3;
+    const qVac = settings.quotaAnnual !== undefined ? settings.quotaAnnual : 6;
+
+    document.getElementById('quota_sick_display').textContent = `${usedSickYear} / ${qSick} วัน`;
+    document.getElementById('quota_sick_remain').textContent = `คงเหลือ ${Math.max(0, qSick - usedSickYear)} วัน`;
+
+    document.getElementById('quota_biz_display').textContent = `${usedBizYear} / ${qBiz} วัน`;
+    document.getElementById('quota_biz_remain').textContent = `คงเหลือ ${Math.max(0, qBiz - usedBizYear)} วัน`;
+
+    document.getElementById('quota_vac_display').textContent = `${usedVacYear} / ${qVac} วัน`;
+    document.getElementById('quota_vac_remain').textContent = `คงเหลือ ${Math.max(0, qVac - usedVacYear)} วัน`;
+
+    // Monthly entries filtering
     const monthEntries = entries.filter(en => {
-      const d = new Date(en.date+'T00:00:00');
-      return d.getFullYear() === y && d.getMonth() === m;
+      if (!en.date) return false;
+      const p = en.date.split('-');
+      return parseInt(p[0], 10) === y && (parseInt(p[1], 10) - 1) === m;
     });
 
     const entryMap = {};
@@ -1798,7 +1825,9 @@
     const workedDays = monthEntries.filter(en => en.status === 'work').length;
     const offDayWorkedDays = monthEntries.filter(en => en.status === 'offday_work').length;
     const actualWorkedDays = workedDays + offDayWorkedDays;
-    const paidLeaveDays = monthEntries.filter(en => ['leave_sick','leave_business','leave_annual'].includes(en.status)).length;
+
+    const sickLeaveDays = monthEntries.filter(en => en.status === 'leave_sick').length;
+    const otherPaidLeaveDays = monthEntries.filter(en => ['leave_business','leave_annual'].includes(en.status)).length;
     const unpaidLeaveDays = monthEntries.filter(en => en.status === 'leave_unpaid').length;
     const absentDays = monthEntries.filter(en => en.status === 'absent').length;
 
@@ -1810,8 +1839,11 @@
     const dailyRate = settings.salary > 0 ? (settings.salary / 30) : 0;
     const hourlyRate = settings.hours > 0 ? (dailyRate / settings.hours) : 0;
 
-    const payableDays = actualWorkedDays + paidLeaveDays;
-    const basePay = dailyRate * payableDays;
+    const payableDays = actualWorkedDays + otherPaidLeaveDays;
+    
+    // Formula Requirements Update:
+    // Base salary = settings.salary
+    const basePay = settings.salary;
     const offDayBonus = dailyRate * offDayWorkedDays;
     const allowancePay = (settings.travel + settings.housing) * actualWorkedDays;
 
@@ -1822,28 +1854,64 @@
     }, 0);
 
     const otMealPay = settings.otMeal * otMealDays;
-    const hasDisqualification = absentDays > 0 || unpaidLeaveDays > 0 || (settings.leaveCounts === 'yes' && paidLeaveDays > 0);
+    const hasDisqualification = absentDays > 0 || unpaidLeaveDays > 0 || (settings.leaveCounts === 'yes' && (sickLeaveDays + otherPaidLeaveDays) > 0);
     const bonusPay = (!hasDisqualification && monthEntries.length > 0) ? settings.bonus : 0;
 
+    // Deductions Calculation
+    // Sick Leave Deduction: จำนวนวันลาป่วย * (เงินเดือน / 30)
+    const sickDeduction = sickLeaveDays * dailyRate;
+    const unpaidDeduction = (unpaidLeaveDays + absentDays) * dailyRate;
     const lateDeduction = lateDeductedHours * hourlyRate;
     const ssoDeduction = settings.sso !== undefined ? settings.sso : 750;
 
+    // Gross Income (เงินเดือน + สวัสดิการ)
     const grossPay = basePay + offDayBonus + allowancePay + otPay + otMealPay + bonusPay;
-    const totalDeductions = lateDeduction + ssoDeduction;
+    
+    // Total Deductions
+    const totalDeductions = sickDeduction + unpaidDeduction + lateDeduction + ssoDeduction;
+
+    // Net Total = (เงินเดือน + สวัสดิการ) - (วันลาป่วย * (เงินเดือน/30)) - รายการหักอื่นๆ
     const netTotal = Math.max(0, grossPay - totalDeductions);
 
-    currentPayrollData = { payableDays, basePay, offDayWorkedDays, offDayBonus, allowancePay, otPay, totalOtHours, otMealPay, bonusPay, lateDeduction, ssoDeduction, grossPay, totalDeductions, netTotal };
+    currentPayrollData = { 
+      payableDays, 
+      sickLeaveDays,
+      sickDeduction,
+      unpaidDeduction,
+      basePay, 
+      offDayWorkedDays, 
+      offDayBonus, 
+      allowancePay, 
+      otPay, 
+      totalOtHours, 
+      otMealPay, 
+      bonusPay, 
+      lateDeduction, 
+      ssoDeduction, 
+      grossPay, 
+      totalDeductions, 
+      netTotal 
+    };
 
     document.getElementById('sum_worked').textContent = actualWorkedDays + ' วัน';
-    document.getElementById('sum_paidLeave').textContent = paidLeaveDays + ' วัน';
+    document.getElementById('sum_sickLeave').textContent = sickLeaveDays + ' วัน';
+    document.getElementById('sum_paidLeave').textContent = otherPaidLeaveDays + ' วัน';
     document.getElementById('sum_unpaidLeave').textContent = unpaidLeaveDays + ' / ' + absentDays + ' วัน';
     document.getElementById('sum_dailyHourly').textContent = `${fmtBaht(dailyRate)} / ฿${Math.round(hourlyRate)}`;
     document.getElementById('sum_base').textContent = fmtBaht(basePay);
     document.getElementById('sum_offDayBonus').textContent = fmtBaht(offDayBonus);
+    document.getElementById('sum_offDayCount').textContent = offDayWorkedDays;
     document.getElementById('sum_allowance').textContent = fmtBaht(allowancePay);
     document.getElementById('sum_ot').textContent = fmtBaht(otPay);
+    document.getElementById('sum_otHours').textContent = totalOtHours;
     document.getElementById('sum_otMeal').textContent = fmtBaht(otMealPay);
+    document.getElementById('sum_otMealDays').textContent = otMealDays;
     document.getElementById('sum_bonus').textContent = fmtBaht(bonusPay);
+
+    document.getElementById('sum_sickCount').textContent = sickLeaveDays;
+    document.getElementById('sum_sickDeduct').textContent = '-' + fmtBaht(sickDeduction);
+    document.getElementById('sum_lateCount').textContent = lateOccurrences;
+    document.getElementById('sum_lateHours').textContent = lateDeductedHours;
     document.getElementById('sum_lateDeduct').textContent = '-' + fmtBaht(lateDeduction);
     document.getElementById('sum_ssoDeduct').textContent = '-' + fmtBaht(ssoDeduction);
     document.getElementById('sum_total').textContent = fmtBaht(netTotal);
@@ -1854,7 +1922,7 @@
     else stampWrap.innerHTML = '<div class="stamp broken">พลาดโบนัส<br>เดือนนี้</div>';
   }
 
-  // GLOBAL EXPORTS
+  // GLOBAL EXPORTS FOR INLINE HTML HANDLERS
   window.switchMainTab = switchMainTab;
   window.calculateFullTax = calculateFullTax;
   window.saveTaxInputs = saveTaxInputs;
