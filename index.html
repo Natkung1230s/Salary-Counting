@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Salary Counting — ระบบบันทึกเวลา คำนวณเงินเดือน & Cloud Database</title>
+<title>Salary Counting — บันทึกเวลา เงินเดือน & ระบบคำนวณภาษีบุคคลธรรมดา</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -20,6 +20,7 @@
     --red:#B23A2E;
     --muted:#7A6F53;
     --text:#241D0E;
+    --blue:#2563EB;
   }
   *{-webkit-tap-highlight-color:transparent;box-sizing:border-box;}
   body{
@@ -38,12 +39,12 @@
       repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0 2px, transparent 2px 40px),
       linear-gradient(180deg, var(--ink-2), var(--ink));
     color:#F1E9D2;
-    padding:22px 20px 30px;
+    padding:22px 20px 26px;
     position:relative;
     box-shadow:0 6px 18px rgba(0,0,0,.25);
   }
   header .wrap{
-    max-width:980px;
+    max-width:1040px;
     margin:0 auto;
     display:flex;
     justify-content:space-between;
@@ -61,12 +62,6 @@
   }
   h1{margin:0 0 4px;font-size:24px;font-weight:700;}
   header p{margin:0;color:#B9AF95;font-size:13px;}
-  .slot{
-    position:absolute;left:50%;bottom:-11px;transform:translateX(-50%);
-    width:74px;height:22px;background:var(--paper);
-    border-radius:0 0 12px 12px;
-    box-shadow: inset 0 4px 6px rgba(0,0,0,.35);
-  }
 
   /* User Badge */
   .user-badge-wrap{
@@ -82,26 +77,55 @@
   .user-name{font-size:13px;font-weight:700;color:#FFF;}
   .user-role{font-size:10.5px;color:var(--amber);font-family:'IBM Plex Mono',monospace;word-break:break-all;}
 
-  main{max-width:980px;margin:0 auto;padding:26px 16px 80px;}
+  main{max-width:1040px;margin:0 auto;padding:20px 16px 80px;}
+
+  /* Main Navigation Tabs */
+  .main-nav-tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+    border-bottom:2px solid var(--line);
+    padding-bottom:2px;
+  }
+  .tab-btn{
+    font-family:'Sarabun',sans-serif;
+    font-size:14.5px;
+    font-weight:700;
+    padding:10px 18px;
+    background:transparent;
+    color:var(--muted);
+    border:none;
+    border-bottom:4px solid transparent;
+    cursor:pointer;
+    border-radius:6px 6px 0 0;
+    transition:all .2s ease;
+  }
+  .tab-btn:hover{color:var(--ink);background:rgba(255,255,255,.3);}
+  .tab-btn.active{
+    color:var(--ink);
+    background:var(--card);
+    border-bottom-color:var(--amber);
+    box-shadow:0 -2px 6px rgba(0,0,0,.05);
+  }
 
   .card{
     background:var(--card);
     border:1px solid var(--line);
-    border-radius:8px;
-    padding:20px;
-    margin-bottom:18px;
+    border-radius:12px;
+    padding:22px;
+    margin-bottom:20px;
     position:relative;
-    box-shadow:0 2px 0 var(--line), 0 10px 24px -14px rgba(30,42,56,.35);
+    box-shadow:0 3px 0 var(--line), 0 10px 24px -14px rgba(30,42,56,.25);
   }
   .card h2{
-    margin:0 0 4px;
-    font-size:15px;
+    margin:0 0 6px;
+    font-size:17px;
     text-transform:uppercase;
-    letter-spacing:.08em;
-    color:var(--muted);
-    font-weight:600;
+    letter-spacing:.03em;
+    color:var(--ink);
+    font-weight:700;
   }
-  .card .hint{font-size:12.5px;color:var(--muted);margin:0 0 14px;}
+  .card .hint{font-size:13px;color:var(--muted);margin:0 0 16px;line-height:1.4;}
 
   /* Toolbar */
   .toolbar{
@@ -139,50 +163,90 @@
 
   .section-divider{
     grid-column:1/-1;
-    font-size:12.5px;
+    font-size:14px;
     font-weight:700;
-    color:var(--ink-2);
-    border-bottom:1px solid var(--line);
-    padding-bottom:4px;
-    margin-top:6px;
+    color:var(--ink);
+    border-bottom:2px solid var(--line);
+    padding-bottom:6px;
+    margin-top:14px;
+    display:flex;
+    align-items:center;
+    gap:6px;
   }
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
-  label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+  label{display:block;font-size:12.5px;color:var(--ink-2);margin-bottom:6px;font-weight:600;}
   input,select{
     width:100%;
     font-family:'Sarabun',sans-serif;
     font-size:14px;
-    padding:8px 10px;
+    padding:9px 12px;
     border:1px solid var(--line);
-    border-radius:5px;
+    border-radius:6px;
     background:#FFFDF7;
     color:var(--text);
+    transition:all .15s ease;
   }
-  input:focus,select:focus{outline:2px solid var(--amber);outline-offset:1px;}
+  input:focus,select:focus{
+    outline:none;
+    border-color:var(--amber);
+    box-shadow:0 0 0 3px rgba(214,138,45,.18);
+    background:#FFF;
+  }
   input[type="number"],input[type="password"]{font-family:'IBM Plex Mono',monospace;}
+
+  /* IMPROVED TAX FIELD & TIP BOX DESIGN */
+  .tax-field-group{
+    display:flex;
+    flex-direction:column;
+    background:rgba(255,255,255,.4);
+    border:1px solid rgba(201,188,152,.6);
+    border-radius:8px;
+    padding:14px;
+    transition:all .15s ease;
+  }
+  .tax-field-group:focus-within{
+    background:#FFFDF7;
+    border-color:var(--amber);
+    box-shadow:0 4px 12px rgba(30,42,56,.06);
+  }
+  .tax-field-group label{
+    margin-bottom:6px;
+    line-height:1.35;
+  }
+  .tip-box{
+    background:rgba(214,138,45,.07);
+    border-left:3px solid var(--amber);
+    padding:8px 10px;
+    border-radius:0 6px 6px 0;
+    font-size:11.5px;
+    color:#4A3716;
+    margin-top:8px;
+    line-height:1.45;
+  }
+  .tip-box strong{color:var(--amber-dark);font-weight:700;}
 
   button{
     font-family:'Sarabun',sans-serif;
     font-weight:600;
     font-size:13px;
     border:none;
-    border-radius:5px;
+    border-radius:6px;
     padding:8px 14px;
     cursor:pointer;
     display:inline-flex;
     align-items:center;
     justify-content:center;
     gap:6px;
-    transition:transform .08s ease, background-color .15s ease;
+    transition:transform .08s ease, background-color .15s ease, box-shadow .15s ease;
   }
   button:active{transform:translateY(1px);}
-  .btn-primary{background:var(--amber);color:#2A1A05;}
+  .btn-primary{background:var(--amber);color:#2A1A05;box-shadow:0 2px 4px rgba(214,138,45,.3);}
   .btn-primary:hover{background:var(--amber-dark);color:#fff;}
   .btn-dark{background:var(--ink);color:#F1E9D2;}
   .btn-dark:hover{background:var(--ink-2);}
   .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--muted);}
-  .btn-ghost:hover{border-color:var(--muted);color:var(--text);}
+  .btn-ghost:hover{border-color:var(--muted);color:var(--text);background:rgba(255,255,255,.4);}
   .btn-danger{background:transparent;color:var(--red);border:1px solid rgba(178,58,46,.4);}
   .btn-danger:hover{background:rgba(178,58,46,.1);}
 
@@ -192,19 +256,19 @@
   .leave-quota-card{
     background:#FFFDF7;
     border:1px solid var(--line);
-    border-radius:6px;
-    padding:12px 14px;
-    margin-bottom:16px;
+    border-radius:8px;
+    padding:14px;
+    margin-bottom:18px;
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-    gap:10px;
+    gap:12px;
   }
-  .quota-item{border-left:3px solid var(--amber);padding-left:8px;}
+  .quota-item{border-left:3px solid var(--amber);padding-left:10px;}
   .quota-item.sick{border-left-color:var(--amber-dark);}
   .quota-item.biz{border-left-color:#6B21A8;}
   .quota-item.vac{border-left-color:var(--teal);}
   .quota-item .q-title{font-size:11.5px;color:var(--muted);font-weight:600;}
-  .quota-item .q-count{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:var(--text);margin-top:2px;}
+  .quota-item .q-count{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:var(--text);margin-top:2px;}
   .quota-item .q-remain{font-size:11px;color:var(--muted);}
 
   /* Calendar */
@@ -219,7 +283,7 @@
   .calendar-wrapper{
     background:#FFFDF7;
     border:1px solid var(--line);
-    border-radius:6px;
+    border-radius:8px;
     overflow:hidden;
   }
   .calendar-header{
@@ -230,7 +294,7 @@
     text-align:center;
     font-size:12px;
     font-weight:600;
-    padding:6px 0;
+    padding:8px 0;
   }
   .calendar-grid{
     display:grid;
@@ -241,7 +305,7 @@
     min-height:86px;
     border-right:1px solid var(--line);
     border-bottom:1px solid var(--line);
-    padding:4px 3px;
+    padding:5px;
     position:relative;
     cursor:pointer;
     transition:background .12s ease;
@@ -253,19 +317,11 @@
   .cal-cell:hover{background:#F5ECD0;}
   .cal-cell.empty{background:rgba(201,188,152,.15);cursor:default;}
   .cal-cell.is-offday{background:#FAF2E2;}
-  .cal-cell.is-offday::after{
-    content:"วันหยุด";
-    position:absolute;
-    bottom:2px;right:4px;
-    font-size:9.5px;
-    color:var(--muted);
-    opacity:.4;
-  }
   .cal-cell.is-today .day-num{
     background:var(--ink);
     color:#FFF;
     border-radius:50%;
-    width:20px;height:20px;
+    width:22px;height:22px;
     display:flex;align-items:center;justify-content:center;
   }
 
@@ -274,7 +330,7 @@
     font-size:11.5px;
     font-weight:700;
     color:var(--text);
-    margin-bottom:2px;
+    margin-bottom:3px;
     width:fit-content;
   }
 
@@ -287,8 +343,8 @@
 
   .badge{
     display:inline-block;
-    padding:1.5px 3px;
-    border-radius:3px;
+    padding:2px 4px;
+    border-radius:4px;
     font-size:10px;
     font-weight:600;
     text-align:center;
@@ -320,7 +376,7 @@
   /* Summary Grid */
   .summary-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;margin-bottom:16px;}
   .stat{
-    background:#FFFDF7;border:1px solid var(--line);border-radius:5px;padding:10px 12px;
+    background:#FFFDF7;border:1px solid var(--line);border-radius:6px;padding:10px 12px;
   }
   .stat .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
   .stat .v{font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;}
@@ -328,7 +384,7 @@
   .stat.total{
     grid-column:1/-1;
     background:linear-gradient(180deg, var(--ink-2), var(--ink));
-    color:#F1E9D2;border:none;padding:16px;border-radius:6px;
+    color:#F1E9D2;border:none;padding:16px;border-radius:8px;
   }
   .stat.total .k{color:#C9BC98;}
   .stat.total .v{font-size:26px;color:var(--amber);}
@@ -349,23 +405,47 @@
     padding:4px;
   }
   .stamp.broken{border-color:var(--red);color:var(--red);}
-  .stamp::before{
-    content:"";position:absolute;inset:4px;border:1px solid currentColor;border-radius:50%;opacity:.5;
-  }
 
-  /* Tax Box */
-  .tax-box{
-    background:#FFFDF7;
-    border:1px dashed var(--line);
-    border-radius:6px;
-    padding:14px;
-    margin-top:12px;
+  /* TAX RESULT DASHBOARD CARD (REFINED) */
+  .tax-dashboard{
+    background:linear-gradient(140deg, #1A2430 0%, #253344 100%);
+    color:#F1E9D2;
+    border-radius:12px;
+    padding:24px;
+    margin-bottom:22px;
+    border:1px solid rgba(255,255,255,.1);
+    box-shadow:0 12px 28px -6px rgba(15,23,42,.4);
   }
-  .tax-box h3{margin:0 0 8px;font-size:13.5px;color:var(--ink);}
-  .tax-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;font-size:12px;}
-  .tax-item{background:var(--card);padding:8px 10px;border-radius:4px;border:1px solid var(--line);}
-  .tax-item .label{font-size:10.5px;color:var(--muted);}
-  .tax-item .val{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:var(--ink-2);margin-top:2px;}
+  .tax-dashboard-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .tax-dash-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));
+    gap:14px;
+    margin-top:18px;
+  }
+  .tax-dash-item{
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.1);
+    padding:14px;
+    border-radius:8px;
+    backdrop-filter:blur(4px);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  }
+  .tax-dash-item .label{font-size:11.5px;color:#B9AF95;line-height:1.35;}
+  .tax-dash-item .val{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:700;color:#FFF;margin-top:6px;}
+  .tax-dash-item.highlight{
+    background:rgba(214,138,45,.18);
+    border:1px solid rgba(214,138,45,.5);
+  }
+  .tax-dash-item.highlight .val{color:var(--amber);font-size:23px;}
 
   /* Modals */
   .modal-overlay{
@@ -382,10 +462,10 @@
   .modal{
     background:var(--card);
     border:1px solid var(--line);
-    border-radius:8px;
+    border-radius:10px;
     max-width:440px;
     width:100%;
-    padding:20px;
+    padding:22px;
     box-shadow:0 12px 32px rgba(0,0,0,.25);
     max-height:92vh;
     overflow-y:auto;
@@ -409,7 +489,7 @@
   .auth-box{
     background:var(--card);
     border:2px solid var(--line);
-    border-radius:8px;
+    border-radius:10px;
     max-width:380px;
     width:100%;
     padding:24px 20px;
@@ -441,15 +521,6 @@
     display:none;
     line-height:1.3;
   }
-  .forgot-link{
-    display:inline-block;
-    margin-top:6px;
-    font-size:12px;
-    color:var(--amber-dark);
-    text-decoration:none;
-    font-weight:600;
-  }
-  .forgot-link:hover{text-decoration:underline;}
 
   /* Payslip */
   .payslip-modal{
@@ -490,16 +561,8 @@
     margin-bottom:14px;
     font-size:12.5px;
   }
-  .ps-table th{
-    background:#2B3A4D;
-    color:#FFF;
-    padding:6px 8px;
-    font-weight:600;
-  }
-  .ps-table td{
-    padding:5px 8px;
-    border-bottom:1px solid #EEE;
-  }
+  .ps-table th{background:#2B3A4D;color:#FFF;padding:6px 8px;font-weight:600;}
+  .ps-table td{padding:5px 8px;border-bottom:1px solid #EEE;}
   .ps-table .right{text-align:right;}
   .ps-table .total-row td{
     font-weight:700;
@@ -519,90 +582,35 @@
     margin-bottom:20px;
   }
   .ps-net-box .val{font-family:'IBM Plex Mono',monospace;font-size:20px;color:var(--amber);}
-  .ps-sign-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:20px;
-    text-align:center;
-    margin-top:20px;
-    font-size:12px;
-  }
-  .ps-sign-line{
-    border-bottom:1px dotted #333;
-    width:140px;
-    margin:25px auto 4px;
-  }
 
-  /* =========================================
-     MOBILE RESPONSIVE BREAKPOINTS (iOS/Android)
-     ========================================= */
   @media (max-width: 680px) {
-    header{padding:16px 12px 24px;}
+    header{padding:16px 12px 20px;}
     header .wrap{flex-direction:column;align-items:flex-start;gap:10px;}
     h1{font-size:20px;}
     .user-badge-wrap{width:100%;justify-content:space-between;}
-    .user-info{text-align:left;}
 
     main{padding:14px 10px 60px;}
-    .card{padding:14px 12px;margin-bottom:14px;border-radius:6px;}
+    .main-nav-tabs{gap:4px;}
+    .tab-btn{font-size:12.5px;padding:8px 10px;}
 
-    /* Full width buttons & tools */
-    .toolbar{flex-direction:column;align-items:stretch;gap:8px;}
+    .card{padding:16px 14px;margin-bottom:14px;}
     .toolbar-group{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-    .toolbar-group button{padding:9px 6px;font-size:12px;justify-content:center;}
-
-    /* Form Grid: 1 column on phone for easy typing */
-    .grid{grid-template-columns:1fr;gap:10px;}
-
-    /* Leave quota: 3 neat rows */
-    .leave-quota-card{grid-template-columns:1fr;gap:8px;padding:10px 12px;}
-
-    /* Calendar Grid Adjustments */
+    .grid{grid-template-columns:1fr;gap:12px;}
     .cal-cell{min-height:64px;padding:2px 1.5px;}
-    .day-num{font-size:10.5px;margin-bottom:1px;}
-    .cal-cell.is-today .day-num{width:17px;height:17px;font-size:9.5px;}
-    .cal-cell.is-offday::after{display:none;} /* Hide watermark text on tiny screens */
-    .badge{font-size:8.5px;padding:1px 2px;letter-spacing:-0.03em;line-height:1.1;}
-    .tag-row{font-size:8px;flex-direction:column;gap:1px;}
-
-    /* Summary: 2 Columns Dashboard layout */
+    .day-num{font-size:10.5px;}
+    .badge{font-size:8.5px;padding:1px 2px;}
     .summary-grid{grid-template-columns:1fr 1fr;gap:8px;}
-    .stat{padding:8px 10px;}
-    .stat .k{font-size:10px;line-height:1.2;}
-    .stat .v{font-size:15px;}
-    .stat.total{padding:12px 14px;}
-    .stat.total .v{font-size:21px;}
-    .stamp-wrap{top:8px;right:8px;}
-    .stamp{width:70px;height:70px;font-size:9.5px;border-width:2px;}
-
-    /* Tax projection */
-    .tax-grid{grid-template-columns:1fr 1fr;gap:6px;}
-    .tax-item{padding:6px 8px;}
-    .tax-item .label{font-size:9.5px;}
-    .tax-item .val{font-size:12.5px;}
-
-    /* Payslip Modal */
-    .payslip-modal{padding:12px 8px;width:96%;}
-    .payslip-container{padding:10px 6px;}
-    .ps-info-grid{grid-template-columns:1fr;gap:4px;font-size:11.5px;}
-    .ps-table{font-size:11px;}
-    .ps-table th, .ps-table td{padding:4px 5px;}
-    .ps-net-box{font-size:13px;padding:8px 10px;}
-    .ps-net-box .val{font-size:16px;}
-    .ps-sign-grid{gap:8px;}
-    .ps-sign-line{width:110px;margin:18px auto 2px;}
+    .tax-dash-grid{grid-template-columns:1fr 1fr;gap:10px;}
+    .tax-dashboard{padding:16px;}
   }
 
   @media print{
     body *{visibility:hidden;}
     #payslipPrintArea, #payslipPrintArea *{visibility:visible;}
-    #payslipPrintArea{
-      position:absolute;left:0;top:0;width:100%;padding:0;margin:0;
-    }
-    .payslip-container{border:1px solid #000;}
+    #payslipPrintArea{position:absolute;left:0;top:0;width:100%;padding:0;margin:0;}
   }
 
-  footer.note{max-width:980px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:11.5px;text-align:center;}
+  footer.note{max-width:1040px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:11.5px;text-align:center;}
 </style>
 </head>
 <body>
@@ -610,12 +618,11 @@
 <header>
   <div class="wrap">
     <div>
-      <div class="eyebrow">TIME · ATTENDANCE · PAYROLL & CLOUD SYNC</div>
+      <div class="eyebrow">TIME · ATTENDANCE · PAYROLL & TAX CALCULATOR</div>
       <h1>Salary Counting</h1>
-      <p>ระบบบันทึกเวลาทำงาน คำนวณเงินเดือน เชื่อมต่อฐานข้อมูล Firebase Cloud</p>
+      <p>ระบบบันทึกเวลาทำงาน คำนวณเงินเดือน & วางแผนภาษีบุคคลธรรมดาประจำปี</p>
     </div>
     
-    <!-- USER PROFILE BAR IN HEADER -->
     <div class="user-badge-wrap" id="userBadgeWrap" style="display:none;">
       <div class="user-info">
         <div class="user-name" id="hdr_userName">พนักงาน</div>
@@ -624,184 +631,397 @@
       <button class="btn-ghost" style="padding:4px 8px;font-size:11.5px;color:#F1E9D2;border-color:rgba(255,255,255,.3);" onclick="handleLogout()">ออกจากระบบ</button>
     </div>
   </div>
-  <div class="slot"></div>
 </header>
 
 <main id="appMain" style="display:none;">
 
-  <!-- DATA & ACTIONS TOOLBAR -->
-  <div class="toolbar">
-    <div class="toolbar-group">
-      <button class="btn-dark" onclick="openPayslipModal()">🖨️ พิมพ์สลิปเงินเดือน</button>
-      <button class="btn-ghost" onclick="exportMonthlyCSV()">📊 ส่งออก Excel</button>
-    </div>
-    <div class="toolbar-group">
-      <button class="btn-ghost" onclick="backupData()">💾 สำรองข้อมูล</button>
-      <button class="btn-ghost" onclick="triggerRestore()">📂 กู้คืนข้อมูล</button>
-      <input type="file" id="restoreFileInput" style="display:none" accept=".json" onchange="restoreData(event)">
-    </div>
+  <!-- MAIN CATEGORY NAVIGATION TABS -->
+  <div class="main-nav-tabs">
+    <button class="tab-btn active" id="btnTabAttendance" onclick="switchMainTab('attendance')">📅 ลงเวลา & คำนวณเงินเดือน</button>
+    <button class="tab-btn" id="btnTabTax" onclick="switchMainTab('tax')">📊 ระบบคำนวณ & วางแผนภาษี (PIT)</button>
   </div>
 
-  <!-- COLLAPSIBLE SETTINGS -->
-  <section class="card" id="settingsCard">
-    <div class="settings-header" onclick="toggleSettings()">
-      <div>
-        <h2>⚙️ ตั้งค่าพนักงาน & สิทธิ์การลา</h2>
-        <div id="settingsSummary" class="settings-summary-badge">กำลังโหลดข้อมูล...</div>
+  <!-- ================================================================= -->
+  <!-- CATEGORY 1: ATTENDANCE & PAYROLL PAGE                             -->
+  <!-- ================================================================= -->
+  <div id="attendanceView">
+    <!-- DATA & ACTIONS TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <button class="btn-dark" onclick="openPayslipModal()">🖨️ พิมพ์สลิปเงินเดือน</button>
+        <button class="btn-ghost" onclick="exportMonthlyCSV()">📊 ส่งออก Excel (CSV)</button>
       </div>
-      <button type="button" class="btn-ghost" id="settingsToggleBtn" style="padding:4px 8px;font-size:11.5px;">แก้ไข ▼</button>
+      <div class="toolbar-group">
+        <button class="btn-ghost" onclick="backupData()">💾 สำรองข้อมูล</button>
+        <button class="btn-ghost" onclick="triggerRestore()">📂 กู้คืนข้อมูล</button>
+        <input type="file" id="restoreFileInput" style="display:none" accept=".json" onchange="restoreData(event)">
+      </div>
     </div>
 
-    <div class="settings-body" id="settingsBody">
-      <p class="hint">ฐานคิดค่าจ้าง: เงินเดือน ÷ 31 วัน | หากมาสายเกิน 1 นาที ระบบจะหักเงินเท่ากับค่าจ้าง 1 ชั่วโมงโดยอัตโนมัติ</p>
+    <!-- COLLAPSIBLE SETTINGS -->
+    <section class="card" id="settingsCard">
+      <div class="settings-header" onclick="toggleSettings()">
+        <div>
+          <h2>⚙️ ตั้งค่าพนักงาน & สิทธิ์การลา</h2>
+          <div id="settingsSummary" class="settings-summary-badge">กำลังโหลดข้อมูล...</div>
+        </div>
+        <button type="button" class="btn-ghost" id="settingsToggleBtn" style="padding:4px 8px;font-size:11.5px;">แก้ไข ▼</button>
+      </div>
+
+      <div class="settings-body" id="settingsBody">
+        <p class="hint">ฐานคิดค่าจ้าง: เงินเดือน ÷ 30 วัน | หากมาสายเกิน 1 นาที ระบบจะหักเงินเท่ากับค่าจ้าง 1 ชั่วโมงโดยอัตโนมัติ</p>
+        
+        <div class="grid">
+          <div class="section-divider">📌 ข้อมูลทั่วไป & อัตราค่าจ้าง</div>
+          <div><label>ชื่อพนักงาน</label><input id="s_name" type="text" placeholder="เช่น สมชาย ใจดี"></div>
+          <div><label>ตำแหน่งงาน / แผนก</label><input id="s_position" type="text" placeholder="เช่น ช่างเทคนิค / บัญชี"></div>
+          <div><label>เงินเดือนฐาน (บาท/เดือน)</label><input id="s_salary" type="number" min="0" step="1"></div>
+          <div><label>ชั่วโมงทำงาน/วัน</label><input id="s_hours" type="number" min="1" step="0.5"></div>
+          <div><label>อัตราค่าโอทีปกติ (เท่า)</label><input id="s_ot" type="number" min="1" step="0.1"></div>
+          <div><label>โบนัสมาครบไม่ขาดงาน (บาท)</label><input id="s_bonus" type="number" min="0" step="1"></div>
+          <div><label>หักประกันสังคม (บาท/เดือน)</label><input id="s_sso" type="number" min="0" step="1" value="750"></div>
+          <div><label>วันลานับเป็นการตัดโบนัสหรือไม่</label>
+            <select id="s_leaveCounts">
+              <option value="no">ไม่ตัดสิทธิ์ (ลาตามสิทธิ์ยังได้โบนัส)</option>
+              <option value="yes">ตัดสิทธิ์โบนัสทันที</option>
+            </select>
+          </div>
+
+          <div class="section-divider">🏖️ สิทธิ์วันลาประจำปีตามกฎหมาย (วัน/ปี)</div>
+          <div><label>สิทธิ์ลาป่วย (ได้รับค่าจ้าง)</label><input id="s_quota_sick" type="number" min="0" step="1" placeholder="เช่น 30"></div>
+          <div><label>สิทธิ์ลากิจ (ได้รับค่าจ้าง)</label><input id="s_quota_biz" type="number" min="0" step="1" placeholder="เช่น 3"></div>
+          <div><label>สิทธิ์ลาพักร้อน (ได้รับค่าจ้าง)</label><input id="s_quota_annual" type="number" min="0" step="1" placeholder="เช่น 6"></div>
+
+          <div class="section-divider">🚗 สวัสดิการ & วันหยุดประจำสัปดาห์</div>
+          <div><label>ค่าเดินทาง/วัน (เฉพาะวันทำงาน)</label><input id="s_travel" type="number" min="0" step="1"></div>
+          <div><label>ค่าเช่าบ้าน/วัน (เฉพาะวันทำงาน)</label><input id="s_housing" type="number" min="0" step="1"></div>
+          <div><label>ค่าอาหารโอที/วัน (เฉพาะวันมีโอที)</label><input id="s_otMeal" type="number" min="0" step="1"></div>
+          <div><label>วันหยุดประจำสัปดาห์</label>
+            <select id="s_offDay">
+              <option value="0">วันอาทิตย์</option>
+              <option value="1">วันจันทร์</option>
+              <option value="2">วันอังคาร</option>
+              <option value="3">วันพุธ</option>
+              <option value="4">วันพฤหัสบดี</option>
+              <option value="5">วันศุกร์</option>
+              <option value="6">วันเสาร์</option>
+            </select>
+          </div>
+          <div><label>อัตราโอทีวันหยุด (เท่า)</label><input id="s_offDayOt" type="number" min="1" step="0.1"></div>
+        </div>
+        
+        <div class="row-actions">
+          <span id="saveMsg" style="align-self:center;font-size:12px;color:var(--teal);opacity:0;transition:opacity .3s;">บันทึกแล้ว</span>
+          <button class="btn-primary" onclick="saveSettings()">บันทึกและพับเก็บ</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEAVE QUOTA TRACKER -->
+    <div class="leave-quota-card">
+      <div class="quota-item sick">
+        <div class="q-title">🤒 สิทธิ์ลาป่วยประจำปี</div>
+        <div class="q-count" id="quota_sick_display">0 / 0 วัน</div>
+        <div class="q-remain" id="quota_sick_remain">คงเหลือ 0 วัน</div>
+      </div>
+      <div class="quota-item biz">
+        <div class="q-title">📋 สิทธิ์ลากิจประจำปี</div>
+        <div class="q-count" id="quota_biz_display">0 / 0 วัน</div>
+        <div class="q-remain" id="quota_biz_remain">คงเหลือ 0 วัน</div>
+      </div>
+      <div class="quota-item vac">
+        <div class="q-title">🏖️ สิทธิ์ลาพักร้อนประจำปี</div>
+        <div class="q-count" id="quota_vac_display">0 / 0 วัน</div>
+        <div class="q-remain" id="quota_vac_remain">คงเหลือ 0 วัน</div>
+      </div>
+    </div>
+
+    <!-- CALENDAR VIEW -->
+    <section class="card">
+      <div class="monthbar">
+        <h2 style="margin:0;">ปฏิทินลงเวลา</h2>
+        <div class="nav">
+          <button onclick="shiftMonth(-1)">‹</button>
+          <span class="label" id="monthLabel"></span>
+          <button onclick="shiftMonth(1)">›</button>
+        </div>
+      </div>
+      <p class="hint" style="margin-bottom:10px;">แตะที่ช่องวันที่เพื่อบันทึกสถานะ, สาย หรือระบุชั่วโมง OT</p>
       
+      <div class="calendar-wrapper">
+        <div class="calendar-header">
+          <div>อา.</div><div>จ.</div><div>อ.</div><div>พ.</div><div>พฤ.</div><div>ศ.</div><div>ส.</div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </div>
+    </section>
+
+    <!-- SUMMARY PAYROLL -->
+    <section class="card" id="summaryCard">
+      <h2>สรุปเงินเดือนประจำเดือน</h2>
+      <p class="hint">คำนวณตามจริงรายวัน (ฐานเงินเดือน ÷ 30 วัน) พร้อมรายการหักสายและประกันสังคม</p>
+      <div class="stamp-wrap" id="stampWrap"></div>
+      
+      <div class="summary-grid">
+        <div class="stat"><div class="k">วันมาทำงานจริง</div><div class="v" id="sum_worked">0 วัน</div></div>
+        <div class="stat"><div class="k">วันลาตามสิทธิ์</div><div class="v" id="sum_paidLeave">0 วัน</div></div>
+        <div class="stat"><div class="k">ลาไม่รับเงิน/ขาด</div><div class="v" id="sum_unpaidLeave">0 / 0 วัน</div></div>
+        <div class="stat"><div class="k">ค่าแรง/วัน & ชม.</div><div class="v" id="sum_dailyHourly">฿0 / ฿0</div></div>
+        
+        <div class="stat"><div class="k">เงินเดือนตามวันทำงาน</div><div class="v" id="sum_base">฿0</div></div>
+        <div class="stat"><div class="k">โบนัสวันหยุด (<span id="sum_offDayCount">0</span>ว.)</div><div class="v" id="sum_offDayBonus">฿0</div></div>
+        <div class="stat"><div class="k">ค่าเดินทาง & เช่าบ้าน</div><div class="v" id="sum_allowance">฿0</div></div>
+        <div class="stat"><div class="k">ค่าโอที (<span id="sum_otHours">0</span>ชม.)</div><div class="v" id="sum_ot">฿0</div></div>
+        <div class="stat"><div class="k">ค่าอาหาร OT (<span id="sum_otMealDays">0</span>ว.)</div><div class="v" id="sum_otMeal">฿0</div></div>
+        <div class="stat"><div class="k">โบนัสไม่ขาดงาน</div><div class="v" id="sum_bonus">฿0</div></div>
+
+        <div class="stat deduct"><div class="k">หักสาย (<span id="sum_lateCount">0</span>ครั้ง/<span id="sum_lateHours">0</span>ชม.)</div><div class="v" id="sum_lateDeduct">-฿0</div></div>
+        <div class="stat deduct"><div class="k">หักประกันสังคม</div><div class="v" id="sum_ssoDeduct">-฿0</div></div>
+
+        <div class="stat total"><div class="k">ยอดรับสุทธิประจำเดือน</div><div class="v" id="sum_total">฿0</div></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- CATEGORY 2: DEDICATED TAX PLANNING & DEDUCTION PAGE (PIT)         -->
+  <!-- ================================================================= -->
+  <div id="taxView" style="display:none;">
+    
+    <!-- TAX SUMMARY DASHBOARD -->
+    <div class="tax-dashboard">
+      <div class="tax-dashboard-header">
+        <div>
+          <div class="eyebrow" style="color:var(--amber);">ANNUAL PIT CALCULATOR</div>
+          <h2 style="margin:0;color:#FFF;font-size:20px;">สรุปผลการคำนวณและวางแผนภาษีประจำปี</h2>
+        </div>
+        <button class="btn-primary" onclick="saveTaxInputs()">💾 บันทึกข้อมูลภาษี</button>
+      </div>
+
+      <div class="tax-dash-grid">
+        <div class="tax-dash-item">
+          <div class="label">รายได้รวมทั้งปี (Gross Income)</div>
+          <div class="val" id="td_gross">฿0</div>
+        </div>
+        <div class="tax-dash-item">
+          <div class="label">หักค่าใช้จ่าย 50% (สูงสุด 100,000)</div>
+          <div class="val" id="td_expense">฿0</div>
+        </div>
+        <div class="tax-dash-item">
+          <div class="label">รวมค่าลดหย่อนทั้งหมด (Total Deductions)</div>
+          <div class="val" id="td_totalDeduction">฿0</div>
+        </div>
+        <div class="tax-dash-item">
+          <div class="label">เงินได้สุทธิคำนวณภาษี (Net Taxable)</div>
+          <div class="val" id="td_netTaxable">฿0</div>
+        </div>
+        <div class="tax-dash-item highlight">
+          <div class="label">ภาษีที่ต้องจ่ายจริงทั้งปี</div>
+          <div class="val" id="td_annualTax">฿0</div>
+        </div>
+        <div class="tax-dash-item">
+          <div class="label">สถานะภาษี (ขอคืน / ชำระเพิ่ม)</div>
+          <div class="val" id="td_taxStatus" style="font-size:15px;color:var(--amber);">฿0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAX INPUT FORM (4 MAIN CATEGORIES WITH DETAILED TIPS) -->
+    <section class="card">
+      
+      <!-- หมวดที่ 1: รายได้พึงประเมิน & ลดหย่อนส่วนตัวและครอบครัว -->
+      <div class="section-divider" style="margin-top:0;">📌 หมวดที่ 1: รายได้พึงประเมิน & สิทธิ์ลดหย่อนส่วนตัวและครอบครัว</div>
+      <p class="hint">ข้อมูลเงินได้และสิทธิ์พื้นฐานทางครอบครัวตามกฎหมายสรรพากร</p>
+
       <div class="grid">
-        <div class="section-divider">📌 ข้อมูลทั่วไป & อัตราค่าจ้าง</div>
-        <div><label>ชื่อพนักงาน</label><input id="s_name" type="text" placeholder="เช่น สมชาย ใจดี"></div>
-        <div><label>ตำแหน่งงาน / แผนก</label><input id="s_position" type="text" placeholder="เช่น ช่างเทคนิค / บัญชี"></div>
-        <div><label>เงินเดือนฐาน (บาท/เดือน)</label><input id="s_salary" type="number" min="0" step="1"></div>
-        <div><label>ชั่วโมงทำงาน/วัน</label><input id="s_hours" type="number" min="1" step="0.5"></div>
-        <div><label>อัตราค่าโอทีปกติ (เท่า)</label><input id="s_ot" type="number" min="1" step="0.1"></div>
-        <div><label>โบนัสมาครบไม่ขาดงาน (บาท)</label><input id="s_bonus" type="number" min="0" step="1"></div>
-        <div><label>หักประกันสังคม (บาท/เดือน)</label><input id="s_sso" type="number" min="0" step="1" value="875"></div>
-        <div><label>วันลานับเป็นการตัดโบนัสหรือไม่</label>
-          <select id="s_leaveCounts">
-            <option value="no">ไม่ตัดสิทธิ์ (ลาตามสิทธิ์ยังได้โบนัส)</option>
-            <option value="yes">ตัดสิทธิ์โบนัสทันที</option>
-          </select>
+        <div class="tax-field-group">
+          <label>1.1 รายได้รวมทั้งปี (เงินเดือน + โบนัส + OT) (บาท)</label>
+          <input type="number" id="t_income" placeholder="เช่น 360000" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ดูได้จาก <strong>หนังสือรับรองการหักภาษี ณ ที่จ่าย (50 ทวิ)</strong> ช่อง "รวมเงินที่จ่าย" ที่ HR ออกให้ตอนสิ้นปี หรือดูจากรวมยอด Gross Pay ในสลิปเงินเดือนเดือนธันวาคม
+          </div>
         </div>
 
-        <div class="section-divider">🏖️ สิทธิ์วันลาประจำปีตามกฎหมาย (วัน/ปี)</div>
-        <div><label>สิทธิ์ลาป่วย (ได้รับค่าจ้าง)</label><input id="s_quota_sick" type="number" min="0" step="1" placeholder="เช่น 30"></div>
-        <div><label>สิทธิ์ลากิจ (ได้รับค่าจ้าง)</label><input id="s_quota_biz" type="number" min="0" step="1" placeholder="เช่น 3"></div>
-        <div><label>สิทธิ์ลาพักร้อน (ได้รับค่าจ้าง)</label><input id="s_quota_annual" type="number" min="0" step="1" placeholder="เช่น 6"></div>
-
-        <div class="section-divider">🚗 สวัสดิการ & วันหยุดประจำสัปดาห์</div>
-        <div><label>ค่าเดินทาง/วัน (เฉพาะวันทำงาน)</label><input id="s_travel" type="number" min="0" step="1"></div>
-        <div><label>ค่าเช่าบ้าน/วัน (เฉพาะวันทำงาน)</label><input id="s_housing" type="number" min="0" step="1"></div>
-        <div><label>ค่าอาหารโอที/วัน (เฉพาะวันมีโอที)</label><input id="s_otMeal" type="number" min="0" step="1"></div>
-        <div><label>วันหยุดประจำสัปดาห์</label>
-          <select id="s_offDay">
-            <option value="0">วันอาทิตย์</option>
-            <option value="1">วันจันทร์</option>
-            <option value="2">วันอังคาร</option>
-            <option value="3">วันพุธ</option>
-            <option value="4">วันพฤหัสบดี</option>
-            <option value="5">วันศุกร์</option>
-            <option value="6">วันเสาร์</option>
-          </select>
+        <div class="tax-field-group">
+          <label>1.2 ภาษีหัก ณ ที่จ่าย ที่ถูกหักสะสมทั้งปี (บาท)</label>
+          <input type="number" id="t_withheld" placeholder="เช่น 2500" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>หนังสือรับรอง 50 ทวิ</strong> ช่อง "ภาษีที่หักและนำส่งไว้" หรือยอดรวมภาษีหักสะสมในสลิปเงินเดือนเดือนสุดท้ายของปี
+          </div>
         </div>
-        <div><label>อัตราโอทีวันหยุด (เท่า)</label><input id="s_offDayOt" type="number" min="1" step="0.1"></div>
-      </div>
-      
-      <div class="row-actions">
-        <span id="saveMsg" style="align-self:center;font-size:12px;color:var(--teal);opacity:0;transition:opacity .3s;">บันทึกแล้ว</span>
-        <button class="btn-primary" onclick="saveSettings()">บันทึกและพับเก็บ</button>
-      </div>
-    </div>
-  </section>
 
-  <!-- LEAVE QUOTA TRACKER -->
-  <div class="leave-quota-card">
-    <div class="quota-item sick">
-      <div class="q-title">🤒 สิทธิ์ลาป่วยประจำปี</div>
-      <div class="q-count" id="quota_sick_display">0 / 0 วัน</div>
-      <div class="q-remain" id="quota_sick_remain">คงเหลือ 0 วัน</div>
-    </div>
-    <div class="quota-item biz">
-      <div class="q-title">📋 สิทธิ์ลากิจประจำปี</div>
-      <div class="q-count" id="quota_biz_display">0 / 0 วัน</div>
-      <div class="q-remain" id="quota_biz_remain">คงเหลือ 0 วัน</div>
-    </div>
-    <div class="quota-item vac">
-      <div class="q-title">🏖️ สิทธิ์ลาพักร้อนประจำปี</div>
-      <div class="q-count" id="quota_vac_display">0 / 0 วัน</div>
-      <div class="q-remain" id="quota_vac_remain">คงเหลือ 0 วัน</div>
-    </div>
+        <div class="tax-field-group">
+          <label>1.3 ลดหย่อนส่วนตัว (อัตโนมัติ 60,000 บาท)</label>
+          <input type="number" id="t_personal" value="60000" readonly style="background:#EFE8D3;">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> สิทธิ์พื้นฐานตามกฎหมาย สรรพากรให้ทุกคนอัตโนมัติ 60,000 บาท ไม่ต้องเตรียมเอกสารเพิ่มเติม
+          </div>
+        </div>
+
+        <div class="tax-field-group">
+          <label>1.4 คู่สมรส (ไม่มีรายได้) (60,000 บาท)</label>
+          <select id="t_spouse" onchange="calculateFullTax()">
+            <option value="0">ไม่มี / คู่สมรสมีรายได้</option>
+            <option value="60000">คู่สมรสจดทะเบียน และไม่มีรายได้ในปีภาษีนี้ (60,000 บาท)</option>
+          </select>
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ต้องจดทะเบียนสมรสตามกฎหมายถูกต้อง และคู่สมรสต้องไม่มีรายได้ตลอดปี เอกสารอ้างอิง: <strong>ใบทะเบียนสมรส (คร.2/คร.3)</strong>
+          </div>
+        </div>
+
+        <div class="tax-field-group">
+          <label>1.5 จำนวนบุตร (คนละ 30,000 บ. / คนที่ 2 ขึ้นไปเกิดปี 61+ ได้ 60,000 บ.)</label>
+          <input type="number" id="t_children" min="0" value="0" placeholder="ระบุจำนวนบุตร" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> บุตรต้องชอบด้วยกฎหมาย อายุไม่เกิน 20 ปี (หรือ 20-25 ปีหากกำลังศึกษา) เอกสารอ้างอิง: <strong>สูติบัตรบุตร</strong> หรือ <strong>ทะเบียนบ้าน</strong>
+          </div>
+        </div>
+
+        <div class="tax-field-group">
+          <label>1.6 ค่าเลี้ยงดูบิดามารดา (คนละ 30,000 บาท สูงสุด 4 คน)</label>
+          <input type="number" id="t_parents" min="0" max="4" value="0" placeholder="จำนวนพ่อแม่ (0-4)" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> บิดามารดาต้องมีอายุ 60 ปีขึ้นไป และมีรายได้ทั้งปีไม่เกิน 30,000 บาท เอกสารอ้างอิง: <strong>ฟอร์ม ล.ย.01</strong> และเลขบัตรประชาชนพ่อแม่ (พี่น้องห้ามใช้สิทธิ์ซ้ำกัน)
+          </div>
+        </div>
+
+        <div class="tax-field-group">
+          <label>1.7 อุปการะผู้พิการ / ทุพพลภาพ (คนละ 60,000 บาท)</label>
+          <input type="number" id="t_disabled" min="0" value="0" placeholder="จำนวนผู้พิการที่ดูแล" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>บัตรประจำตัวผู้พิการ</strong> ที่ระบุชื่อเราเป็นผู้ดูแล หรือ <strong>หนังสือรับรองการเป็นผู้ดูแลผู้พิการ</strong> จากกรมส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ
+          </div>
+        </div>
+      </div>
+
+      <!-- หมวดที่ 2: ประกัน การออม & การลงทุน -->
+      <div class="section-divider">📌 หมวดที่ 2: ประกัน การออม & การลงทุน</div>
+      <p class="hint">กลุ่มหลักทรัพย์ ประกันภัย และกองทุนเกษียณอายุเพื่ออนาคต</p>
+
+      <div class="grid">
+        <div class="tax-field-group">
+          <label>2.1 ประกันสังคม (จ่ายตามจริง สูงสุด 9,000 บาท)</label>
+          <input type="number" id="t_sso" placeholder="เช่น 9000" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>แอปพลิเคชัน SSO Connect</strong> หรือยอดรวมหักประกันสังคมในหนังสือรับรอง 50 ทวิ / สลิปเงินเดือนรวม 12 เดือน
+          </div>
+        </div>
+
+        <div class="tax-field-group">
+          <label>2.2 เบี้ยประกันชีวิตทั่วไป / ประกันออมทรัพย์ (สูงสุด 100,000 บาท)</label>
+          <input type="number" id="t_lifeIns" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>หนังสือรับรองการชำระเบี้ยประกันภัย</strong> ที่ขอจากแอปพลิเคชันบริษัทประกัน (เช่น AIA, TLFA, FWD, เมืองไทยประกันชีวิต)
+          </div>
+        </div>
+
+        <div class="tax-field-group">
+          <label>2.3 เบี้ยประกันสุขภาพตนเอง (สูงสุด 25,000 บาท)</label>
+          <input type="number" id="t_healthIns" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>หนังสือรับรองเบี้ยประกันสุขภาพ</strong> จากแอป/เว็บประกันภัย (หมายเหตุ: รวมกับข้อ 2.2 แล้วต้องไม่เกิน 100,000 บาท)
+          </div>
+        </div>
+
+        <div class="tax-field-group">
+          <label>2.4 เบี้ยประกันสุขภาพบิดามารดา (สูงสุด 15,000 บาท)</label>
+          <input type="number" id="t_parentsHealth" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>หนังสือรับรองการชำระเบี้ยประกันภัย</strong> ที่ระบุบิดา/มารดาเป็นผู้เอาประกันภัย และมีชื่อเราเป็นผู้ชำระเบี้ย
+          </div>
+        </div>
+
+        <div class="tax-field-group">
+          <label>2.5 กองทุนสำรองเลี้ยงชีพ (PVD) / กบข. (ตามจ่ายจริง)</label>
+          <input type="number" id="t_pvd" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ดูได้จาก <strong>สลิปเงินเดือน</strong> (ช่องสะสม PVD) หรือขอ <strong>หนังสือรับรองการจ่ายเงินสะสม PVD</strong> จาก HR หรือแอป บลจ. จัดการกองทุน
+          </div>
+        </div>
+
+        <div class="tax-field-group">
+          <label>2.6 กองทุนรวมเพื่อการเลี้ยงชีพ (RMF) (สูงสุด 30% ไม่เกิน 500k)</label>
+          <input type="number" id="t_rmf" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ดูได้จาก <strong>หนังสือรับรองการซื้อหน่วยลงทุน RMF</strong> หรือกดดาวน์โหลดเอกสารภาษีในแอปธนาคาร/บลจ. ที่คุณซื้อ (เช่น Streaming, InnovestX, K-MyFunds)
+          </div>
+        </div>
+
+        <div class="tax-field-group">
+          <label>2.7 กองทุนรวมเพื่อการออม (SSF) / Thai ESG (ตามจ่ายจริง)</label>
+          <input type="number" id="t_ssf" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ดูหนังสือรับรองซื้อหน่วยลงทุนจากแอป บลจ. หรือล็อกอินเว็บบอร์ด <strong>TSD EveryNet</strong> ของศูนย์รับฝากหลักทรัพย์
+          </div>
+        </div>
+
+        <div class="tax-field-group">
+          <label>2.8 ประกันชีวิตแบบบำนาญ (สูงสุด 15% ไม่เกิน 200,000 บาท)</label>
+          <input type="number" id="t_pensionIns" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>หนังสือรับรองการชำระเบี้ยประกันภัยแบบบำนาญ</strong> ที่บริษัทประกันออกให้ทางอีเมลหรือแอปพลิเคชัน
+          </div>
+        </div>
+      </div>
+
+      <!-- หมวดที่ 3: อสังหาริมทรัพย์ & เงินบริจาค -->
+      <div class="section-divider">📌 หมวดที่ 3: อสังหาริมทรัพย์ & เงินบริจาค</div>
+      <p class="hint">ดอกเบี้ยกู้บ้าน และเงินบริจาคสนับสนุนสังคม</p>
+
+      <div class="grid">
+        <div class="tax-field-group">
+          <label>3.1 ดอกเบี้ยกู้ยืมเพื่อซื้อ/สร้างที่อยู่อาศัย (สูงสุด 100,000 บาท)</label>
+          <input type="number" id="t_homeLoan" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>หนังสือรับรองดอกเบี้ยกู้ยืมประจำปี</strong> ที่ธนาคารผู้ให้กู้ส่งให้ทางอีเมล/ไปรษณีย์ หรือกดดาวน์โหลดในแอปธนาคาร (เช่น ธอส., SCB, K-Bank)
+          </div>
+        </div>
+
+        <div class="tax-field-group">
+          <label>3.2 เงินบริจาคทั่วไป (หักตามจริง ไม่เกิน 10% ของเงินได้หลังหักลดหย่อน)</label>
+          <input type="number" id="t_donateGeneral" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>ใบเสร็จรับเงินบริจาค</strong> หรือตรวจสอบยอดผ่าน <strong>ระบบ e-Donation ของกรมสรรพากร (rd.go.th)</strong>
+          </div>
+        </div>
+
+        <div class="tax-field-group">
+          <label>3.3 เงินบริจาคเพื่อการศึกษา/กีฬา/โรงพยาบาลรัฐ (ได้สิทธิ์ 2 เท่า)</label>
+          <input type="number" id="t_donateEdu" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> สแกนบริจาคผ่าน QR Code e-Donation ข้อมูลจะส่งตรงเข้ากรมสรรพากรและคำนวณหักลดหย่อน 2 เท่าให้อัตโนมัติในระบบ
+          </div>
+        </div>
+
+        <div class="tax-field-group">
+          <label>3.4 เงินบริจาคพรรคการเมือง (ตามจ่ายจริง สูงสุด 10,000 บาท)</label>
+          <input type="number" id="t_donatePolitical" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>ใบเสร็จรับเงินบริจาคที่ออกโดยพรรคการเมือง</strong> ที่ได้รับอนุญาตตามกฎหมาย
+          </div>
+        </div>
+      </div>
+
+      <!-- หมวดที่ 4: มาตรการกระตุ้นเศรษฐกิจรัฐบาล -->
+      <div class="section-divider">📌 หมวดที่ 4: มาตรการกระตุ้นเศรษฐกิจของรัฐบาล</div>
+      <p class="hint">โครงการลดหย่อนตามนโยบายภาครัฐในแต่ละปีภาษี</p>
+
+      <div class="grid">
+        <div class="tax-field-group">
+          <label>4.1 โครงการ Easy E-Receipt / ช้อปดีมีคืน (สูงสุด 50,000 บาท)</label>
+          <input type="number" id="t_easyReceipt" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
+          <div class="tip-box">
+            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>ใบกำกับภาษีเต็มรูปแบบในรูปแบบอิเล็กทรอนิกส์ (e-Tax Invoice & e-Receipt)</strong> ที่ได้รับทางอีเมลจากร้านค้าที่ร่วมโครงการ
+          </div>
+        </div>
+      </div>
+
+    </section>
   </div>
-
-  <!-- CALENDAR VIEW -->
-  <section class="card">
-    <div class="monthbar">
-      <h2 style="margin:0;">ปฏิทินลงเวลา</h2>
-      <div class="nav">
-        <button onclick="shiftMonth(-1)">‹</button>
-        <span class="label" id="monthLabel"></span>
-        <button onclick="shiftMonth(1)">›</button>
-      </div>
-    </div>
-    <p class="hint" style="margin-bottom:10px;">แตะที่ช่องวันที่เพื่อบันทึกสถานะ, สาย หรือระบุชั่วโมง OT</p>
-    
-    <div class="calendar-wrapper">
-      <div class="calendar-header">
-        <div>อา.</div><div>จ.</div><div>อ.</div><div>พ.</div><div>พฤ.</div><div>ศ.</div><div>ส.</div>
-      </div>
-      <div class="calendar-grid" id="calendarGrid"></div>
-    </div>
-  </section>
-
-  <!-- SUMMARY -->
-  <section class="card" id="summaryCard">
-    <h2>สรุปเงินเดือนประจำเดือน</h2>
-    <p class="hint">คำนวณตามจริงรายวัน (ฐานเงินเดือน ÷ 31 วัน) พร้อมรายการหักสายและประกันสังคม</p>
-    <div class="stamp-wrap" id="stampWrap"></div>
-    
-    <div class="summary-grid">
-      <div class="stat"><div class="k">วันมาทำงานจริง</div><div class="v" id="sum_worked">0 วัน</div></div>
-      <div class="stat"><div class="k">วันลาตามสิทธิ์</div><div class="v" id="sum_paidLeave">0 วัน</div></div>
-      <div class="stat"><div class="k">ลาไม่รับเงิน/ขาด</div><div class="v" id="sum_unpaidLeave">0 / 0 วัน</div></div>
-      <div class="stat"><div class="k">ค่าแรง/วัน & ชม.</div><div class="v" id="sum_dailyHourly">฿0 / ฿0</div></div>
-      
-      <div class="stat"><div class="k">เงินเดือนตามวันทำงาน</div><div class="v" id="sum_base">฿0</div></div>
-      <div class="stat"><div class="k">โบนัสวันหยุด (<span id="sum_offDayCount">0</span>ว.)</div><div class="v" id="sum_offDayBonus">฿0</div></div>
-      <div class="stat"><div class="k">ค่าเดินทาง & เช่าบ้าน</div><div class="v" id="sum_allowance">฿0</div></div>
-      <div class="stat"><div class="k">ค่าโอที (<span id="sum_otHours">0</span>ชม.)</div><div class="v" id="sum_ot">฿0</div></div>
-      <div class="stat"><div class="k">ค่าอาหาร OT (<span id="sum_otMealDays">0</span>ว.)</div><div class="v" id="sum_otMeal">฿0</div></div>
-      <div class="stat"><div class="k">โบนัสไม่ขาดงาน</div><div class="v" id="sum_bonus">฿0</div></div>
-
-      <div class="stat deduct"><div class="k">หักสาย (<span id="sum_lateCount">0</span>ครั้ง/<span id="sum_lateHours">0</span>ชม.)</div><div class="v" id="sum_lateDeduct">-฿0</div></div>
-      <div class="stat deduct"><div class="k">หักประกันสังคม</div><div class="v" id="sum_ssoDeduct">-฿0</div></div>
-
-      <div class="stat total"><div class="k">ยอดรับสุทธิประจำเดือน</div><div class="v" id="sum_total">฿0</div></div>
-    </div>
-
-    <!-- ANNUAL TAX PROJECTION -->
-    <div class="tax-box">
-      <h3>📊 วิเคราะห์ภาษีเงินได้บุคคลธรรมดาโดยประมาณ (รายได้ทั้งปี)</h3>
-      <div class="tax-grid">
-        <div class="tax-item">
-          <div class="label">รายได้พึงประเมินทั้งปี</div>
-          <div class="val" id="tax_annualGross">฿0</div>
-        </div>
-        <div class="tax-item">
-          <div class="label">หักค่าใช้จ่าย 50%</div>
-          <div class="val" id="tax_expense">฿0</div>
-        </div>
-        <div class="tax-item">
-          <div class="label">หักลดหย่อนส่วนตัว+สปส.</div>
-          <div class="val" id="tax_allowance">฿0</div>
-        </div>
-        <div class="tax-item">
-          <div class="label">เงินได้สุทธิคิดภาษี</div>
-          <div class="val" id="tax_netTaxable">฿0</div>
-        </div>
-        <div class="tax-item" style="border-color:var(--amber);">
-          <div class="label">ภาษีทั้งปีโดยประมาณ</div>
-          <div class="val" style="color:var(--amber-dark);" id="tax_annualTotal">฿0</div>
-        </div>
-        <div class="tax-item" style="border-color:var(--teal);">
-          <div class="label">ภาษีหักเฉลี่ย/เดือน</div>
-          <div class="val" style="color:var(--teal);" id="tax_monthlyWithhold">฿0</div>
-        </div>
-      </div>
-    </div>
-  </section>
 
 </main>
 
-<!-- =========================================
-     AUTH / LOGIN OVERLAY SCREEN
-     ========================================= -->
+<!-- AUTH OVERLAY -->
 <div class="auth-overlay" id="authScreen">
   <div class="auth-box">
     <div style="text-align:center;margin-bottom:16px;">
@@ -815,31 +1035,26 @@
       <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">ลงทะเบียนใหม่</div>
     </div>
 
-    <!-- LOGIN FORM -->
     <form id="formLogin" onsubmit="handleLoginSubmit(event)">
       <div class="form-group">
         <label>อีเมล (Email)</label>
         <input id="login_username" type="email" placeholder="เช่น somchai@gmail.com" required>
       </div>
-      <div class="form-group" style="margin-bottom:4px;">
-        <label>รหัสผ่าน / PIN (อย่างน้อย 6 ตัวอักษร)</label>
+      <div class="form-group">
+        <label>รหัสผ่าน</label>
         <input id="login_pin" type="password" placeholder="รหัสผ่านอย่างน้อย 6 ตัวอักษร" required minlength="6">
-      </div>
-      <div style="text-align:right;">
-        <a href="#" class="forgot-link" onclick="handleForgotPassword(event)">ลืมรหัสผ่าน?</a>
       </div>
       <div class="auth-error" id="loginError">อีเมลหรือรหัสผ่านไม่ถูกต้อง</div>
       <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:14px;padding:9px;">เข้าสู่ระบบ</button>
     </form>
 
-    <!-- REGISTER FORM -->
     <form id="formRegister" style="display:none;" onsubmit="handleRegisterSubmit(event)">
       <div class="form-group">
-        <label>อีเมล (สำหรับเข้าสู่ระบบและกู้คืนรหัสผ่าน)</label>
+        <label>อีเมล</label>
         <input id="reg_username" type="email" placeholder="เช่น somchai@gmail.com" required>
       </div>
       <div class="form-group">
-        <label>ตั้งรหัสผ่าน / PIN (อย่างน้อย 6 ตัวอักษร)</label>
+        <label>ตั้งรหัสผ่าน (อย่างน้อย 6 ตัวอักษร)</label>
         <input id="reg_pin" type="password" placeholder="รหัสผ่านอย่างน้อย 6 ตัวอักษร" required minlength="6">
       </div>
       <div class="form-group">
@@ -861,7 +1076,6 @@
   <div class="modal">
     <h3 id="modalTitle">บันทึกข้อมูลวันที่</h3>
     <div class="modal-sub" id="modalSub"></div>
-
     <input type="hidden" id="modalDate">
 
     <div class="form-group">
@@ -880,7 +1094,7 @@
     </div>
 
     <div class="form-group">
-      <label>มาสายกี่นาที? (หากเกิน 1 นาที จะถูกหักค่าจ้าง 1 ชม.)</label>
+      <label>มาสายกี่นาที? (เกิน 1 นาที หักค่าจ้าง 1 ชม.)</label>
       <input id="modalLate" type="number" min="0" step="1" value="0">
     </div>
 
@@ -955,19 +1169,6 @@
           <span>ยอดรับสุทธิ (NET PAY)</span>
           <span class="val" id="ps_net">-</span>
         </div>
-
-        <div class="ps-sign-grid">
-          <div>
-            <div class="ps-sign-line"></div>
-            <div>ลงชื่อผู้รับเงิน / พนักงาน</div>
-            <div style="font-size:10.5px;color:#666;">วันที่: _____/_____/_________</div>
-          </div>
-          <div>
-            <div class="ps-sign-line"></div>
-            <div>ลงชื่อผู้จ่ายเงิน / ผู้มีอำนาจ</div>
-            <div style="font-size:10.5px;color:#666;">วันที่: _____/_____/_________</div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -983,8 +1184,7 @@
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword, 
     onAuthStateChanged, 
-    signOut,
-    sendPasswordResetEmail
+    signOut 
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { 
     getFirestore, 
@@ -1016,7 +1216,7 @@
     hours: 8,
     ot: 1.5,
     bonus: 1500,
-    sso: 875,
+    sso: 750,
     leaveCounts: 'no',
     quotaSick: 30,
     quotaBusiness: 3,
@@ -1028,6 +1228,7 @@
     offDayOt: 3
   };
 
+  let taxInputsData = {};
   let entries = [];
   let viewDate = new Date();
   viewDate.setDate(1);
@@ -1038,29 +1239,23 @@
   const dayNamesTh = ['วันอาทิตย์','วันจันทร์','วันอังคาร','วันพุธ','วันพฤหัสบดี','วันศุกร์','วันเสาร์'];
 
   const statusLabel = {
-    work: 'มาทำงาน',
-    offday_work: 'ทำงานวันหยุด',
-    leave_sick: 'ลาป่วย',
-    leave_business: 'ลากิจ',
-    leave_annual: 'ลาพักร้อน',
-    leave_unpaid: 'ลาไม่รับเงิน',
-    absent: 'ขาดงาน',
-    holiday: 'วันหยุด'
+    work: 'มาทำงาน', offday_work: 'ทำงานวันหยุด', leave_sick: 'ลาป่วย',
+    leave_business: 'ลากิจ', leave_annual: 'ลาพักร้อน', leave_unpaid: 'ลาไม่รับเงิน',
+    absent: 'ขาดงาน', holiday: 'วันหยุด'
   };
 
   const statusBadgeClass = {
-    work: 'badge-work',
-    offday_work: 'badge-offday-work',
-    leave_sick: 'badge-sick',
-    leave_business: 'badge-business',
-    leave_annual: 'badge-annual',
-    leave_unpaid: 'badge-unpaid',
-    absent: 'badge-absent',
-    holiday: 'badge-holiday'
+    work: 'badge-work', offday_work: 'badge-offday-work', leave_sick: 'badge-sick',
+    leave_business: 'badge-business', leave_annual: 'badge-annual', leave_unpaid: 'badge-unpaid',
+    absent: 'badge-absent', holiday: 'badge-holiday'
   };
 
-  function isValidEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  // SWITCH MAIN TABS
+  function switchMainTab(tab) {
+    document.getElementById('btnTabAttendance').classList.toggle('active', tab === 'attendance');
+    document.getElementById('btnTabTax').classList.toggle('active', tab === 'tax');
+    document.getElementById('attendanceView').style.display = (tab === 'attendance') ? 'block' : 'none';
+    document.getElementById('taxView').style.display = (tab === 'tax') ? 'block' : 'none';
   }
 
   onAuthStateChanged(auth, async (user) => {
@@ -1094,25 +1289,21 @@
         const data = docSnap.data();
         if (data.settings) settings = Object.assign(settings, data.settings);
         if (data.entries && Array.isArray(data.entries)) entries = data.entries;
-        else entries = [];
-        isSettingsOpen = false;
-      } else {
-        isSettingsOpen = true;
-        entries = [];
+        if (data.taxInputs) taxInputsData = data.taxInputs;
       }
     } catch (e) {
-      console.error("Load from Firestore error:", e);
-      isSettingsOpen = true;
+      console.error("Load Firestore error:", e);
     }
 
     fillSettingsForm();
+    fillTaxForm();
     updateSettingsUI();
     render();
+    calculateFullTax();
   }
 
   async function saveSettings() {
     if (!currentUserUID) return;
-
     settings = {
       name: document.getElementById('s_name').value.trim(),
       position: document.getElementById('s_position').value.trim(),
@@ -1135,20 +1326,156 @@
     try {
       const userRef = doc(db, "users", currentUserUID);
       await setDoc(userRef, { settings, updatedAt: new Date().toISOString() }, { merge: true });
-      
       document.getElementById('hdr_userName').textContent = settings.name || currentUserEmail.split('@')[0];
-
       const msg = document.getElementById('saveMsg');
       msg.style.opacity = 1;
       setTimeout(() => msg.style.opacity = 0, 1600);
     } catch (e) {
-      console.error("Save to Firestore error:", e);
       alert("บันทึกข้อมูลไม่สำเร็จ: " + e.message);
     }
-
     isSettingsOpen = false;
     updateSettingsUI();
     render();
+  }
+
+  // COMPREHENSIVE PIT TAX CALCULATION FUNCTION
+  function calculateFullTax() {
+    const income = parseFloat(document.getElementById('t_income').value) || (settings.salary * 12);
+    const withheld = parseFloat(document.getElementById('t_withheld').value) || 0;
+    
+    // 1. Expense Deduction (50% max 100,000)
+    const expense = Math.min(income * 0.5, 100000);
+
+    // 2. Category 1 Deductions
+    const personal = 60000;
+    const spouse = parseFloat(document.getElementById('t_spouse').value) || 0;
+    const childrenCount = parseFloat(document.getElementById('t_children').value) || 0;
+    const childrenDeduction = childrenCount * 30000;
+    const parentsCount = Math.min(parseFloat(document.getElementById('t_parents').value) || 0, 4);
+    const parentsDeduction = parentsCount * 30000;
+    const disabledCount = parseFloat(document.getElementById('t_disabled').value) || 0;
+    const disabledDeduction = disabledCount * 60000;
+
+    // 3. Category 2 Deductions
+    const sso = Math.min(parseFloat(document.getElementById('t_sso').value) || (settings.sso * 12), 9000);
+    const lifeIns = Math.min(parseFloat(document.getElementById('t_lifeIns').value) || 0, 100000);
+    const healthIns = Math.min(parseFloat(document.getElementById('t_healthIns').value) || 0, 25000);
+    const combinedLifeHealth = Math.min(lifeIns + healthIns, 100000);
+
+    const parentsHealth = Math.min(parseFloat(document.getElementById('t_parentsHealth').value) || 0, 15000);
+    const pvd = Math.min(parseFloat(document.getElementById('t_pvd').value) || 0, income * 0.15);
+    const rmf = Math.min(parseFloat(document.getElementById('t_rmf').value) || 0, income * 0.30);
+    const ssf = Math.min(parseFloat(document.getElementById('t_ssf').value) || 0, income * 0.30);
+    const pensionIns = Math.min(parseFloat(document.getElementById('t_pensionIns').value) || 0, income * 0.15, 200000);
+
+    // 4. Category 3 Deductions
+    const homeLoan = Math.min(parseFloat(document.getElementById('t_homeLoan').value) || 0, 100000);
+    const donateGeneral = parseFloat(document.getElementById('t_donateGeneral').value) || 0;
+    const donateEdu = (parseFloat(document.getElementById('t_donateEdu').value) || 0) * 2;
+    const donatePolitical = Math.min(parseFloat(document.getElementById('t_donatePolitical').value) || 0, 10000);
+
+    // 5. Category 4 Deductions
+    const easyReceipt = Math.min(parseFloat(document.getElementById('t_easyReceipt').value) || 0, 50000);
+
+    // Total Deductions Before Donations
+    const baseDeductions = personal + spouse + childrenDeduction + parentsDeduction + disabledDeduction
+      + sso + combinedLifeHealth + parentsHealth + pvd + rmf + ssf + pensionIns + homeLoan + easyReceipt;
+
+    const netBeforeDonation = Math.max(0, income - expense - baseDeductions);
+    
+    // Donation cap: 10% of net before donation
+    const maxDonationAllowed = netBeforeDonation * 0.10;
+    const actualDonation = Math.min(donateGeneral + donateEdu + donatePolitical, maxDonationAllowed);
+
+    const totalDeductions = baseDeductions + actualDonation;
+    const netTaxable = Math.max(0, income - expense - totalDeductions);
+
+    // PIT Progressive Brackets Calculation
+    let annualTax = 0;
+    let remain = netTaxable;
+
+    const brackets = [
+      { cap: 150000, rate: 0 },
+      { cap: 150000, rate: 0.05 },
+      { cap: 200000, rate: 0.10 },
+      { cap: 250000, rate: 0.15 },
+      { cap: 250000, rate: 0.20 },
+      { cap: 1000000, rate: 0.25 },
+      { cap: 3000000, rate: 0.30 },
+      { cap: Infinity, rate: 0.35 },
+    ];
+
+    for (const b of brackets) {
+      if (remain <= 0) break;
+      const taxableInBracket = Math.min(remain, b.cap);
+      annualTax += taxableInBracket * b.rate;
+      remain -= taxableInBracket;
+    }
+
+    const diff = annualTax - withheld;
+
+    // Update Dashboard UI
+    document.getElementById('td_gross').textContent = fmtBaht(income);
+    document.getElementById('td_expense').textContent = fmtBaht(expense);
+    document.getElementById('td_totalDeduction').textContent = fmtBaht(totalDeductions);
+    document.getElementById('td_netTaxable').textContent = fmtBaht(netTaxable);
+    document.getElementById('td_annualTax').textContent = fmtBaht(annualTax);
+
+    const statusEl = document.getElementById('td_taxStatus');
+    if (diff < 0) {
+      statusEl.textContent = `ได้เงินคืนภาษี ${fmtBaht(Math.abs(diff))}`;
+      statusEl.style.color = '#34D399';
+    } else if (diff > 0) {
+      statusEl.textContent = `ต้องจ่ายเพิ่ม ${fmtBaht(diff)}`;
+      statusEl.style.color = '#F87171';
+    } else {
+      statusEl.textContent = 'พอดี (ไม่ต้องจ่ายเพิ่ม/ไม่ได้คืน)';
+      statusEl.style.color = '#FBBF24';
+    }
+  }
+
+  async function saveTaxInputs() {
+    if (!currentUserUID) return;
+    const taxInputs = {
+      income: document.getElementById('t_income').value,
+      withheld: document.getElementById('t_withheld').value,
+      spouse: document.getElementById('t_spouse').value,
+      children: document.getElementById('t_children').value,
+      parents: document.getElementById('t_parents').value,
+      disabled: document.getElementById('t_disabled').value,
+      sso: document.getElementById('t_sso').value,
+      lifeIns: document.getElementById('t_lifeIns').value,
+      healthIns: document.getElementById('t_healthIns').value,
+      parentsHealth: document.getElementById('t_parentsHealth').value,
+      pvd: document.getElementById('t_pvd').value,
+      rmf: document.getElementById('t_rmf').value,
+      ssf: document.getElementById('t_ssf').value,
+      pensionIns: document.getElementById('t_pensionIns').value,
+      homeLoan: document.getElementById('t_homeLoan').value,
+      donateGeneral: document.getElementById('t_donateGeneral').value,
+      donateEdu: document.getElementById('t_donateEdu').value,
+      donatePolitical: document.getElementById('t_donatePolitical').value,
+      easyReceipt: document.getElementById('t_easyReceipt').value,
+    };
+
+    try {
+      const userRef = doc(db, "users", currentUserUID);
+      await setDoc(userRef, { taxInputs, updatedAt: new Date().toISOString() }, { merge: true });
+      alert('บันทึกข้อมูลและแผนลดหย่อนภาษีเรียบร้อยแล้ว');
+    } catch (e) {
+      alert('เกิดข้อผิดพลาดในการบันทึกภาษี: ' + e.message);
+    }
+  }
+
+  function fillTaxForm() {
+    if (!taxInputsData) return;
+    const ids = ['income','withheld','spouse','children','parents','disabled','sso','lifeIns','healthIns','parentsHealth','pvd','rmf','ssf','pensionIns','homeLoan','donateGeneral','donateEdu','donatePolitical','easyReceipt'];
+    ids.forEach(id => {
+      const el = document.getElementById('t_' + id);
+      if (el && taxInputsData[id] !== undefined) {
+        el.value = taxInputsData[id];
+      }
+    });
   }
 
   async function persistEntries() {
@@ -1168,7 +1495,7 @@
     document.getElementById('s_hours').value = settings.hours;
     document.getElementById('s_ot').value = settings.ot;
     document.getElementById('s_bonus').value = settings.bonus;
-    document.getElementById('s_sso').value = settings.sso !== undefined ? settings.sso : 875;
+    document.getElementById('s_sso').value = settings.sso !== undefined ? settings.sso : 750;
     document.getElementById('s_leaveCounts').value = settings.leaveCounts;
     document.getElementById('s_quota_sick').value = settings.quotaSick !== undefined ? settings.quotaSick : 30;
     document.getElementById('s_quota_biz').value = settings.quotaBusiness !== undefined ? settings.quotaBusiness : 3;
@@ -1193,9 +1520,9 @@
       btn.textContent = 'แก้ไข ▼';
     }
 
-    const daily = settings.salary > 0 ? (settings.salary / 31) : 0;
+    const daily = settings.salary > 0 ? (settings.salary / 30) : 0;
     const empName = settings.name ? settings.name : (currentUserEmail ? currentUserEmail.split('@')[0] : 'พนักงาน');
-    summary.textContent = `${empName} • ฿${Number(settings.salary).toLocaleString('th-TH')} (เฉลี่ยวันละ ฿${Math.round(daily).toLocaleString('th-TH')}) • ลา: ป่วย ${settings.quotaSick||30} / กิจ ${settings.quotaBusiness||3} / พักร้อน ${settings.quotaAnnual||6} วัน`;
+    summary.textContent = `${empName} • ฿${Number(settings.salary).toLocaleString('th-TH')} (เฉลี่ยวันละ ฿${Math.round(daily).toLocaleString('th-TH')})`;
   }
 
   function toggleSettings() {
@@ -1208,28 +1535,15 @@
     document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
     document.getElementById('formLogin').style.display = (tab === 'login') ? 'block' : 'none';
     document.getElementById('formRegister').style.display = (tab === 'register') ? 'block' : 'none';
-    document.getElementById('loginError').style.display = 'none';
-    document.getElementById('regError').style.display = 'none';
   }
 
   async function handleLoginSubmit(e) {
     e.preventDefault();
     const email = document.getElementById('login_username').value.trim();
     const p = document.getElementById('login_pin').value;
-
-    if (!isValidEmail(email)) {
-      document.getElementById('loginError').textContent = 'กรุณากรอกอีเมลให้ถูกต้องตามรูปแบบ (เช่น name@example.com)';
-      document.getElementById('loginError').style.display = 'block';
-      return;
-    }
-
     try {
       await signInWithEmailAndPassword(auth, email, p);
     } catch (err) {
-      let msg = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
-      if (err.code === 'auth/invalid-email') msg = 'รูปแบบอีเมลไม่ถูกต้อง';
-      else if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') msg = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
-      document.getElementById('loginError').textContent = msg;
       document.getElementById('loginError').style.display = 'block';
     }
   }
@@ -1241,60 +1555,22 @@
     const name = document.getElementById('reg_name').value.trim();
     const salary = parseFloat(document.getElementById('reg_salary').value) || 25000;
 
-    if (!isValidEmail(email)) {
-      document.getElementById('regError').textContent = 'กรุณากรอกอีเมลให้ถูกต้องตามรูปแบบ (เช่น name@example.com)';
-      document.getElementById('regError').style.display = 'block';
-      return;
-    }
-
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, p);
       const initialSettings = Object.assign({}, settings, { name, salary });
-      
-      const userRef = doc(db, "users", cred.user.uid);
-      await setDoc(userRef, {
+      await setDoc(doc(db, "users", cred.user.uid), {
         settings: initialSettings,
         entries: [],
         createdAt: new Date().toISOString()
       });
     } catch (err) {
-      let msg = 'ไม่สามารถสร้างบัญชีได้: ';
-      if (err.code === 'auth/email-already-in-use') msg = 'อีเมลนี้ถูกใช้งานลงทะเบียนแล้ว';
-      else if (err.code === 'auth/invalid-email') msg = 'รูปแบบอีเมลไม่ถูกต้อง';
-      else if (err.code === 'auth/weak-password') msg = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
-      else msg += err.message;
-      document.getElementById('regError').textContent = msg;
+      document.getElementById('regError').textContent = err.message;
       document.getElementById('regError').style.display = 'block';
     }
   }
 
-  async function handleForgotPassword(e) {
-    if (e) e.preventDefault();
-    const email = prompt("กรุณากรอกอีเมลของคุณเพื่อรับลิงก์ตั้งรหัสผ่านใหม่:");
-    if (!email) return;
-
-    const trimmedEmail = email.trim();
-    if (!isValidEmail(trimmedEmail)) {
-      alert("รูปแบบอีเมลไม่ถูกต้อง กรุณาระบุ เช่น name@example.com");
-      return;
-    }
-
-    try {
-      await sendPasswordResetEmail(auth, trimmedEmail);
-      alert(`ระบบได้ส่งลิงก์สำหรับรีเซ็ตรหัสผ่านไปยัง ${trimmedEmail} เรียบร้อยแล้ว\n(กรุณาตรวจสอบในกล่องข้อความ หรือโฟลเดอร์ Junk/Spam)`);
-    } catch (err) {
-      let msg = "ไม่สามารถส่งอีเมลรีเซ็ตรหัสผ่านได้: ";
-      if (err.code === 'auth/user-not-found') msg = "ไม่พบอีเมลนี้ในระบบ";
-      else if (err.code === 'auth/invalid-email') msg = "รูปแบบอีเมลไม่ถูกต้อง";
-      else msg += err.message;
-      alert(msg);
-    }
-  }
-
   async function handleLogout() {
-    if (confirm('ต้องการออกจากระบบใช่หรือไม่?')) {
-      await signOut(auth);
-    }
+    if (confirm('ต้องการออกจากระบบใช่หรือไม่?')) await signOut(auth);
   }
 
   function shiftMonth(delta) {
@@ -1310,7 +1586,6 @@
     const d = new Date(dateStr + 'T00:00:00');
     const dow = d.getDay();
     const isOffDay = (dow === settings.offDay);
-    
     const existing = entries.find(e => e.date === dateStr);
 
     document.getElementById('modalDate').value = dateStr;
@@ -1344,28 +1619,20 @@
 
     if (status === 'leave_sick') {
       const used = yearEntries.filter(e => e.status === 'leave_sick').length;
-      const quota = settings.quotaSick || 30;
-      hintEl.textContent = `ℹ️ ลาป่วยปีนี้: ใช้ไป ${used}/${quota} วัน (เหลือ ${Math.max(0, quota - used)} วัน)`;
+      hintEl.textContent = `ℹ️ ลาป่วยปีนี้: ใช้ไป ${used}/${settings.quotaSick||30} วัน`;
     } else if (status === 'leave_business') {
       const used = yearEntries.filter(e => e.status === 'leave_business').length;
-      const quota = settings.quotaBusiness || 3;
-      hintEl.textContent = `ℹ️ ลากิจปีนี้: ใช้ไป ${used}/${quota} วัน (เหลือ ${Math.max(0, quota - used)} วัน)`;
+      hintEl.textContent = `ℹ️ ลากิจปีนี้: ใช้ไป ${used}/${settings.quotaBusiness||3} วัน`;
     } else if (status === 'leave_annual') {
       const used = yearEntries.filter(e => e.status === 'leave_annual').length;
-      const quota = settings.quotaAnnual || 6;
-      hintEl.textContent = `ℹ️ ลาพักร้อนปีนี้: ใช้ไป ${used}/${quota} วัน (เหลือ ${Math.max(0, quota - used)} วัน)`;
+      hintEl.textContent = `ℹ️ ลาพักร้อนปีนี้: ใช้ไป ${used}/${settings.quotaAnnual||6} วัน`;
     } else {
       hintEl.textContent = '';
     }
   }
 
-  function closeModal() {
-    document.getElementById('entryModal').classList.remove('open');
-  }
-
-  function handleModalOverlayClick(e) {
-    if (e.target.id === 'entryModal') closeModal();
-  }
+  function closeModal() { document.getElementById('entryModal').classList.remove('open'); }
+  function handleModalOverlayClick(e) { if (e.target.id === 'entryModal') closeModal(); }
 
   async function saveModalEntry() {
     const date = document.getElementById('modalDate').value;
@@ -1390,57 +1657,17 @@
     render();
   }
 
-  function calculatePIT(annualGross, annualSSO) {
-    const expense = Math.min(annualGross * 0.5, 100000);
-    const personalAllowance = 60000;
-    const totalAllowance = personalAllowance + annualSSO;
-    const netTaxable = Math.max(0, annualGross - expense - totalAllowance);
-
-    let tax = 0;
-    let remain = netTaxable;
-
-    const brackets = [
-      { cap: 150000, rate: 0 },
-      { cap: 150000, rate: 0.05 },
-      { cap: 200000, rate: 0.10 },
-      { cap: 250000, rate: 0.15 },
-      { cap: 250000, rate: 0.20 },
-      { cap: 1000000, rate: 0.25 },
-      { cap: 3000000, rate: 0.30 },
-      { cap: Infinity, rate: 0.35 },
-    ];
-
-    for (const b of brackets) {
-      if (remain <= 0) break;
-      const taxableInBracket = Math.min(remain, b.cap);
-      tax += taxableInBracket * b.rate;
-      remain -= taxableInBracket;
-    }
-
-    return { expense, totalAllowance, netTaxable, annualTax: tax, monthlyWithhold: tax / 12 };
-  }
-
   function backupData() {
-    const data = {
-      user: currentUserEmail,
-      settings,
-      entries,
-      exportedAt: new Date().toISOString(),
-      version: '3.0-firebase'
-    };
+    const data = { user: currentUserEmail, settings, entries, taxInputs: taxInputsData, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `salary_backup_${currentUserEmail.split('@')[0]}_${new Date().toISOString().slice(0,10)}.json`;
+    a.download = `backup_${currentUserEmail.split('@')[0]}_${new Date().toISOString().slice(0,10)}.json`;
     a.click();
-    URL.revokeObjectURL(url);
   }
 
-  function triggerRestore() {
-    document.getElementById('restoreFileInput').click();
-  }
-
+  function triggerRestore() { document.getElementById('restoreFileInput').click(); }
   function restoreData(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -1449,23 +1676,19 @@
       try {
         const data = JSON.parse(e.target.result);
         if (data.settings) settings = Object.assign(settings, data.settings);
-        if (data.entries && Array.isArray(data.entries)) entries = data.entries;
-        
+        if (data.entries) entries = data.entries;
+        if (data.taxInputs) taxInputsData = data.taxInputs;
         if (currentUserUID) {
-          const userRef = doc(db, "users", currentUserUID);
-          await setDoc(userRef, { settings, entries, updatedAt: new Date().toISOString() }, { merge: true });
+          await setDoc(doc(db, "users", currentUserUID), { settings, entries, taxInputs: taxInputsData }, { merge: true });
         }
-
         fillSettingsForm();
-        updateSettingsUI();
+        fillTaxForm();
         render();
-        alert('นำเข้าข้อมูลสำเร็จเรียบร้อยแล้ว');
-      } catch (err) {
-        alert('ไฟล์ไม่ถูกต้อง หรือโครงสร้างข้อมูลผิดพลาด');
-      }
+        calculateFullTax();
+        alert('กู้คืนข้อมูลสำเร็จ');
+      } catch (err) { alert('ไฟล์ไม่ถูกต้อง'); }
     };
     reader.readAsText(file);
-    event.target.value = '';
   }
 
   function exportMonthlyCSV() {
@@ -1474,60 +1697,44 @@
     const monthEntries = entries.filter(en => {
       const d = new Date(en.date+'T00:00:00');
       return d.getFullYear() === y && d.getMonth() === m;
-    }).sort((a, b) => a.date.localeCompare(b.date));
+    });
 
-    if (monthEntries.length === 0) {
-      alert('ไม่มีข้อมูลรายการในเดือนนี้');
-      return;
-    }
-
-    let csv = 'วันที่,วันในสัปดาห์,สถานะ,ชั่วโมง OT,มาสาย (นาที)\n';
+    let csv = 'วันที่,สถานะ,ชั่วโมง OT,มาสาย (นาที)\n';
     monthEntries.forEach(en => {
-      const d = new Date(en.date+'T00:00:00');
-      const dayName = dayNamesTh[d.getDay()];
-      const stName = statusLabel[en.status] || en.status;
-      csv += `"${en.date}","${dayName}","${stName}",${en.ot || 0},${en.late || 0}\n`;
+      csv += `"${en.date}","${statusLabel[en.status]||en.status}",${en.ot||0},${en.late||0}\n`;
     });
 
     const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `attendance_${currentUserEmail.split('@')[0]}_${thMonths[m]}_${y+543}.csv`;
+    a.download = `attendance_${thMonths[m]}_${y+543}.csv`;
     a.click();
-    URL.revokeObjectURL(url);
   }
 
   function openPayslipModal() {
-    if (!currentPayrollData) {
-      alert('ไม่พบข้อมูลเงินเดือนของเดือนนี้');
-      return;
-    }
+    if (!currentPayrollData) return;
     const p = currentPayrollData;
-    const y = viewDate.getFullYear();
     const m = viewDate.getMonth();
+    const y = viewDate.getFullYear();
 
     document.getElementById('ps_period').textContent = `ประจำงวด: ${thMonths[m]} ${y+543}`;
     document.getElementById('ps_name').textContent = settings.name || currentUserEmail.split('@')[0];
-    document.getElementById('ps_position').textContent = settings.position || 'พนักงานทั่วไป';
+    document.getElementById('ps_position').textContent = settings.position || 'พนักงาน';
     document.getElementById('ps_salary').textContent = Number(settings.salary).toLocaleString('th-TH');
     document.getElementById('ps_days_worked').textContent = p.payableDays;
 
-    let incomeHtml = `
-      <tr><td>เงินเดือนตามวันทำงาน (${p.payableDays} วัน)</td><td class="right">${fmtBaht(p.basePay)}</td></tr>
-    `;
+    let incomeHtml = `<tr><td>เงินเดือนตามวันทำงาน (${p.payableDays} วัน)</td><td class="right">${fmtBaht(p.basePay)}</td></tr>`;
     if (p.offDayBonus > 0) incomeHtml += `<tr><td>โบนัสวันหยุด (${p.offDayWorkedDays} วัน)</td><td class="right">${fmtBaht(p.offDayBonus)}</td></tr>`;
     if (p.otPay > 0) incomeHtml += `<tr><td>ค่าล่วงเวลา / OT (${p.totalOtHours} ชม.)</td><td class="right">${fmtBaht(p.otPay)}</td></tr>`;
     if (p.allowancePay > 0) incomeHtml += `<tr><td>ค่าเดินทาง & ค่าเช่าบ้าน</td><td class="right">${fmtBaht(p.allowancePay)}</td></tr>`;
-    if (p.otMealPay > 0) incomeHtml += `<tr><td>ค่าอาหาร OT (${p.otMealDays} วัน)</td><td class="right">${fmtBaht(p.otMealPay)}</td></tr>`;
-    if (p.bonusPay > 0) incomeHtml += `<tr><td>เบี้ยขยัน / ไม่ขาดงาน</td><td class="right">${fmtBaht(p.bonusPay)}</td></tr>`;
+    if (p.bonusPay > 0) incomeHtml += `<tr><td>เบี้ยขยัน</td><td class="right">${fmtBaht(p.bonusPay)}</td></tr>`;
     document.getElementById('ps_income_rows').innerHTML = incomeHtml;
 
     let deductHtml = '';
-    if (p.lateDeduction > 0) deductHtml += `<tr><td>หักมาสาย (${p.lateOccurrences} ครั้ง / ${p.lateDeductedHours} ชม.)</td><td class="right">-${fmtBaht(p.lateDeduction)}</td></tr>`;
+    if (p.lateDeduction > 0) deductHtml += `<tr><td>หักมาสาย</td><td class="right">-${fmtBaht(p.lateDeduction)}</td></tr>`;
     if (p.ssoDeduction > 0) deductHtml += `<tr><td>หักประกันสังคม</td><td class="right">-${fmtBaht(p.ssoDeduction)}</td></tr>`;
-    if (!deductHtml) deductHtml = `<tr><td>ไม่มีรายการหัก</td><td class="right">฿0</td></tr>`;
-    document.getElementById('ps_deduct_rows').innerHTML = deductHtml;
+    document.getElementById('ps_deduct_rows').innerHTML = deductHtml || `<tr><td>ไม่มีรายการหัก</td><td class="right">฿0</td></tr>`;
 
     document.getElementById('ps_gross').textContent = fmtBaht(p.grossPay);
     document.getElementById('ps_total_deduct').textContent = '-' + fmtBaht(p.totalDeductions);
@@ -1536,13 +1743,8 @@
     document.getElementById('payslipModal').classList.add('open');
   }
 
-  function closePayslipModal() {
-    document.getElementById('payslipModal').classList.remove('open');
-  }
-
-  function handlePayslipOverlayClick(e) {
-    if (e.target.id === 'payslipModal') closePayslipModal();
-  }
+  function closePayslipModal() { document.getElementById('payslipModal').classList.remove('open'); }
+  function handlePayslipOverlayClick(e) { if (e.target.id === 'payslipModal') closePayslipModal(); }
 
   function render() {
     const y = viewDate.getFullYear();
@@ -1554,37 +1756,14 @@
       return d.getFullYear() === y && d.getMonth() === m;
     });
 
-    const yearEntries = entries.filter(en => {
-      const d = new Date(en.date+'T00:00:00');
-      return d.getFullYear() === y;
-    });
-
     const entryMap = {};
     monthEntries.forEach(en => { entryMap[en.date] = en; });
 
-    const usedSick = yearEntries.filter(e => e.status === 'leave_sick').length;
-    const usedBiz = yearEntries.filter(e => e.status === 'leave_business').length;
-    const usedVac = yearEntries.filter(e => e.status === 'leave_annual').length;
-
-    const qSick = settings.quotaSick || 30;
-    const qBiz = settings.quotaBusiness || 3;
-    const qVac = settings.quotaAnnual || 6;
-
-    document.getElementById('quota_sick_display').textContent = `${usedSick} / ${qSick} วัน`;
-    document.getElementById('quota_sick_remain').textContent = `คงเหลือ ${Math.max(0, qSick - usedSick)} วัน`;
-    document.getElementById('quota_biz_display').textContent = `${usedBiz} / ${qBiz} วัน`;
-    document.getElementById('quota_biz_remain').textContent = `คงเหลือ ${Math.max(0, qBiz - usedBiz)} วัน`;
-    document.getElementById('quota_vac_display').textContent = `${usedVac} / ${qVac} วัน`;
-    document.getElementById('quota_vac_remain').textContent = `คงเหลือ ${Math.max(0, qVac - usedVac)} วัน`;
-
     const calGrid = document.getElementById('calendarGrid');
     calGrid.innerHTML = '';
-
     const firstDayIndex = new Date(y, m, 1).getDay();
     const totalDaysInMonth = new Date(y, m + 1, 0).getDate();
-
-    const today = new Date();
-    const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+    const todayStr = new Date().toISOString().slice(0,10);
 
     for (let i = 0; i < firstDayIndex; i++) {
       const empty = document.createElement('div');
@@ -1594,8 +1773,7 @@
 
     for (let day = 1; day <= totalDaysInMonth; day++) {
       const dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-      const dayObj = new Date(y, m, day);
-      const dow = dayObj.getDay();
+      const dow = new Date(y, m, day).getDay();
       const isOff = dow === settings.offDay;
       const isToday = (dStr === todayStr);
 
@@ -1604,11 +1782,9 @@
       cell.onclick = () => openModal(dStr);
 
       let cellInner = `<div class="day-num">${day}</div><div class="cell-content">`;
-
       if (entryMap[dStr]) {
         const en = entryMap[dStr];
-        cellInner += `<span class="badge ${statusBadgeClass[en.status] || 'badge-work'}">${statusLabel[en.status] || 'ทำงาน'}</span>`;
-        
+        cellInner += `<span class="badge ${statusBadgeClass[en.status] || 'badge-work'}">${statusLabel[en.status]}</span>`;
         let tagRow = '';
         if (en.ot > 0) tagRow += `<span class="ot-tag">+${en.ot}h</span>`;
         if (en.late > 0) tagRow += `<span class="late-tag">สาย ${en.late}น.</span>`;
@@ -1622,19 +1798,16 @@
     const workedDays = monthEntries.filter(en => en.status === 'work').length;
     const offDayWorkedDays = monthEntries.filter(en => en.status === 'offday_work').length;
     const actualWorkedDays = workedDays + offDayWorkedDays;
-
     const paidLeaveDays = monthEntries.filter(en => ['leave_sick','leave_business','leave_annual'].includes(en.status)).length;
     const unpaidLeaveDays = monthEntries.filter(en => en.status === 'leave_unpaid').length;
     const absentDays = monthEntries.filter(en => en.status === 'absent').length;
 
     const totalOtHours = monthEntries.reduce((sum, en) => sum + (en.ot || 0), 0);
     const otMealDays = monthEntries.filter(en => (en.ot || 0) > 0).length;
-
-    const lateEntries = monthEntries.filter(en => (en.late || 0) > 1);
-    const lateOccurrences = lateEntries.length;
+    const lateOccurrences = monthEntries.filter(en => (en.late || 0) > 1).length;
     const lateDeductedHours = lateOccurrences * 1;
 
-    const dailyRate = settings.salary > 0 ? (settings.salary / 31) : 0;
+    const dailyRate = settings.salary > 0 ? (settings.salary / 30) : 0;
     const hourlyRate = settings.hours > 0 ? (dailyRate / settings.hours) : 0;
 
     const payableDays = actualWorkedDays + paidLeaveDays;
@@ -1649,80 +1822,42 @@
     }, 0);
 
     const otMealPay = settings.otMeal * otMealDays;
-
     const hasDisqualification = absentDays > 0 || unpaidLeaveDays > 0 || (settings.leaveCounts === 'yes' && paidLeaveDays > 0);
-    const qualifiesForBonus = !hasDisqualification && monthEntries.length > 0;
-    const bonusPay = qualifiesForBonus ? settings.bonus : 0;
+    const bonusPay = (!hasDisqualification && monthEntries.length > 0) ? settings.bonus : 0;
 
     const lateDeduction = lateDeductedHours * hourlyRate;
-    const ssoDeduction = settings.sso !== undefined ? settings.sso : 875;
+    const ssoDeduction = settings.sso !== undefined ? settings.sso : 750;
 
     const grossPay = basePay + offDayBonus + allowancePay + otPay + otMealPay + bonusPay;
     const totalDeductions = lateDeduction + ssoDeduction;
     const netTotal = Math.max(0, grossPay - totalDeductions);
 
-    currentPayrollData = {
-      payableDays,
-      actualWorkedDays,
-      offDayWorkedDays,
-      basePay,
-      offDayBonus,
-      allowancePay,
-      otPay,
-      totalOtHours,
-      otMealPay,
-      otMealDays,
-      bonusPay,
-      lateOccurrences,
-      lateDeductedHours,
-      lateDeduction,
-      ssoDeduction,
-      grossPay,
-      totalDeductions,
-      netTotal
-    };
+    currentPayrollData = { payableDays, basePay, offDayWorkedDays, offDayBonus, allowancePay, otPay, totalOtHours, otMealPay, bonusPay, lateDeduction, ssoDeduction, grossPay, totalDeductions, netTotal };
 
     document.getElementById('sum_worked').textContent = actualWorkedDays + ' วัน';
     document.getElementById('sum_paidLeave').textContent = paidLeaveDays + ' วัน';
     document.getElementById('sum_unpaidLeave').textContent = unpaidLeaveDays + ' / ' + absentDays + ' วัน';
     document.getElementById('sum_dailyHourly').textContent = `${fmtBaht(dailyRate)} / ฿${Math.round(hourlyRate)}`;
     document.getElementById('sum_base').textContent = fmtBaht(basePay);
-    document.getElementById('sum_offDayCount').textContent = offDayWorkedDays;
     document.getElementById('sum_offDayBonus').textContent = fmtBaht(offDayBonus);
     document.getElementById('sum_allowance').textContent = fmtBaht(allowancePay);
-    document.getElementById('sum_otHours').textContent = totalOtHours;
     document.getElementById('sum_ot').textContent = fmtBaht(otPay);
-    document.getElementById('sum_otMealDays').textContent = otMealDays;
     document.getElementById('sum_otMeal').textContent = fmtBaht(otMealPay);
     document.getElementById('sum_bonus').textContent = fmtBaht(bonusPay);
-    
-    document.getElementById('sum_lateCount').textContent = lateOccurrences;
-    document.getElementById('sum_lateHours').textContent = lateDeductedHours;
     document.getElementById('sum_lateDeduct').textContent = '-' + fmtBaht(lateDeduction);
     document.getElementById('sum_ssoDeduct').textContent = '-' + fmtBaht(ssoDeduction);
     document.getElementById('sum_total').textContent = fmtBaht(netTotal);
 
     const stampWrap = document.getElementById('stampWrap');
-    if (monthEntries.length === 0) {
-      stampWrap.innerHTML = '';
-    } else if (qualifiesForBonus) {
-      stampWrap.innerHTML = '<div class="stamp">ไม่ขาดงาน<br>รับโบนัส</div>';
-    } else {
-      stampWrap.innerHTML = '<div class="stamp broken">พลาดโบนัส<br>เดือนนี้</div>';
-    }
-
-    const estimatedAnnualGross = grossPay > 0 ? (grossPay * 12) : (settings.salary * 12);
-    const annualSSO = ssoDeduction * 12;
-    const taxResult = calculatePIT(estimatedAnnualGross, annualSSO);
-
-    document.getElementById('tax_annualGross').textContent = fmtBaht(estimatedAnnualGross);
-    document.getElementById('tax_expense').textContent = fmtBaht(taxResult.expense);
-    document.getElementById('tax_allowance').textContent = fmtBaht(taxResult.totalAllowance);
-    document.getElementById('tax_netTaxable').textContent = fmtBaht(taxResult.netTaxable);
-    document.getElementById('tax_annualTotal').textContent = fmtBaht(taxResult.annualTax);
-    document.getElementById('tax_monthlyWithhold').textContent = fmtBaht(taxResult.monthlyWithhold);
+    if (monthEntries.length === 0) stampWrap.innerHTML = '';
+    else if (bonusPay > 0) stampWrap.innerHTML = '<div class="stamp">ไม่ขาดงาน<br>รับโบนัส</div>';
+    else stampWrap.innerHTML = '<div class="stamp broken">พลาดโบนัส<br>เดือนนี้</div>';
   }
 
+  // GLOBAL EXPORTS
+  window.switchMainTab = switchMainTab;
+  window.calculateFullTax = calculateFullTax;
+  window.saveTaxInputs = saveTaxInputs;
   window.toggleSettings = toggleSettings;
   window.saveSettings = saveSettings;
   window.shiftMonth = shiftMonth;
@@ -1742,7 +1877,6 @@
   window.switchAuthTab = switchAuthTab;
   window.handleLoginSubmit = handleLoginSubmit;
   window.handleRegisterSubmit = handleRegisterSubmit;
-  window.handleForgotPassword = handleForgotPassword;
   window.handleLogout = handleLogout;
 </script>
 
