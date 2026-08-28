@@ -279,6 +279,7 @@
   .monthbar .nav{display:flex;align-items:center;gap:6px;}
   .monthbar button{background:var(--ink);color:#F1E9D2;padding:5px 12px;font-family:'IBM Plex Mono',monospace;}
   .monthbar .label{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;min-width:140px;text-align:center;}
+  .period-range{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--muted);margin-top:2px;letter-spacing:.01em;}
 
   .calendar-wrapper{
     background:#FFFDF7;
@@ -317,6 +318,9 @@
   .cal-cell:hover{background:#F5ECD0;}
   .cal-cell.empty{background:rgba(201,188,152,.15);cursor:default;}
   .cal-cell.is-offday{background:#FAF2E2;}
+  .cal-cell.other-month{background:rgba(201,188,152,.22);}
+  .cal-cell.other-month:hover{background:rgba(201,188,152,.34);}
+  .cal-cell.other-month .day-num{color:var(--muted);}
   .cal-cell.is-today .day-num{
     background:var(--ink);
     color:#FFF;
@@ -332,6 +336,14 @@
     color:var(--text);
     margin-bottom:3px;
     width:fit-content;
+    display:flex;
+    align-items:baseline;
+    gap:3px;
+  }
+  .day-num-month{
+    font-size:9px;
+    font-weight:600;
+    color:var(--muted);
   }
 
   .cell-content{
@@ -388,6 +400,31 @@
   }
   .stat.total .k{color:#C9BC98;}
   .stat.total .v{font-size:26px;color:var(--amber);}
+
+  /* Expense Tracker */
+  .expense-list{display:flex;flex-direction:column;gap:8px;}
+  .expense-row{
+    display:flex;align-items:center;gap:12px;
+    background:#FFFDF7;border:1px solid var(--line);border-radius:8px;
+    padding:10px 14px;
+  }
+  .expense-row .exp-main{flex:1;min-width:0;}
+  .expense-row .exp-title{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .expense-row .exp-sub{font-size:11.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:2px;}
+  .expense-row .exp-amount{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:15px;color:var(--red);white-space:nowrap;}
+  .expense-row .exp-del{
+    background:transparent;border:1px solid var(--line);color:var(--muted);
+    width:28px;height:28px;padding:0;border-radius:6px;font-size:14px;line-height:1;flex-shrink:0;
+  }
+  .expense-row .exp-del:hover{background:var(--red);border-color:var(--red);color:#fff;}
+  .expense-empty{
+    text-align:center;color:var(--muted);font-size:13px;
+    padding:20px;border:1px dashed var(--line);border-radius:8px;background:rgba(255,255,255,.3);
+  }
+  .exp-cat-tag{
+    display:inline-block;font-size:11px;font-weight:600;color:var(--ink-2);
+    background:var(--paper-2);border-radius:20px;padding:2px 9px;margin-right:6px;
+  }
 
   /* Stamp */
   .stamp-wrap{position:absolute;top:16px;right:18px;}
@@ -639,6 +676,7 @@
   <div class="main-nav-tabs">
     <button class="tab-btn active" id="btnTabAttendance" onclick="switchMainTab('attendance')">📅 ลงเวลา & คำนวณเงินเดือน</button>
     <button class="tab-btn" id="btnTabTax" onclick="switchMainTab('tax')">📊 ระบบคำนวณ & วางแผนภาษี (PIT)</button>
+    <button class="tab-btn" id="btnTabExpense" onclick="switchMainTab('expense')">💸 บันทึกรายจ่าย</button>
   </div>
 
   <!-- CATEGORY 1: ATTENDANCE & PAYROLL PAGE -->
@@ -706,6 +744,13 @@
             </select>
           </div>
           <div><label>อัตราโอทีวันหยุด (เท่า)</label><input id="s_offDayOt" type="number" min="1" step="0.1"></div>
+
+          <div class="section-divider">📅 รอบตัดยอดเงินเดือน</div>
+          <div>
+            <label>วันที่ตัดยอด (เริ่มงวดใหม่)</label>
+            <input id="s_payCutoffDay" type="number" min="1" max="28" step="1" placeholder="เช่น 21">
+            <p class="hint" style="margin:6px 0 0;">ค่าเริ่มต้น = 21 หมายถึง งวดเงินเดือนเริ่มวันที่ 21 ของเดือน ถึงวันที่ 20 ของเดือนถัดไป (วันสุดท้ายของงวดคือวันที่ 20)</p>
+          </div>
         </div>
         
         <div class="row-actions">
@@ -1017,6 +1062,83 @@
     </section>
   </div>
 
+  <!-- CATEGORY 3: EXPENSE TRACKER (รายจ่ายประจำ & รายจ่ายรายวัน) -->
+  <div id="expenseView" style="display:none;">
+
+    <!-- MONTHLY RECURRING EXPENSES -->
+    <section class="card">
+      <h2>🔁 รายจ่ายประจำ (รายเดือน)</h2>
+      <p class="hint">รายการที่จ่ายซ้ำทุกเดือนเป็นจำนวนคงที่ เช่น ค่าเช่าบ้าน ค่าผ่อนรถ ค่าอินเทอร์เน็ต ค่าประกัน — ระบบจะรวมยอดนี้ให้ทุกเดือนโดยอัตโนมัติ ไม่ต้องกรอกซ้ำ</p>
+
+      <div class="grid" style="margin-bottom:14px;">
+        <div><label>ชื่อรายการ</label><input id="e_m_name" type="text" placeholder="เช่น ค่าเช่าบ้าน"></div>
+        <div><label>จำนวนเงิน/เดือน (บาท)</label><input id="e_m_amount" type="number" min="0" step="1" placeholder="0"></div>
+      </div>
+      <div class="row-actions" style="justify-content:flex-start;margin-top:0;margin-bottom:16px;">
+        <button class="btn-primary" onclick="addMonthlyExpense()">+ เพิ่มรายการประจำ</button>
+      </div>
+
+      <div class="expense-list" id="monthlyExpenseList"></div>
+
+      <div class="summary-grid" style="margin-top:14px;">
+        <div class="stat total"><div class="k">รวมรายจ่ายประจำ / เดือน</div><div class="v" id="e_monthly_total">฿0</div></div>
+      </div>
+    </section>
+
+    <!-- DAILY EXPENSES -->
+    <section class="card">
+      <div class="monthbar">
+        <h2 style="margin:0;">🧾 รายจ่ายรายวัน</h2>
+        <div class="nav">
+          <button onclick="shiftExpenseMonth(-1)">‹</button>
+          <span class="label" id="expenseMonthLabel"></span>
+          <button onclick="shiftExpenseMonth(1)">›</button>
+        </div>
+      </div>
+      <p class="hint" style="margin-bottom:14px;">บันทึกรายจ่ายแต่ละวัน แยกตามหมวดหมู่ เพื่อดูภาพรวมการใช้จ่ายรายเดือน (แยกจากรายจ่ายประจำด้านบน)</p>
+
+      <div class="grid" style="margin-bottom:14px;">
+        <div><label>วันที่</label><input id="e_d_date" type="date"></div>
+        <div><label>หมวดหมู่</label>
+          <select id="e_d_category">
+            <option value="food">🍔 อาหาร</option>
+            <option value="transport">🚗 เดินทาง</option>
+            <option value="bills">🧾 บิล / ค่าน้ำค่าไฟ</option>
+            <option value="shopping">🛍️ ช้อปปิ้ง</option>
+            <option value="health">💊 สุขภาพ</option>
+            <option value="entertainment">🎬 บันเทิง</option>
+            <option value="education">📚 การศึกษา</option>
+            <option value="other">📦 อื่นๆ</option>
+          </select>
+        </div>
+        <div><label>รายละเอียด (ถ้ามี)</label><input id="e_d_note" type="text" placeholder="เช่น ข้าวเที่ยง"></div>
+        <div><label>จำนวนเงิน (บาท)</label><input id="e_d_amount" type="number" min="0" step="1" placeholder="0"></div>
+      </div>
+      <div class="row-actions" style="justify-content:flex-start;margin-top:0;margin-bottom:16px;">
+        <button class="btn-primary" onclick="addDailyExpense()">+ บันทึกรายจ่าย</button>
+      </div>
+
+      <div class="expense-list" id="dailyExpenseList"></div>
+
+      <div class="summary-grid" style="margin-top:14px;">
+        <div class="stat"><div class="k">จำนวนรายการเดือนนี้</div><div class="v" id="e_daily_count">0</div></div>
+        <div class="stat total"><div class="k">รวมรายจ่ายรายวันเดือนนี้</div><div class="v" id="e_daily_total">฿0</div></div>
+      </div>
+    </section>
+
+    <!-- GRAND TOTAL -->
+    <section class="card">
+      <h2>📊 สรุปรายจ่ายรวมของเดือนนี้</h2>
+      <p class="hint">รายจ่ายประจำ + รายจ่ายรายวัน ของเดือนที่กำลังดูอยู่ในตารางด้านบน</p>
+      <div class="summary-grid">
+        <div class="stat"><div class="k">รายจ่ายประจำ</div><div class="v" id="e_sum_monthly">฿0</div></div>
+        <div class="stat"><div class="k">รายจ่ายรายวัน</div><div class="v" id="e_sum_daily">฿0</div></div>
+        <div class="stat total"><div class="k">รวมรายจ่ายทั้งหมด</div><div class="v" id="e_sum_grand">฿0</div></div>
+      </div>
+    </section>
+
+  </div>
+
 </main>
 
 <!-- AUTH OVERLAY -->
@@ -1223,17 +1345,57 @@
     housing: 45,
     otMeal: 50,
     offDay: 0,
-    offDayOt: 3
+    offDayOt: 3,
+    payCutoffDay: 21
   };
 
   let taxInputsData = {};
   let entries = [];
+  let expensesMonthly = [];   // recurring: [{id, name, amount}]
+  let expensesDaily = [];     // one-off:   [{id, date, category, note, amount}]
+  let expenseViewDate = new Date();
+  expenseViewDate.setDate(1);
   let viewDate = new Date();
   viewDate.setDate(1);
   let isSettingsOpen = false;
+  let viewDateInitialized = false;
   let currentPayrollData = null;
 
   const thMonths = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const thMonthsAbbr = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+  // --- Payroll cutoff period helpers ---
+  // A "period" is labeled by the month/year in which it ENDS.
+  // e.g. with cutoffDay = 21, the period labeled September = 21 Aug - 20 Sep.
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function dateToStr(d) { return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
+  function getPayCutoffDay() {
+    const c = settings.payCutoffDay;
+    return (c && c >= 1 && c <= 28) ? c : 21;
+  }
+  // Returns {start, end} Date objects (both inclusive) for the pay period labeled (labelYear, labelMonth).
+  function getPayPeriodRange(labelYear, labelMonth) {
+    const cutoff = getPayCutoffDay();
+    if (cutoff <= 1) {
+      // No real cutoff offset — period is just the calendar month itself.
+      return { start: new Date(labelYear, labelMonth, 1), end: new Date(labelYear, labelMonth + 1, 0) };
+    }
+    const start = new Date(labelYear, labelMonth - 1, cutoff);
+    const end = new Date(labelYear, labelMonth, cutoff - 1);
+    return { start, end };
+  }
+  // Given "today", figure out which period label (year, month) we're currently inside.
+  function getCurrentPeriodLabel(refDate) {
+    const cutoff = getPayCutoffDay();
+    const d = refDate || new Date();
+    let labelMonth = d.getMonth();
+    let labelYear = d.getFullYear();
+    if (cutoff > 1 && d.getDate() >= cutoff) {
+      labelMonth += 1;
+      if (labelMonth > 11) { labelMonth = 0; labelYear += 1; }
+    }
+    return { labelYear, labelMonth };
+  }
   const dayNamesTh = ['วันอาทิตย์','วันจันทร์','วันอังคาร','วันพุธ','วันพฤหัสบดี','วันศุกร์','วันเสาร์'];
 
   const statusLabel = {
@@ -1248,6 +1410,12 @@
     absent: 'badge-absent', holiday: 'badge-holiday'
   };
 
+  const expenseCategoryLabel = {
+    food: '🍔 อาหาร', transport: '🚗 เดินทาง', bills: '🧾 บิล/ค่าน้ำค่าไฟ',
+    shopping: '🛍️ ช้อปปิ้ง', health: '💊 สุขภาพ', entertainment: '🎬 บันเทิง',
+    education: '📚 การศึกษา', other: '📦 อื่นๆ'
+  };
+
   function getNumInput(id, defaultValue = 0) {
     const el = document.getElementById(id);
     if (!el || el.value.trim() === '') return defaultValue;
@@ -1258,8 +1426,11 @@
   function switchMainTab(tab) {
     document.getElementById('btnTabAttendance').classList.toggle('active', tab === 'attendance');
     document.getElementById('btnTabTax').classList.toggle('active', tab === 'tax');
+    document.getElementById('btnTabExpense').classList.toggle('active', tab === 'expense');
     document.getElementById('attendanceView').style.display = (tab === 'attendance') ? 'block' : 'none';
     document.getElementById('taxView').style.display = (tab === 'tax') ? 'block' : 'none';
+    document.getElementById('expenseView').style.display = (tab === 'expense') ? 'block' : 'none';
+    if (tab === 'expense') renderExpenses();
   }
 
   onAuthStateChanged(auth, async (user) => {
@@ -1294,15 +1465,25 @@
         if (data.settings) settings = Object.assign(settings, data.settings);
         if (data.entries && Array.isArray(data.entries)) entries = data.entries;
         if (data.taxInputs) taxInputsData = data.taxInputs;
+        if (data.expensesMonthly && Array.isArray(data.expensesMonthly)) expensesMonthly = data.expensesMonthly;
+        if (data.expensesDaily && Array.isArray(data.expensesDaily)) expensesDaily = data.expensesDaily;
       }
     } catch (e) {
       console.error("Load Firestore error:", e);
+    }
+
+    if (!viewDateInitialized) {
+      const { labelYear, labelMonth } = getCurrentPeriodLabel(new Date());
+      viewDate = new Date(labelYear, labelMonth, 1);
+      expenseViewDate = new Date(labelYear, labelMonth, 1);
+      viewDateInitialized = true;
     }
 
     fillSettingsForm();
     fillTaxForm();
     updateSettingsUI();
     render();
+    renderExpenses();
     calculateFullTax();
   }
 
@@ -1325,6 +1506,7 @@
       otMeal: getNumInput('s_otMeal', 0),
       offDay: parseInt(document.getElementById('s_offDay').value, 10),
       offDayOt: getNumInput('s_offDayOt', 3),
+      payCutoffDay: Math.min(28, Math.max(1, getNumInput('s_payCutoffDay', 21))),
     };
 
     try {
@@ -1508,6 +1690,7 @@
     document.getElementById('s_otMeal').value = settings.otMeal;
     document.getElementById('s_offDay').value = settings.offDay;
     document.getElementById('s_offDayOt').value = settings.offDayOt;
+    document.getElementById('s_payCutoffDay').value = settings.payCutoffDay !== undefined ? settings.payCutoffDay : 21;
   }
 
   function updateSettingsUI() {
@@ -1661,7 +1844,7 @@
   }
 
   function backupData() {
-    const data = { user: currentUserEmail, settings, entries, taxInputs: taxInputsData, exportedAt: new Date().toISOString() };
+    const data = { user: currentUserEmail, settings, entries, taxInputs: taxInputsData, expensesMonthly, expensesDaily, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1681,12 +1864,15 @@
         if (data.settings) settings = Object.assign(settings, data.settings);
         if (data.entries) entries = data.entries;
         if (data.taxInputs) taxInputsData = data.taxInputs;
+        if (data.expensesMonthly && Array.isArray(data.expensesMonthly)) expensesMonthly = data.expensesMonthly;
+        if (data.expensesDaily && Array.isArray(data.expensesDaily)) expensesDaily = data.expensesDaily;
         if (currentUserUID) {
-          await setDoc(doc(db, "users", currentUserUID), { settings, entries, taxInputs: taxInputsData }, { merge: true });
+          await setDoc(doc(db, "users", currentUserUID), { settings, entries, taxInputs: taxInputsData, expensesMonthly, expensesDaily }, { merge: true });
         }
         fillSettingsForm();
         fillTaxForm();
         render();
+        renderExpenses();
         calculateFullTax();
         alert('กู้คืนข้อมูลสำเร็จ');
       } catch (err) { alert('ไฟล์ไม่ถูกต้อง'); }
@@ -1697,13 +1883,13 @@
   function exportMonthlyCSV() {
     const y = viewDate.getFullYear();
     const m = viewDate.getMonth();
-    const monthEntries = entries.filter(en => {
-      if (!en.date) return false;
-      const p = en.date.split('-');
-      return parseInt(p[0], 10) === y && (parseInt(p[1], 10) - 1) === m;
-    });
+    const { start: periodStart, end: periodEnd } = getPayPeriodRange(y, m);
+    const periodStartStr = dateToStr(periodStart);
+    const periodEndStr = dateToStr(periodEnd);
+    const monthEntries = entries.filter(en => en.date && en.date >= periodStartStr && en.date <= periodEndStr);
 
-    let csv = 'วันที่,สถานะ,ชั่วโมง OT,มาสาย (นาที)\n';
+    let csv = `งวด,${periodStartStr} ถึง ${periodEndStr}\n`;
+    csv += 'วันที่,สถานะ,ชั่วโมง OT,มาสาย (นาที)\n';
     monthEntries.forEach(en => {
       csv += `"${en.date}","${statusLabel[en.status]||en.status}",${en.ot||0},${en.late||0}\n`;
     });
@@ -1712,7 +1898,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `attendance_${thMonths[m]}_${y+543}.csv`;
+    a.download = `attendance_${thMonths[m]}_${y+543}_${periodStartStr}_to_${periodEndStr}.csv`;
     a.click();
   }
 
@@ -1721,8 +1907,15 @@
     const p = currentPayrollData;
     const m = viewDate.getMonth();
     const y = viewDate.getFullYear();
+    const cutoff = getPayCutoffDay();
 
-    document.getElementById('ps_period').textContent = `ประจำงวด: ${thMonths[m]} ${y+543}`;
+    if (cutoff > 1) {
+      const { start: periodStart, end: periodEnd } = getPayPeriodRange(y, m);
+      const rangeText = `${periodStart.getDate()} ${thMonthsAbbr[periodStart.getMonth()]} ${periodStart.getFullYear()+543} – ${periodEnd.getDate()} ${thMonthsAbbr[periodEnd.getMonth()]} ${periodEnd.getFullYear()+543}`;
+      document.getElementById('ps_period').textContent = `ประจำงวด: ${rangeText} (${thMonths[m]} ${y+543})`;
+    } else {
+      document.getElementById('ps_period').textContent = `ประจำงวด: ${thMonths[m]} ${y+543}`;
+    }
     document.getElementById('ps_name').textContent = settings.name || currentUserEmail.split('@')[0];
     document.getElementById('ps_position').textContent = settings.position || 'พนักงาน';
     document.getElementById('ps_salary').textContent = Number(settings.salary).toLocaleString('th-TH');
@@ -1755,7 +1948,15 @@
   function render() {
     const y = viewDate.getFullYear();
     const m = viewDate.getMonth();
-    document.getElementById('monthLabel').textContent = thMonths[m] + ' ' + (y + 543);
+    const { start: periodStart, end: periodEnd } = getPayPeriodRange(y, m);
+    const cutoff = getPayCutoffDay();
+
+    if (cutoff > 1) {
+      const rangeText = `${periodStart.getDate()} ${thMonthsAbbr[periodStart.getMonth()]} – ${periodEnd.getDate()} ${thMonthsAbbr[periodEnd.getMonth()]} ${periodEnd.getFullYear() + 543}`;
+      document.getElementById('monthLabel').innerHTML = `${thMonths[m]} ${y + 543}<div class="period-range mono">งวด ${rangeText}</div>`;
+    } else {
+      document.getElementById('monthLabel').textContent = thMonths[m] + ' ' + (y + 543);
+    }
 
     // Timezone-safe Annual Quota Tracker calculation
     const yearEntries = entries.filter(en => en.date && parseInt(en.date.split('-')[0], 10) === y);
@@ -1776,20 +1977,18 @@
     document.getElementById('quota_vac_display').textContent = `${usedVacYear} / ${qVac} วัน`;
     document.getElementById('quota_vac_remain').textContent = `คงเหลือ ${Math.max(0, qVac - usedVacYear)} วัน`;
 
-    // Monthly entries filtering
-    const monthEntries = entries.filter(en => {
-      if (!en.date) return false;
-      const p = en.date.split('-');
-      return parseInt(p[0], 10) === y && (parseInt(p[1], 10) - 1) === m;
-    });
+    // Pay-period entries filtering (e.g. 21st of prev month through 20th of this month)
+    const periodStartStr = dateToStr(periodStart);
+    const periodEndStr = dateToStr(periodEnd);
+    const monthEntries = entries.filter(en => en.date && en.date >= periodStartStr && en.date <= periodEndStr);
 
     const entryMap = {};
     monthEntries.forEach(en => { entryMap[en.date] = en; });
 
     const calGrid = document.getElementById('calendarGrid');
     calGrid.innerHTML = '';
-    const firstDayIndex = new Date(y, m, 1).getDay();
-    const totalDaysInMonth = new Date(y, m + 1, 0).getDate();
+    const firstDayIndex = periodStart.getDay();
+    const totalDaysInPeriod = Math.round((periodEnd - periodStart) / 86400000) + 1;
     const todayStr = new Date().toISOString().slice(0,10);
 
     for (let i = 0; i < firstDayIndex; i++) {
@@ -1798,17 +1997,25 @@
       calGrid.appendChild(empty);
     }
 
-    for (let day = 1; day <= totalDaysInMonth; day++) {
-      const dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-      const dow = new Date(y, m, day).getDay();
+    for (let i = 0; i < totalDaysInPeriod; i++) {
+      const cur = new Date(periodStart);
+      cur.setDate(periodStart.getDate() + i);
+      const dStr = dateToStr(cur);
+      const day = cur.getDate();
+      const dow = cur.getDay();
       const isOff = dow === settings.offDay;
       const isToday = (dStr === todayStr);
+      const isOtherMonth = cutoff > 1 && cur.getMonth() !== m;
 
       const cell = document.createElement('div');
-      cell.className = `cal-cell ${isOff ? 'is-offday' : ''} ${isToday ? 'is-today' : ''}`;
+      cell.className = `cal-cell ${isOff ? 'is-offday' : ''} ${isToday ? 'is-today' : ''} ${isOtherMonth ? 'other-month' : ''}`;
       cell.onclick = () => openModal(dStr);
 
-      let cellInner = `<div class="day-num">${day}</div><div class="cell-content">`;
+      const dayNumHtml = isOtherMonth
+        ? `<div class="day-num">${day}<span class="day-num-month">${thMonthsAbbr[cur.getMonth()]}</span></div>`
+        : `<div class="day-num">${day}</div>`;
+
+      let cellInner = `${dayNumHtml}<div class="cell-content">`;
       if (entryMap[dStr]) {
         const en = entryMap[dStr];
         cellInner += `<span class="badge ${statusBadgeClass[en.status] || 'badge-work'}">${statusLabel[en.status]}</span>`;
@@ -1922,8 +2129,143 @@
     else stampWrap.innerHTML = '<div class="stamp broken">พลาดโบนัส<br>เดือนนี้</div>';
   }
 
+  // ===================== EXPENSE TRACKER (รายจ่ายประจำ & รายจ่ายรายวัน) =====================
+
+  async function persistExpenses() {
+    if (!currentUserUID) return;
+    try {
+      const userRef = doc(db, "users", currentUserUID);
+      await setDoc(userRef, { expensesMonthly, expensesDaily, updatedAt: new Date().toISOString() }, { merge: true });
+    } catch (e) {
+      console.error("Save expenses error:", e);
+    }
+  }
+
+  function makeExpenseId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function shiftExpenseMonth(delta) {
+    expenseViewDate.setMonth(expenseViewDate.getMonth() + delta);
+    renderExpenses();
+  }
+
+  async function addMonthlyExpense() {
+    const name = document.getElementById('e_m_name').value.trim();
+    const amount = getNumInput('e_m_amount', 0);
+    if (!name || amount <= 0) {
+      alert('กรุณากรอกชื่อรายการและจำนวนเงินให้ถูกต้อง');
+      return;
+    }
+    expensesMonthly.push({ id: makeExpenseId(), name, amount });
+    document.getElementById('e_m_name').value = '';
+    document.getElementById('e_m_amount').value = '';
+    await persistExpenses();
+    renderExpenses();
+  }
+
+  async function deleteMonthlyExpense(id) {
+    expensesMonthly = expensesMonthly.filter(x => x.id !== id);
+    await persistExpenses();
+    renderExpenses();
+  }
+
+  async function addDailyExpense() {
+    const dateEl = document.getElementById('e_d_date');
+    const date = dateEl.value || new Date().toISOString().slice(0, 10);
+    const category = document.getElementById('e_d_category').value;
+    const note = document.getElementById('e_d_note').value.trim();
+    const amount = getNumInput('e_d_amount', 0);
+    if (amount <= 0) {
+      alert('กรุณากรอกจำนวนเงินให้ถูกต้อง');
+      return;
+    }
+    expensesDaily.push({ id: makeExpenseId(), date, category, note, amount });
+    expensesDaily.sort((a, b) => a.date.localeCompare(b.date));
+    document.getElementById('e_d_note').value = '';
+    document.getElementById('e_d_amount').value = '';
+    await persistExpenses();
+    renderExpenses();
+  }
+
+  async function deleteDailyExpense(id) {
+    expensesDaily = expensesDaily.filter(x => x.id !== id);
+    await persistExpenses();
+    renderExpenses();
+  }
+
+  function renderExpenses() {
+    // Default the date picker to today, once.
+    const dateEl = document.getElementById('e_d_date');
+    if (dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0, 10);
+
+    // --- Monthly recurring list ---
+    const monthlyListEl = document.getElementById('monthlyExpenseList');
+    if (expensesMonthly.length === 0) {
+      monthlyListEl.innerHTML = '<div class="expense-empty">ยังไม่มีรายการรายจ่ายประจำ — เพิ่มรายการด้านบน เช่น ค่าเช่าบ้าน ค่าอินเทอร์เน็ต</div>';
+    } else {
+      monthlyListEl.innerHTML = expensesMonthly.map(x => `
+        <div class="expense-row">
+          <div class="exp-main">
+            <div class="exp-title">${x.name}</div>
+            <div class="exp-sub">ทุกเดือน</div>
+          </div>
+          <div class="exp-amount">-${fmtBaht(x.amount)}</div>
+          <button class="exp-del" onclick="deleteMonthlyExpense('${x.id}')" title="ลบรายการ">✕</button>
+        </div>
+      `).join('');
+    }
+    const monthlyTotal = expensesMonthly.reduce((sum, x) => sum + (x.amount || 0), 0);
+    document.getElementById('e_monthly_total').textContent = fmtBaht(monthlyTotal);
+
+    // --- Daily expenses for the viewed month ---
+    const ey = expenseViewDate.getFullYear();
+    const em = expenseViewDate.getMonth();
+    document.getElementById('expenseMonthLabel').textContent = thMonths[em] + ' ' + (ey + 543);
+
+    const dailyForMonth = expensesDaily.filter(x => {
+      if (!x.date) return false;
+      const p = x.date.split('-');
+      return parseInt(p[0], 10) === ey && (parseInt(p[1], 10) - 1) === em;
+    }).sort((a, b) => b.date.localeCompare(a.date));
+
+    const dailyListEl = document.getElementById('dailyExpenseList');
+    if (dailyForMonth.length === 0) {
+      dailyListEl.innerHTML = '<div class="expense-empty">ยังไม่มีรายจ่ายในเดือนนี้ — เพิ่มรายการด้านบน</div>';
+    } else {
+      dailyListEl.innerHTML = dailyForMonth.map(x => {
+        const d = new Date(x.date + 'T00:00:00');
+        const dLabel = `${d.getDate()} ${thMonthsAbbr[d.getMonth()]}`;
+        const catLabel = expenseCategoryLabel[x.category] || '📦 อื่นๆ';
+        return `
+        <div class="expense-row">
+          <div class="exp-main">
+            <div class="exp-title">${x.note ? x.note : catLabel.replace(/^\S+\s/, '')}</div>
+            <div class="exp-sub"><span class="exp-cat-tag">${catLabel}</span>${dLabel}</div>
+          </div>
+          <div class="exp-amount">-${fmtBaht(x.amount)}</div>
+          <button class="exp-del" onclick="deleteDailyExpense('${x.id}')" title="ลบรายการ">✕</button>
+        </div>`;
+      }).join('');
+    }
+
+    const dailyTotal = dailyForMonth.reduce((sum, x) => sum + (x.amount || 0), 0);
+    document.getElementById('e_daily_count').textContent = dailyForMonth.length;
+    document.getElementById('e_daily_total').textContent = fmtBaht(dailyTotal);
+
+    // --- Grand total for the viewed month ---
+    document.getElementById('e_sum_monthly').textContent = fmtBaht(monthlyTotal);
+    document.getElementById('e_sum_daily').textContent = fmtBaht(dailyTotal);
+    document.getElementById('e_sum_grand').textContent = fmtBaht(monthlyTotal + dailyTotal);
+  }
+
   // GLOBAL EXPORTS FOR INLINE HTML HANDLERS
   window.switchMainTab = switchMainTab;
+  window.shiftExpenseMonth = shiftExpenseMonth;
+  window.addMonthlyExpense = addMonthlyExpense;
+  window.deleteMonthlyExpense = deleteMonthlyExpense;
+  window.addDailyExpense = addDailyExpense;
+  window.deleteDailyExpense = deleteDailyExpense;
   window.calculateFullTax = calculateFullTax;
   window.saveTaxInputs = saveTaxInputs;
   window.toggleSettings = toggleSettings;
