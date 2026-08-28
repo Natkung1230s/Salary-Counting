@@ -426,6 +426,21 @@
     background:var(--paper-2);border-radius:20px;padding:2px 9px;margin-right:6px;
   }
 
+  /* Expense Group (shared) */
+  .expense-group-setup{display:flex;flex-wrap:wrap;gap:20px;padding-top:4px;}
+  .expense-group-setup-col{flex:1;min-width:220px;}
+  .expense-group-setup-col label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;}
+  .expense-group-active{
+    display:flex;flex-wrap:wrap;align-items:center;gap:20px;
+    background:#FFFDF7;border:1px solid var(--line);border-radius:8px;padding:14px 16px;
+  }
+  .group-code{
+    font-size:20px;font-weight:700;letter-spacing:.08em;color:var(--amber-dark);
+    background:var(--paper-2);border:1px dashed var(--line);border-radius:6px;
+    padding:6px 12px;cursor:pointer;display:inline-block;
+  }
+  .group-code:hover{background:#F5ECD0;}
+
   /* Stamp */
   .stamp-wrap{position:absolute;top:16px;right:18px;}
   .stamp{
@@ -1065,6 +1080,13 @@
   <!-- CATEGORY 3: EXPENSE TRACKER (รายจ่ายประจำ & รายจ่ายรายวัน) -->
   <div id="expenseView" style="display:none;">
 
+    <!-- SHARED EXPENSE GROUP -->
+    <section class="card">
+      <h2>🔗 กลุ่มรายจ่ายร่วม</h2>
+      <p class="hint">เชื่อมรายจ่ายกับอีกบัญชี (เช่น คู่รัก/ครอบครัว) เพื่อบันทึกและดูรายจ่ายร่วมกันแบบเรียลไทม์</p>
+      <div id="expenseGroupPanel"></div>
+    </section>
+
     <!-- MONTHLY RECURRING EXPENSES -->
     <section class="card">
       <h2>🔁 รายจ่ายประจำ (รายเดือน)</h2>
@@ -1310,7 +1332,12 @@
     getFirestore, 
     doc, 
     getDoc, 
-    setDoc 
+    setDoc,
+    updateDoc,
+    onSnapshot,
+    arrayUnion,
+    arrayRemove,
+    deleteField
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -1351,8 +1378,11 @@
 
   let taxInputsData = {};
   let entries = [];
-  let expensesMonthly = [];   // recurring: [{id, name, amount}]
-  let expensesDaily = [];     // one-off:   [{id, date, category, note, amount}]
+  let expensesMonthly = [];   // recurring: [{id, name, amount, addedBy?}]
+  let expensesDaily = [];     // one-off:   [{id, date, category, note, amount, addedBy?}]
+  let expenseGroupId = null;       // null = personal mode, otherwise the shared group code
+  let expenseGroupMembers = {};    // {uid: email}
+  let expenseGroupUnsub = null;    // onSnapshot unsubscribe fn for the active group listener
   let expenseViewDate = new Date();
   expenseViewDate.setDate(1);
   let viewDate = new Date();
@@ -1467,6 +1497,7 @@
         if (data.taxInputs) taxInputsData = data.taxInputs;
         if (data.expensesMonthly && Array.isArray(data.expensesMonthly)) expensesMonthly = data.expensesMonthly;
         if (data.expensesDaily && Array.isArray(data.expensesDaily)) expensesDaily = data.expensesDaily;
+        if (data.expenseGroupId) expenseGroupId = data.expenseGroupId;
       }
     } catch (e) {
       console.error("Load Firestore error:", e);
@@ -1483,7 +1514,13 @@
     fillTaxForm();
     updateSettingsUI();
     render();
-    renderExpenses();
+
+    if (expenseGroupId) {
+      attachExpenseGroupListener(expenseGroupId);
+    } else {
+      renderExpenses();
+    }
+
     calculateFullTax();
   }
 
@@ -1756,7 +1793,10 @@
   }
 
   async function handleLogout() {
-    if (confirm('ต้องการออกจากระบบใช่หรือไม่?')) await signOut(auth);
+    if (confirm('ต้องการออกจากระบบใช่หรือไม่?')) {
+      if (expenseGroupUnsub) { expenseGroupUnsub(); expenseGroupUnsub = null; }
+      await signOut(auth);
+    }
   }
 
   function shiftMonth(delta) {
@@ -2131,18 +2171,198 @@
 
   // ===================== EXPENSE TRACKER (รายจ่ายประจำ & รายจ่ายรายวัน) =====================
 
+  function makeExpenseId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function makeGroupCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I to avoid confusion
+    let code = '';
+    for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    return code;
+  }
+
+  // Persist expense data to the right place: the shared group doc if joined, otherwise the personal user doc.
   async function persistExpenses() {
     if (!currentUserUID) return;
     try {
-      const userRef = doc(db, "users", currentUserUID);
-      await setDoc(userRef, { expensesMonthly, expensesDaily, updatedAt: new Date().toISOString() }, { merge: true });
+      if (expenseGroupId) {
+        const groupRef = doc(db, "expenseGroups", expenseGroupId);
+        await setDoc(groupRef, { expensesMonthly, expensesDaily, updatedAt: new Date().toISOString() }, { merge: true });
+      } else {
+        const userRef = doc(db, "users", currentUserUID);
+        await setDoc(userRef, { expensesMonthly, expensesDaily, updatedAt: new Date().toISOString() }, { merge: true });
+      }
     } catch (e) {
       console.error("Save expenses error:", e);
+      alert('บันทึกข้อมูลไม่สำเร็จ กรุณาลองใหม่ (ตรวจสอบ Firestore rules หากอยู่ในกลุ่มร่วม)');
     }
   }
 
-  function makeExpenseId() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  // Live-sync expensesMonthly/expensesDaily from the shared group doc while joined to one.
+  function attachExpenseGroupListener(code) {
+    if (expenseGroupUnsub) { expenseGroupUnsub(); expenseGroupUnsub = null; }
+    const groupRef = doc(db, "expenseGroups", code);
+    expenseGroupUnsub = onSnapshot(groupRef, (snap) => {
+      if (!snap.exists()) {
+        alert('กลุ่มนี้ถูกลบไปแล้ว หรือไม่พบข้อมูล กลับเป็นบัญชีเดี่ยว');
+        expenseGroupId = null;
+        if (expenseGroupUnsub) { expenseGroupUnsub(); expenseGroupUnsub = null; }
+        setDoc(doc(db, "users", currentUserUID), { expenseGroupId: deleteField() }, { merge: true }).catch(() => {});
+        reloadPersonalExpenses();
+        return;
+      }
+      const d = snap.data();
+      expensesMonthly = Array.isArray(d.expensesMonthly) ? d.expensesMonthly : [];
+      expensesDaily = Array.isArray(d.expensesDaily) ? d.expensesDaily : [];
+      expenseGroupMembers = d.memberEmails || {};
+      renderExpenses();
+    }, (err) => {
+      console.error("Group listener error:", err);
+    });
+  }
+
+  async function reloadPersonalExpenses() {
+    try {
+      const userRef = doc(db, "users", currentUserUID);
+      const snap = await getDoc(userRef);
+      const d = snap.exists() ? snap.data() : {};
+      expensesMonthly = Array.isArray(d.expensesMonthly) ? d.expensesMonthly : [];
+      expensesDaily = Array.isArray(d.expensesDaily) ? d.expensesDaily : [];
+    } catch (e) {
+      console.error("Reload personal expenses error:", e);
+      expensesMonthly = [];
+      expensesDaily = [];
+    }
+    renderExpenses();
+  }
+
+  async function createExpenseGroup() {
+    if (!currentUserUID) return;
+    if (!confirm('สร้างกลุ่มรายจ่ายร่วมใหม่? ข้อมูลรายจ่ายปัจจุบันของคุณจะถูกย้ายเข้ากลุ่มนี้ (ยังเก็บสำเนาไว้ในบัญชีเดี่ยวเผื่อออกจากกลุ่มภายหลัง)')) return;
+    try {
+      let code = makeGroupCode();
+      // Avoid extremely unlikely collision with an existing code.
+      for (let i = 0; i < 5; i++) {
+        const existing = await getDoc(doc(db, "expenseGroups", code));
+        if (!existing.exists()) break;
+        code = makeGroupCode();
+      }
+      const groupRef = doc(db, "expenseGroups", code);
+      await setDoc(groupRef, {
+        members: [currentUserUID],
+        memberEmails: { [currentUserUID]: currentUserEmail },
+        expensesMonthly,
+        expensesDaily,
+        createdBy: currentUserUID,
+        createdAt: new Date().toISOString()
+      });
+      await setDoc(doc(db, "users", currentUserUID), { expenseGroupId: code }, { merge: true });
+      expenseGroupId = code;
+      attachExpenseGroupListener(code);
+      renderExpenseGroupPanel();
+      alert(`สร้างกลุ่มสำเร็จ! รหัสกลุ่มคือ ${code}\nส่งรหัสนี้ให้อีกฝ่ายเพื่อกดเข้าร่วมกลุ่มได้เลย`);
+    } catch (e) {
+      console.error("Create group error:", e);
+      alert('สร้างกลุ่มไม่สำเร็จ กรุณาลองใหม่');
+    }
+  }
+
+  async function joinExpenseGroup() {
+    if (!currentUserUID) return;
+    const input = document.getElementById('e_group_code_input');
+    const code = (input.value || '').trim().toUpperCase();
+    if (!code) { alert('กรุณากรอกรหัสกลุ่ม'); return; }
+    try {
+      const groupRef = doc(db, "expenseGroups", code);
+      const snap = await getDoc(groupRef);
+      if (!snap.exists()) { alert('ไม่พบกลุ่มรหัสนี้ กรุณาตรวจสอบอีกครั้ง'); return; }
+      if (!confirm('เข้าร่วมกลุ่มนี้? รายจ่ายของคุณในบัญชีเดี่ยวจะซ่อนไว้ชั่วคราว (ไม่หาย) จนกว่าจะออกจากกลุ่ม และคุณจะเห็น/แก้ไขรายจ่ายร่วมกับสมาชิกกลุ่มแทน')) return;
+      await updateDoc(groupRef, {
+        members: arrayUnion(currentUserUID),
+        [`memberEmails.${currentUserUID}`]: currentUserEmail
+      });
+      await setDoc(doc(db, "users", currentUserUID), { expenseGroupId: code }, { merge: true });
+      expenseGroupId = code;
+      attachExpenseGroupListener(code);
+      renderExpenseGroupPanel();
+      input.value = '';
+    } catch (e) {
+      console.error("Join group error:", e);
+      alert('เข้าร่วมกลุ่มไม่สำเร็จ กรุณาลองใหม่ (ตรวจสอบ Firestore rules)');
+    }
+  }
+
+  async function leaveExpenseGroup() {
+    if (!currentUserUID || !expenseGroupId) return;
+    if (!confirm('ออกจากกลุ่มรายจ่ายร่วม? คุณจะกลับไปเห็นเฉพาะรายจ่ายส่วนตัวของบัญชีนี้')) return;
+    const code = expenseGroupId;
+    try {
+      const groupRef = doc(db, "expenseGroups", code);
+      await updateDoc(groupRef, {
+        members: arrayRemove(currentUserUID),
+        [`memberEmails.${currentUserUID}`]: deleteField()
+      });
+    } catch (e) {
+      console.error("Leave group (group doc) error:", e);
+    }
+    try {
+      await setDoc(doc(db, "users", currentUserUID), { expenseGroupId: deleteField() }, { merge: true });
+    } catch (e) {
+      console.error("Leave group (user doc) error:", e);
+    }
+    if (expenseGroupUnsub) { expenseGroupUnsub(); expenseGroupUnsub = null; }
+    expenseGroupId = null;
+    expenseGroupMembers = {};
+    await reloadPersonalExpenses();
+    renderExpenseGroupPanel();
+  }
+
+  function copyGroupCode() {
+    if (!expenseGroupId) return;
+    navigator.clipboard.writeText(expenseGroupId).then(() => {
+      alert(`คัดลอกรหัสกลุ่ม "${expenseGroupId}" แล้ว`);
+    }).catch(() => {
+      alert(`รหัสกลุ่มของคุณคือ: ${expenseGroupId}`);
+    });
+  }
+
+  function renderExpenseGroupPanel() {
+    const panel = document.getElementById('expenseGroupPanel');
+    if (!panel) return;
+    if (expenseGroupId) {
+      const members = Object.values(expenseGroupMembers || {});
+      const membersHtml = members.length
+        ? members.map(email => `<span class="exp-cat-tag">${email}</span>`).join('')
+        : `<span class="exp-cat-tag">${currentUserEmail}</span>`;
+      panel.innerHTML = `
+        <div class="expense-group-active">
+          <div>
+            <div class="exp-sub" style="margin-bottom:4px;">รหัสกลุ่มรายจ่ายร่วม</div>
+            <div class="group-code mono" onclick="copyGroupCode()" title="แตะเพื่อคัดลอก">${expenseGroupId}</div>
+          </div>
+          <div style="flex:1;min-width:180px;">
+            <div class="exp-sub" style="margin-bottom:4px;">สมาชิกในกลุ่ม</div>
+            <div>${membersHtml}</div>
+          </div>
+          <button class="btn-ghost" onclick="leaveExpenseGroup()">ออกจากกลุ่ม</button>
+        </div>`;
+    } else {
+      panel.innerHTML = `
+        <div class="expense-group-setup">
+          <div class="expense-group-setup-col">
+            <p class="hint" style="margin:0 0 8px;">ยังไม่ได้เชื่อมกับบัญชีอื่น — รายจ่ายเห็นเฉพาะบัญชีนี้</p>
+            <button class="btn-primary" onclick="createExpenseGroup()">+ สร้างกลุ่มรายจ่ายร่วม</button>
+          </div>
+          <div class="expense-group-setup-col">
+            <label>มีรหัสกลุ่มอยู่แล้ว?</label>
+            <div style="display:flex;gap:8px;">
+              <input id="e_group_code_input" type="text" placeholder="กรอกรหัสกลุ่ม เช่น AB12CD" style="text-transform:uppercase;">
+              <button class="btn-dark" onclick="joinExpenseGroup()">เข้าร่วม</button>
+            </div>
+          </div>
+        </div>`;
+    }
   }
 
   function shiftExpenseMonth(delta) {
@@ -2157,7 +2377,7 @@
       alert('กรุณากรอกชื่อรายการและจำนวนเงินให้ถูกต้อง');
       return;
     }
-    expensesMonthly.push({ id: makeExpenseId(), name, amount });
+    expensesMonthly.push({ id: makeExpenseId(), name, amount, addedBy: currentUserEmail || '' });
     document.getElementById('e_m_name').value = '';
     document.getElementById('e_m_amount').value = '';
     await persistExpenses();
@@ -2180,7 +2400,7 @@
       alert('กรุณากรอกจำนวนเงินให้ถูกต้อง');
       return;
     }
-    expensesDaily.push({ id: makeExpenseId(), date, category, note, amount });
+    expensesDaily.push({ id: makeExpenseId(), date, category, note, amount, addedBy: currentUserEmail || '' });
     expensesDaily.sort((a, b) => a.date.localeCompare(b.date));
     document.getElementById('e_d_note').value = '';
     document.getElementById('e_d_amount').value = '';
@@ -2195,9 +2415,14 @@
   }
 
   function renderExpenses() {
+    renderExpenseGroupPanel();
+
     // Default the date picker to today, once.
     const dateEl = document.getElementById('e_d_date');
     if (dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0, 10);
+
+    const isGroup = !!expenseGroupId;
+    const showOwner = isGroup && Object.keys(expenseGroupMembers || {}).length > 1;
 
     // --- Monthly recurring list ---
     const monthlyListEl = document.getElementById('monthlyExpenseList');
@@ -2208,7 +2433,7 @@
         <div class="expense-row">
           <div class="exp-main">
             <div class="exp-title">${x.name}</div>
-            <div class="exp-sub">ทุกเดือน</div>
+            <div class="exp-sub">ทุกเดือน${showOwner && x.addedBy ? ' · เพิ่มโดย ' + x.addedBy : ''}</div>
           </div>
           <div class="exp-amount">-${fmtBaht(x.amount)}</div>
           <button class="exp-del" onclick="deleteMonthlyExpense('${x.id}')" title="ลบรายการ">✕</button>
@@ -2241,7 +2466,7 @@
         <div class="expense-row">
           <div class="exp-main">
             <div class="exp-title">${x.note ? x.note : catLabel.replace(/^\S+\s/, '')}</div>
-            <div class="exp-sub"><span class="exp-cat-tag">${catLabel}</span>${dLabel}</div>
+            <div class="exp-sub"><span class="exp-cat-tag">${catLabel}</span>${dLabel}${showOwner && x.addedBy ? ' · ' + x.addedBy : ''}</div>
           </div>
           <div class="exp-amount">-${fmtBaht(x.amount)}</div>
           <button class="exp-del" onclick="deleteDailyExpense('${x.id}')" title="ลบรายการ">✕</button>
@@ -2266,6 +2491,10 @@
   window.deleteMonthlyExpense = deleteMonthlyExpense;
   window.addDailyExpense = addDailyExpense;
   window.deleteDailyExpense = deleteDailyExpense;
+  window.createExpenseGroup = createExpenseGroup;
+  window.joinExpenseGroup = joinExpenseGroup;
+  window.leaveExpenseGroup = leaveExpenseGroup;
+  window.copyGroupCode = copyGroupCode;
   window.calculateFullTax = calculateFullTax;
   window.saveTaxInputs = saveTaxInputs;
   window.toggleSettings = toggleSettings;
