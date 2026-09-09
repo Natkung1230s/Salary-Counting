@@ -841,6 +841,62 @@
         <div class="stat total"><div class="k">ยอดรับสุทธิประจำเดือน</div><div class="v" id="sum_total">฿0</div></div>
       </div>
     </section>
+
+    <!-- SALARY GOAL PLANNER -->
+    <section class="card" id="goalCard">
+      <h2>🎯 ตั้งเป้าหมายเงินเดือน</h2>
+      <p class="hint">ระบุยอดเงินที่ต้องการได้รับในงวดนี้ ระบบจะคำนวณจากเงินเดือนฐาน สวัสดิการ โบนัส และโอทีที่ทำไปแล้ว ว่าต้องทำโอทีเพิ่มอีกกี่ชั่วโมงถึงจะถึงเป้าหมาย</p>
+
+      <div class="grid" style="margin-bottom:18px;">
+        <div>
+          <label>เป้าหมายรายรับงวดนี้ (บาท)</label>
+          <input id="goal_amount" type="number" min="0" step="500" value="30000" oninput="onSalaryGoalChange()">
+        </div>
+        <div>
+          <label>คำนวณโอทีที่ต้องทำเพิ่มด้วยอัตรา</label>
+          <select id="goal_ot_type" onchange="onSalaryGoalChange()">
+            <option value="normal">โอทีวันทำงานปกติ</option>
+            <option value="offday">โอทีวันหยุด</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="tax-dashboard" style="margin-bottom:0;">
+        <div class="tax-dashboard-header">
+          <div>
+            <div class="eyebrow" style="margin-bottom:2px;">ความคืบหน้าสู่เป้าหมาย</div>
+            <div style="font-size:13px;color:#B9AF95;" id="goal_status_text">กำลังคำนวณ...</div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;background:rgba(255,255,255,.08);border-radius:20px;overflow:hidden;height:10px;">
+          <div id="goal_progress_bar" style="height:100%;width:0%;background:var(--amber);transition:width .3s ease;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#B9AF95;margin-top:6px;">
+          <span id="goal_progress_pct">0%</span>
+          <span id="goal_progress_amounts">฿0 / ฿0</span>
+        </div>
+
+        <div class="tax-dash-grid">
+          <div class="tax-dash-item">
+            <div class="label">รายได้ปัจจุบัน (ไม่รวม OT)</div>
+            <div class="val" id="goal_base_income">฿0</div>
+          </div>
+          <div class="tax-dash-item">
+            <div class="label">รายได้จาก OT ที่ทำไปแล้ว (<span id="goal_ot_hours_done">0</span> ชม.)</div>
+            <div class="val" id="goal_ot_income">฿0</div>
+          </div>
+          <div class="tax-dash-item highlight">
+            <div class="label" id="goal_remaining_label">ต้องทำโอทีเพิ่มอีก</div>
+            <div class="val" id="goal_remaining_hours">0 ชม.</div>
+          </div>
+          <div class="tax-dash-item">
+            <div class="label" id="goal_per_day_label">เฉลี่ยต่อวันทำงานที่เหลือในงวด</div>
+            <div class="val" id="goal_per_day_hours">0 ชม./วัน</div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
   <!-- CATEGORY 2: DEDICATED TAX PLANNING & DEDUCTION PAGE (PIT) -->
@@ -1390,6 +1446,9 @@
   let isSettingsOpen = false;
   let viewDateInitialized = false;
   let currentPayrollData = null;
+  let salaryGoal = 30000;          // target take-home pay for the current pay period
+  let salaryGoalOtType = 'normal'; // 'normal' or 'offday' — which OT rate to use for the projection
+  let goalSaveTimer = null;
 
   const thMonths = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
   const thMonthsAbbr = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -1498,6 +1557,8 @@
         if (data.expensesMonthly && Array.isArray(data.expensesMonthly)) expensesMonthly = data.expensesMonthly;
         if (data.expensesDaily && Array.isArray(data.expensesDaily)) expensesDaily = data.expensesDaily;
         if (data.expenseGroupId) expenseGroupId = data.expenseGroupId;
+        if (data.salaryGoal !== undefined) salaryGoal = data.salaryGoal;
+        if (data.salaryGoalOtType) salaryGoalOtType = data.salaryGoalOtType;
       }
     } catch (e) {
       console.error("Load Firestore error:", e);
@@ -1512,6 +1573,7 @@
 
     fillSettingsForm();
     fillTaxForm();
+    fillGoalForm();
     updateSettingsUI();
     render();
 
@@ -1746,6 +1808,111 @@
     const daily = settings.salary > 0 ? (settings.salary / 30) : 0;
     const empName = settings.name ? settings.name : (currentUserEmail ? currentUserEmail.split('@')[0] : 'พนักงาน');
     summary.textContent = `${empName} • ฿${Number(settings.salary).toLocaleString('th-TH')} (เฉลี่ยวันละ ฿${Math.round(daily).toLocaleString('th-TH')})`;
+  }
+
+  function fillGoalForm() {
+    const amountEl = document.getElementById('goal_amount');
+    const typeEl = document.getElementById('goal_ot_type');
+    if (amountEl) amountEl.value = salaryGoal;
+    if (typeEl) typeEl.value = salaryGoalOtType;
+  }
+
+  function onSalaryGoalChange() {
+    salaryGoal = getNumInput('goal_amount', 0);
+    const typeEl = document.getElementById('goal_ot_type');
+    salaryGoalOtType = typeEl ? typeEl.value : 'normal';
+    renderSalaryGoal();
+
+    if (!currentUserUID) return;
+    clearTimeout(goalSaveTimer);
+    goalSaveTimer = setTimeout(async () => {
+      try {
+        const userRef = doc(db, "users", currentUserUID);
+        await setDoc(userRef, { salaryGoal, salaryGoalOtType }, { merge: true });
+      } catch (e) {
+        console.error("Save salary goal error:", e);
+      }
+    }, 600);
+  }
+
+  // Projects how many extra OT hours are needed this pay period to hit the salary goal,
+  // based on currentPayrollData (base salary + benefits + bonus + OT already logged - deductions).
+  function renderSalaryGoal() {
+    const goalEl = document.getElementById('goal_amount');
+    if (!goalEl || !currentPayrollData) return;
+
+    const goal = getNumInput('goal_amount', salaryGoal);
+    const typeEl = document.getElementById('goal_ot_type');
+    const otType = typeEl ? typeEl.value : salaryGoalOtType;
+    const otRate = otType === 'offday' ? settings.offDayOt : settings.ot;
+
+    const { netTotal, otPay, totalOtHours, hourlyRate } = currentPayrollData;
+    const baseIncome = Math.max(0, netTotal - otPay);
+    const remainingPay = goal - netTotal;
+
+    document.getElementById('goal_base_income').textContent = fmtBaht(baseIncome);
+    document.getElementById('goal_ot_income').textContent = fmtBaht(otPay);
+    document.getElementById('goal_ot_hours_done').textContent = totalOtHours;
+
+    const pct = goal > 0 ? Math.min(100, Math.round((netTotal / goal) * 100)) : 0;
+    document.getElementById('goal_progress_bar').style.width = pct + '%';
+    document.getElementById('goal_progress_pct').textContent = pct + '%';
+    document.getElementById('goal_progress_amounts').textContent = `${fmtBaht(netTotal)} / ${fmtBaht(goal)}`;
+
+    // Remaining working days left in this pay period (tomorrow → period end, excluding the weekly off day)
+    const y = viewDate.getFullYear();
+    const m = viewDate.getMonth();
+    const { end: periodEnd } = getPayPeriodRange(y, m);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let remainingWorkDays = 0;
+    const cursor = new Date(today);
+    cursor.setDate(cursor.getDate() + 1);
+    while (cursor <= periodEnd) {
+      if (cursor.getDay() !== settings.offDay) remainingWorkDays++;
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    const remLabelEl = document.getElementById('goal_remaining_label');
+    const remHoursEl = document.getElementById('goal_remaining_hours');
+    const perDayLabelEl = document.getElementById('goal_per_day_label');
+    const perDayEl = document.getElementById('goal_per_day_hours');
+    const statusEl = document.getElementById('goal_status_text');
+
+    if (remainingPay <= 0) {
+      remLabelEl.textContent = '🎉 ถึงเป้าหมายแล้ว';
+      remHoursEl.textContent = 'เกิน ' + fmtBaht(Math.abs(remainingPay));
+      perDayLabelEl.textContent = 'เฉลี่ยต่อวันทำงานที่เหลือในงวด';
+      perDayEl.textContent = '—';
+      statusEl.textContent = `ยอดรวมตอนนี้ถึงเป้าหมาย ${fmtBaht(goal)} แล้ว 🎉`;
+      return;
+    }
+
+    if (hourlyRate <= 0 || otRate <= 0) {
+      remLabelEl.textContent = 'ต้องทำโอทีเพิ่มอีก';
+      remHoursEl.textContent = '— ชม.';
+      perDayLabelEl.textContent = 'เฉลี่ยต่อวันทำงานที่เหลือในงวด';
+      perDayEl.textContent = '—';
+      statusEl.textContent = 'กรุณาตรวจสอบเงินเดือนฐาน/ชั่วโมงทำงานในหัวข้อตั้งค่าก่อน';
+      return;
+    }
+
+    const neededHours = remainingPay / (hourlyRate * otRate);
+    const neededHoursRounded = Math.ceil(neededHours * 10) / 10; // round up to nearest 0.1 ชม.
+
+    remLabelEl.textContent = 'ต้องทำโอทีเพิ่มอีก';
+    remHoursEl.textContent = `${neededHoursRounded} ชม.`;
+
+    if (remainingWorkDays > 0) {
+      const perDay = Math.ceil((neededHours / remainingWorkDays) * 10) / 10;
+      perDayLabelEl.textContent = `เฉลี่ยต่อวันทำงานที่เหลือ (${remainingWorkDays} วัน)`;
+      perDayEl.textContent = `${perDay} ชม./วัน`;
+    } else {
+      perDayLabelEl.textContent = 'วันทำงานที่เหลือในงวดนี้';
+      perDayEl.textContent = '0 วัน';
+    }
+
+    statusEl.textContent = `ขาดอีก ${fmtBaht(remainingPay)} เพื่อให้ถึงเป้าหมาย ${fmtBaht(goal)}`;
   }
 
   function toggleSettings() {
@@ -2125,6 +2292,8 @@
       sickLeaveDays,
       sickDeduction,
       unpaidDeduction,
+      dailyRate,
+      hourlyRate,
       basePay, 
       offDayWorkedDays, 
       offDayBonus, 
@@ -2167,6 +2336,8 @@
     if (monthEntries.length === 0) stampWrap.innerHTML = '';
     else if (bonusPay > 0) stampWrap.innerHTML = '<div class="stamp">ไม่ขาดงาน<br>รับโบนัส</div>';
     else stampWrap.innerHTML = '<div class="stamp broken">พลาดโบนัส<br>เดือนนี้</div>';
+
+    renderSalaryGoal();
   }
 
   // ===================== EXPENSE TRACKER (รายจ่ายประจำ & รายจ่ายรายวัน) =====================
@@ -2495,6 +2666,7 @@
   window.joinExpenseGroup = joinExpenseGroup;
   window.leaveExpenseGroup = leaveExpenseGroup;
   window.copyGroupCode = copyGroupCode;
+  window.onSalaryGoalChange = onSalaryGoalChange;
   window.calculateFullTax = calculateFullTax;
   window.saveTaxInputs = saveTaxInputs;
   window.toggleSettings = toggleSettings;
