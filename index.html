@@ -1897,7 +1897,21 @@
       return;
     }
 
-    const neededHours = remainingPay / (hourlyRate * otRate);
+    // สมมติฐาน: การจะทำโอทีได้ ผู้ใช้ต้องมาทำงานอยู่แล้วในวันนั้น ซึ่งถ้ามาทำงานก็จะได้รับ
+    // "สวัสดิการรายวัน" ของวันนั้นไปด้วยโดยอัตโนมัติ ไม่ว่าจะทำโอทีหรือไม่ก็ตาม ได้แก่
+    //   - ค่าเดินทาง + ค่าที่พัก (ต่อวันทำงาน)
+    //   - ค่าอาหาร OT (เฉพาะวันที่มีโอที)
+    // จึงนำสวัสดิการรายวันทั้งสองส่วนนี้ ที่จะเกิดขึ้นจริงในวันทำงานที่เหลือของงวด (remainingWorkDays)
+    // มาหักออกจากยอดขาดสุทธิก่อน เหลือเป็นส่วนที่ต้อง "ปิดด้วยค่าโอทีล้วนๆ" จริงๆ แล้วค่อยหารเป็นชั่วโมง
+    // (ไม่รวมโบนัสวันหยุด/โบนัสไม่ขาดงาน เพราะเป็นรายการที่ผูกกับเงื่อนไขพิเศษ ไม่ใช่สวัสดิการรายวันปกติ)
+    const otMealPerDay = settings.otMeal || 0;
+    const dailyAllowance = (settings.travel || 0) + (settings.housing || 0);
+    const projectedOtMealBenefit = remainingWorkDays * otMealPerDay;
+    const projectedAllowanceBenefit = remainingWorkDays * dailyAllowance;
+    const projectedDailyBenefits = projectedOtMealBenefit + projectedAllowanceBenefit;
+    const remainingPayAfterBenefits = Math.max(0, remainingPay - projectedDailyBenefits);
+
+    const neededHours = remainingPayAfterBenefits / (hourlyRate * otRate);
     const neededHoursRounded = Math.ceil(neededHours * 10) / 10; // round up to nearest 0.1 ชม.
 
     remLabelEl.textContent = 'ต้องทำโอทีเพิ่มอีก';
@@ -1912,7 +1926,11 @@
       perDayEl.textContent = '0 วัน';
     }
 
-    statusEl.textContent = `ขาดอีก ${fmtBaht(remainingPay)} เพื่อให้ถึงเป้าหมาย ${fmtBaht(goal)}`;
+    if (projectedDailyBenefits > 0 && remainingWorkDays > 0) {
+      statusEl.textContent = `ขาดอีก ${fmtBaht(remainingPay)} (รวมสวัสดิการรายวันที่จะได้รับจากการมาทำงาน ${remainingWorkDays} วันที่เหลือ ${fmtBaht(projectedDailyBenefits)} แล้ว เหลือทำโอทีปิดส่วนต่างอีก ${fmtBaht(remainingPayAfterBenefits)}) เพื่อให้ถึงเป้าหมาย ${fmtBaht(goal)}`;
+    } else {
+      statusEl.textContent = `ขาดอีก ${fmtBaht(remainingPay)} เพื่อให้ถึงเป้าหมาย ${fmtBaht(goal)}`;
+    }
   }
 
   function toggleSettings() {
