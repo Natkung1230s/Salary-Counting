@@ -871,7 +871,7 @@
           <div class="section-divider">🚗 สวัสดิการ & วันหยุดประจำสัปดาห์</div>
           <div><label>ค่าเดินทาง/วัน (เฉพาะวันทำงาน)</label><input id="s_travel" type="number" min="0" step="1"></div>
           <div><label>ค่าเช่าบ้าน/วัน (เฉพาะวันทำงาน)</label><input id="s_housing" type="number" min="0" step="1"></div>
-          <div><label>ค่าอาหารโอที/วัน (เฉพาะวันมีโอที)</label><input id="s_otMeal" type="number" min="0" step="1"></div>
+          <div><label>ค่าอาหารโอที/วัน (โอทีตั้งแต่ 2 ชม. ขึ้นไป)</label><input id="s_otMeal" type="number" min="0" step="1"></div>
           <div><label>วันหยุดประจำสัปดาห์</label>
             <select id="s_offDay">
               <option value="0">วันอาทิตย์</option>
@@ -968,7 +968,7 @@
         <div class="stat"><div class="k">โบนัสวันหยุด (<span id="sum_offDayCount">0</span>ว.)</div><div class="v money-mask" id="sum_offDayBonus">฿0</div></div>
         <div class="stat"><div class="k">ค่าเดินทาง & เช่าบ้าน</div><div class="v money-mask" id="sum_allowance">฿0</div></div>
         <div class="stat"><div class="k">ค่าโอที (<span id="sum_otHours">0</span>ชม.)</div><div class="v money-mask" id="sum_ot">฿0</div></div>
-        <div class="stat"><div class="k">ค่าอาหาร OT (<span id="sum_otMealDays">0</span>ว.)</div><div class="v money-mask" id="sum_otMeal">฿0</div></div>
+        <div class="stat"><div class="k">ค่าอาหาร OT ≥2ชม. (<span id="sum_otMealDays">0</span>ว.)</div><div class="v money-mask" id="sum_otMeal">฿0</div></div>
         <div class="stat"><div class="k">โบนัสไม่ขาดงาน</div><div class="v money-mask" id="sum_bonus">฿0</div></div>
 
         <div class="stat deduct"><div class="k">หักลาป่วย (<span id="sum_sickCount">0</span>วัน)</div><div class="v money-mask" id="sum_sickDeduct">-฿0</div></div>
@@ -2575,8 +2575,16 @@
     // (ไม่รวมโบนัสวันหยุด/โบนัสไม่ขาดงาน เพราะเป็นรายการที่ผูกกับเงื่อนไขพิเศษ ไม่ใช่สวัสดิการรายวันปกติ)
     const otMealPerDay = settings.otMeal || 0;
     const dailyAllowance = (settings.travel || 0) + (settings.housing || 0);
-    const projectedOtMealBenefit = remainingWorkDays * otMealPerDay;
     const projectedAllowanceBenefit = remainingWorkDays * dailyAllowance;
+
+    // เงื่อนไขค่าอาหาร OT: ต้องทำโอทีเฉลี่ย >= 2 ชม./วัน ถึงจะนับว่าเข้าเงื่อนไข
+    // ใช้แผนแบบยังไม่รวมค่าอาหาร OT (remainingAfterAllowance) มาเช็คก่อน เพื่อไม่ให้เกิดการคำนวณวนกลับไปมา
+    const remainingAfterAllowance = Math.max(0, remainingPay - projectedAllowanceBenefit);
+    const neededHoursNoMeal = remainingAfterAllowance / (hourlyRate * otRate);
+    const perDayNoMeal = remainingWorkDays > 0 ? (neededHoursNoMeal / remainingWorkDays) : 0;
+    const qualifiesForOtMeal = perDayNoMeal >= 2;
+
+    const projectedOtMealBenefit = qualifiesForOtMeal ? remainingWorkDays * otMealPerDay : 0;
     const projectedDailyBenefits = projectedOtMealBenefit + projectedAllowanceBenefit;
     const remainingPayAfterBenefits = Math.max(0, remainingPay - projectedDailyBenefits);
 
@@ -2597,7 +2605,10 @@
     }
 
     if (projectedDailyBenefits > 0 && remainingWorkDays > 0) {
-      statusEl.textContent = `ขาดอีก ${fmtBaht(remainingPay)} (รวมสวัสดิการรายวันที่จะได้รับจากการมาทำงาน ${remainingWorkDays} วันที่เหลือ ${fmtBaht(projectedDailyBenefits)} แล้ว เหลือทำโอทีปิดส่วนต่างอีก ${fmtBaht(remainingPayAfterBenefits)}) เพื่อให้ถึงเป้าหมาย ${fmtBaht(goal)}`;
+      const mealNote = qualifiesForOtMeal
+        ? `รวมค่าอาหาร OT ด้วย เพราะแผนนี้ต้องทำโอทีเฉลี่ยถึง 2 ชม./วันขึ้นไป`
+        : `ไม่รวมค่าอาหาร OT เพราะแผนนี้ทำโอทีเฉลี่ยยังไม่ถึง 2 ชม./วัน`;
+      statusEl.textContent = `ขาดอีก ${fmtBaht(remainingPay)} (รวมสวัสดิการรายวันที่จะได้รับจากการมาทำงาน ${remainingWorkDays} วันที่เหลือ ${fmtBaht(projectedDailyBenefits)} แล้ว — ${mealNote} — เหลือทำโอทีปิดส่วนต่างอีก ${fmtBaht(remainingPayAfterBenefits)}) เพื่อให้ถึงเป้าหมาย ${fmtBaht(goal)}`;
     } else {
       statusEl.textContent = `ขาดอีก ${fmtBaht(remainingPay)} เพื่อให้ถึงเป้าหมาย ${fmtBaht(goal)}`;
     }
@@ -2820,6 +2831,7 @@
     if (p.offDayBonus > 0) incomeHtml += `<tr><td>โบนัสวันหยุด (${p.offDayWorkedDays} วัน)</td><td class="right money-mask">${fmtBaht(p.offDayBonus)}</td></tr>`;
     if (p.otPay > 0) incomeHtml += `<tr><td>ค่าล่วงเวลา / OT (${p.totalOtHours} ชม.)</td><td class="right money-mask">${fmtBaht(p.otPay)}</td></tr>`;
     if (p.allowancePay > 0) incomeHtml += `<tr><td>ค่าเดินทาง & ค่าเช่าบ้าน</td><td class="right money-mask">${fmtBaht(p.allowancePay)}</td></tr>`;
+    if (p.otMealPay > 0) incomeHtml += `<tr><td>ค่าอาหาร OT (โอที ≥2ชม./วัน)</td><td class="right money-mask">${fmtBaht(p.otMealPay)}</td></tr>`;
     if (p.bonusPay > 0) incomeHtml += `<tr><td>เบี้ยขยัน</td><td class="right money-mask">${fmtBaht(p.bonusPay)}</td></tr>`;
     document.getElementById('ps_income_rows').innerHTML = incomeHtml;
 
@@ -2934,7 +2946,7 @@
     const absentDays = monthEntries.filter(en => en.status === 'absent').length;
 
     const totalOtHours = monthEntries.reduce((sum, en) => sum + (en.ot || 0), 0);
-    const otMealDays = monthEntries.filter(en => (en.ot || 0) > 0).length;
+    const otMealDays = monthEntries.filter(en => (en.ot || 0) >= 2).length;
     const lateOccurrences = monthEntries.filter(en => (en.late || 0) > 1).length;
     const lateDeductedHours = lateOccurrences * 1;
 
