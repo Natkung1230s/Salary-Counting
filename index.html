@@ -680,22 +680,11 @@
   .pin-auth-panel .form-group{margin-bottom:12px;text-align:left;}
   .pin-auth-panel label{font-size:12px;}
 
-  /* Money mask: hides every value tagged .money-mask when body.pin-locked is on */
+  /* Money mask: when body.pin-locked is on, applyMoneyMask() swaps each .money-mask
+     element's real textContent for the placeholder text directly (see JS), so this
+     class no longer needs to fake it with CSS. Just keep a pointer cursor as a hint. */
   body.pin-locked .money-mask{
-    color:transparent !important;
-    position:relative;
     cursor:pointer;
-  }
-  body.pin-locked .money-mask::before{
-    content:"฿ ••••";
-    position:absolute;
-    left:0;top:0;
-    color:var(--ink);
-    font-weight:inherit;
-  }
-  body.pin-locked td.money-mask::before,
-  body.pin-locked .exp-amount.money-mask::before{
-    color:#B23A2E;
   }
 
   /* Payslip */
@@ -856,11 +845,8 @@
           <div><label>อัตราค่าโอทีปกติ (เท่า)</label><input id="s_ot" type="number" min="1" step="0.1"></div>
           <div><label>โบนัสมาครบไม่ขาดงาน (บาท)</label><input id="s_bonus" type="number" min="0" step="1"></div>
           <div><label>หักประกันสังคม (บาท/เดือน)</label><input id="s_sso" type="number" min="0" step="1" value="750"></div>
-          <div><label>วันลานับเป็นการตัดโบนัสหรือไม่</label>
-            <select id="s_leaveCounts">
-              <option value="no">ไม่ตัดสิทธิ์ (ลาตามสิทธิ์ยังได้โบนัส)</option>
-              <option value="yes">ตัดสิทธิ์โบนัสทันที</option>
-            </select>
+          <div><label>เงื่อนไขเบี้ยขยัน</label>
+            <div class="hint" style="margin-top:6px;line-height:1.5;">ลาป่วย / ลากิจ / ลาไม่รับเงิน / ขาดงาน — ตัดสิทธิ์เบี้ยขยันทันที<br>ลาพักร้อน — ไม่ตัดสิทธิ์ ยังได้เบี้ยขยันตามปกติ</div>
           </div>
 
           <div class="section-divider">🏖️ สิทธิ์วันลาประจำปีตามกฎหมาย (วัน/ปี)</div>
@@ -1031,6 +1017,31 @@
             <div class="label" id="goal_per_day_label">เฉลี่ยต่อวันทำงานที่เหลือในงวด</div>
             <div class="val" id="goal_per_day_hours">0 ชม./วัน</div>
           </div>
+        </div>
+
+        <div class="eyebrow" style="margin:18px 0 8px;">สวัสดิการที่จะได้รับเพิ่มถ้ามาทำงานตามแผน</div>
+        <div class="tax-dash-grid">
+          <div class="tax-dash-item">
+            <div class="label">วันที่ต้องมาทำงาน (เหลือในงวด)</div>
+            <div class="val" id="goal_remaining_days">0 วัน</div>
+          </div>
+          <div class="tax-dash-item">
+            <div class="label">ค่าเดินทาง + ค่าเช่าบ้าน</div>
+            <div class="val money-mask" id="goal_travel_housing">฿0</div>
+          </div>
+          <div class="tax-dash-item">
+            <div class="label" id="goal_otmeal_label">ค่าอาหาร OT</div>
+            <div class="val money-mask" id="goal_otmeal">฿0</div>
+          </div>
+          <div class="tax-dash-item">
+            <div class="label" id="goal_diligence_label">เบี้ยขยัน (ถ้าไม่ขาดงานตลอดงวด)</div>
+            <div class="val money-mask" id="goal_diligence">฿0</div>
+          </div>
+        </div>
+
+        <div class="tax-dash-item highlight" style="margin-top:12px;">
+          <div class="label">ยอดสุทธิเมื่อจบงวด ถ้าทำตามแผนนี้ครบ</div>
+          <div class="val money-mask" id="goal_final_total" style="font-size:22px;">฿0</div>
         </div>
       </div>
     </section>
@@ -1629,7 +1640,6 @@
     ot: 1.5,
     bonus: 1500,
     sso: 750,
-    leaveCounts: 'no',
     quotaSick: 30,
     quotaBusiness: 3,
     quotaAnnual: 6,
@@ -1845,6 +1855,30 @@
     } else {
       startPinAutoLockTimer();
     }
+
+    applyMoneyMask();
+  }
+
+  // ซ่อนยอดเงินจริงๆ ในระดับ textContent (ไม่ใช่แค่ทาสีให้โปร่งใสด้วย CSS)
+  // เพราะการทาสีโปร่งใสอย่างเดียว ตัวเลขจริงยังฝังอยู่ใน DOM สามารถลาก-เลือกข้อความ
+  // (select/copy) หรือเปิด inspect element แล้วเห็นค่าจริงได้ทันทีแม้ตอนล็อกอยู่ — ถือเป็นช่องโหว่
+  // ฟังก์ชันนี้จึงสลับ textContent จริงเป็น "฿ ••••" ตรงๆ เมื่อ locked และเก็บค่าจริงไว้ใน data-real
+  // แล้วค่อยคืนค่ากลับตอนปลดล็อก เรียกซ้ำได้เรื่อยๆ ทุกครั้งที่มีการ render ข้อมูลใหม่ขณะล็อกอยู่ก็ปลอดภัย
+  function applyMoneyMask() {
+    const locked = document.body.classList.contains('pin-locked');
+    document.querySelectorAll('.money-mask').forEach(el => {
+      if (locked) {
+        // ถ้ายังไม่เคยเก็บค่าจริงไว้ (หรือค่าที่โชว์อยู่ไม่ใช่ mask placeholder) ให้เก็บของปัจจุบันไว้ก่อน
+        if (el.dataset.real === undefined || (el.textContent !== '฿ ••••' && el.textContent !== '-฿ ••••')) {
+          el.dataset.real = el.textContent;
+        }
+        const isNegative = el.dataset.real.trim().startsWith('-');
+        el.textContent = (isNegative ? '-' : '') + '฿ ••••';
+      } else if (el.dataset.real !== undefined) {
+        el.textContent = el.dataset.real;
+        delete el.dataset.real;
+      }
+    });
   }
 
   // กดปุ่มที่ header: ถ้ากำลังซ่อนอยู่ -> เปิดคีย์แพดให้ใส่ PIN เพื่อดู, ถ้ากำลังโชว์อยู่ -> ซ่อนกลับทันที
@@ -2263,7 +2297,6 @@
       ot: getNumInput('s_ot', 1.5),
       bonus: getNumInput('s_bonus', 0),
       sso: getNumInput('s_sso', 750),
-      leaveCounts: document.getElementById('s_leaveCounts').value,
       quotaSick: getNumInput('s_quota_sick', 30),
       quotaBusiness: getNumInput('s_quota_biz', 3),
       quotaAnnual: getNumInput('s_quota_annual', 6),
@@ -2383,6 +2416,7 @@
       statusEl.textContent = 'พอดี (ไม่ต้องจ่ายเพิ่ม/ไม่ได้คืน)';
       statusEl.style.color = '#FBBF24';
     }
+    applyMoneyMask();
   }
 
   async function saveTaxInputs() {
@@ -2447,7 +2481,6 @@
     document.getElementById('s_ot').value = settings.ot;
     document.getElementById('s_bonus').value = settings.bonus;
     document.getElementById('s_sso').value = settings.sso !== undefined ? settings.sso : 750;
-    document.getElementById('s_leaveCounts').value = settings.leaveCounts;
     document.getElementById('s_quota_sick').value = settings.quotaSick !== undefined ? settings.quotaSick : 30;
     document.getElementById('s_quota_biz').value = settings.quotaBusiness !== undefined ? settings.quotaBusiness : 3;
     document.getElementById('s_quota_annual').value = settings.quotaAnnual !== undefined ? settings.quotaAnnual : 6;
@@ -2539,12 +2572,25 @@
       if (cursor.getDay() !== settings.offDay) remainingWorkDays++;
       cursor.setDate(cursor.getDate() + 1);
     }
+    document.getElementById('goal_remaining_days').textContent = remainingWorkDays + ' วัน';
 
     const remLabelEl = document.getElementById('goal_remaining_label');
     const remHoursEl = document.getElementById('goal_remaining_hours');
     const perDayLabelEl = document.getElementById('goal_per_day_label');
     const perDayEl = document.getElementById('goal_per_day_hours');
     const statusEl = document.getElementById('goal_status_text');
+    const travelHousingEl = document.getElementById('goal_travel_housing');
+    const otMealEl = document.getElementById('goal_otmeal');
+    const otMealLabelEl = document.getElementById('goal_otmeal_label');
+    const diligenceEl = document.getElementById('goal_diligence');
+    const diligenceLabelEl = document.getElementById('goal_diligence_label');
+    const finalTotalEl = document.getElementById('goal_final_total');
+
+    const { hasDisqualification } = currentPayrollData;
+    diligenceEl.textContent = fmtBaht(hasDisqualification ? 0 : settings.bonus);
+    diligenceLabelEl.textContent = hasDisqualification
+      ? 'เบี้ยขยัน (ขาดงานไปแล้วในงวดนี้)'
+      : 'เบี้ยขยัน (ถ้าไม่ขาดงานตลอดงวด)';
 
     if (remainingPay <= 0) {
       remLabelEl.textContent = '🎉 ถึงเป้าหมายแล้ว';
@@ -2553,6 +2599,11 @@
       perDayLabelEl.textContent = 'เฉลี่ยต่อวันทำงานที่เหลือในงวด';
       perDayEl.textContent = '—';
       statusEl.textContent = `ยอดรวมตอนนี้ถึงเป้าหมาย ${fmtBaht(goal)} แล้ว 🎉`;
+      travelHousingEl.textContent = fmtBaht(0);
+      otMealLabelEl.textContent = 'ค่าอาหาร OT';
+      otMealEl.textContent = fmtBaht(0);
+      finalTotalEl.textContent = fmtBaht(netTotal);
+      applyMoneyMask();
       return;
     }
 
@@ -2563,6 +2614,10 @@
       perDayLabelEl.textContent = 'เฉลี่ยต่อวันทำงานที่เหลือในงวด';
       perDayEl.textContent = '—';
       statusEl.textContent = 'กรุณาตรวจสอบเงินเดือนฐาน/ชั่วโมงทำงานในหัวข้อตั้งค่าก่อน';
+      travelHousingEl.textContent = fmtBaht(0);
+      otMealEl.textContent = fmtBaht(0);
+      finalTotalEl.textContent = fmtBaht(netTotal);
+      applyMoneyMask();
       return;
     }
 
@@ -2612,6 +2667,15 @@
     } else {
       statusEl.textContent = `ขาดอีก ${fmtBaht(remainingPay)} เพื่อให้ถึงเป้าหมาย ${fmtBaht(goal)}`;
     }
+
+    travelHousingEl.textContent = fmtBaht(projectedAllowanceBenefit);
+    otMealLabelEl.textContent = qualifiesForOtMeal ? 'ค่าอาหาร OT (เข้าเงื่อนไข ≥2ชม./วัน)' : 'ค่าอาหาร OT (แผนนี้ยังไม่ถึง 2ชม./วัน)';
+    otMealEl.textContent = fmtBaht(projectedOtMealBenefit);
+
+    const otPayFromPlan = neededHoursRounded * hourlyRate * otRate;
+    const projectedFinalTotal = netTotal + projectedDailyBenefits + otPayFromPlan;
+    finalTotalEl.textContent = fmtBaht(projectedFinalTotal);
+    applyMoneyMask();
   }
 
   function toggleSettings() {
@@ -2847,6 +2911,7 @@
     document.getElementById('ps_net').textContent = fmtBaht(p.netTotal);
 
     document.getElementById('payslipModal').classList.add('open');
+    applyMoneyMask();
   }
 
   function closePayslipModal() { document.getElementById('payslipModal').classList.remove('open'); }
@@ -2941,7 +3006,9 @@
     const actualWorkedDays = workedDays + offDayWorkedDays;
 
     const sickLeaveDays = monthEntries.filter(en => en.status === 'leave_sick').length;
-    const otherPaidLeaveDays = monthEntries.filter(en => ['leave_business','leave_annual'].includes(en.status)).length;
+    const businessLeaveDays = monthEntries.filter(en => en.status === 'leave_business').length;
+    const annualLeaveDays = monthEntries.filter(en => en.status === 'leave_annual').length;
+    const otherPaidLeaveDays = businessLeaveDays + annualLeaveDays;
     const unpaidLeaveDays = monthEntries.filter(en => en.status === 'leave_unpaid').length;
     const absentDays = monthEntries.filter(en => en.status === 'absent').length;
 
@@ -2968,7 +3035,9 @@
     }, 0);
 
     const otMealPay = settings.otMeal * otMealDays;
-    const hasDisqualification = absentDays > 0 || unpaidLeaveDays > 0 || (settings.leaveCounts === 'yes' && (sickLeaveDays + otherPaidLeaveDays) > 0);
+    // นโยบายเบี้ยขยัน: ลาประเภทใดก็ตาม (ป่วย/กิจ/ไม่รับเงิน/ขาดงาน) ตัดสิทธิ์เบี้ยขยันทันทีไม่มีเงื่อนไข
+    // ยกเว้นเฉพาะ "ลาพักร้อน" (leave_annual) เพียงอย่างเดียวที่ลาแล้วยังคงได้เบี้ยขยันตามปกติ
+    const hasDisqualification = absentDays > 0 || unpaidLeaveDays > 0 || sickLeaveDays > 0 || businessLeaveDays > 0;
     const bonusPay = (!hasDisqualification && monthEntries.length > 0) ? settings.bonus : 0;
 
     // Deductions Calculation
@@ -3002,6 +3071,7 @@
       totalOtHours, 
       otMealPay, 
       bonusPay, 
+      hasDisqualification,
       lateDeduction, 
       ssoDeduction, 
       grossPay, 
@@ -3038,6 +3108,7 @@
     else stampWrap.innerHTML = '<div class="stamp broken">พลาดโบนัส<br>เดือนนี้</div>';
 
     renderSalaryGoal();
+    applyMoneyMask();
   }
 
   // ===================== EXPENSE TRACKER (รายจ่ายประจำ & รายจ่ายรายวัน) =====================
@@ -3353,6 +3424,7 @@
     document.getElementById('e_sum_monthly').textContent = fmtBaht(monthlyTotal);
     document.getElementById('e_sum_daily').textContent = fmtBaht(dailyTotal);
     document.getElementById('e_sum_grand').textContent = fmtBaht(monthlyTotal + dailyTotal);
+    applyMoneyMask();
   }
 
   // GLOBAL EXPORTS FOR INLINE HTML HANDLERS
