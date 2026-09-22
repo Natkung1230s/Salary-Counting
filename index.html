@@ -21,6 +21,8 @@
     --muted:#7A6F53;
     --text:#241D0E;
     --blue:#2563EB;
+    --line-green:#06C755;
+    --line-green-dark:#05a847;
   }
   *{-webkit-tap-highlight-color:transparent;box-sizing:border-box;}
   body{
@@ -63,7 +65,35 @@
   h1{margin:0 0 4px;font-size:24px;font-weight:700;}
   header p{margin:0;color:#B9AF95;font-size:13px;}
 
-  /* User Badge */
+  .header-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .btn-line-connect{
+    background:var(--line-green);
+    color:#FFF;
+    font-family:'Sarabun',sans-serif;
+    font-weight:700;
+    font-size:12.5px;
+    padding:7px 14px;
+    border-radius:30px;
+    border:1px solid rgba(255,255,255,.2);
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    box-shadow:0 3px 10px rgba(6,199,85,.35);
+    transition:transform .08s ease, background-color .15s ease, box-shadow .15s ease;
+  }
+  .btn-line-connect:hover{
+    background:var(--line-green-dark);
+    transform:translateY(-1px);
+    box-shadow:0 4px 12px rgba(6,199,85,.45);
+  }
+  .btn-line-connect:active{transform:translateY(1px);}
+
   .user-badge-wrap{
     display:flex;
     align-items:center;
@@ -79,7 +109,6 @@
 
   main{max-width:1040px;margin:0 auto;padding:20px 16px 80px;}
 
-  /* Main Navigation Tabs */
   .main-nav-tabs{
     display:flex;
     gap:10px;
@@ -127,7 +156,6 @@
   }
   .card .hint{font-size:13px;color:var(--muted);margin:0 0 16px;line-height:1.4;}
 
-  /* Toolbar */
   .toolbar{
     display:flex;
     flex-wrap:wrap;
@@ -138,7 +166,6 @@
   }
   .toolbar-group{display:flex;flex-wrap:wrap;gap:8px;}
 
-  /* Collapsible Settings */
   .settings-header{
     display:flex;
     justify-content:space-between;
@@ -195,7 +222,6 @@
   }
   input[type="number"],input[type="password"]{font-family:'IBM Plex Mono',monospace;}
 
-  /* TAX FIELD & TIP BOX DESIGN */
   .tax-field-group{
     display:flex;
     flex-direction:column;
@@ -210,10 +236,7 @@
     border-color:var(--amber);
     box-shadow:0 4px 12px rgba(30,42,56,.06);
   }
-  .tax-field-group label{
-    margin-bottom:6px;
-    line-height:1.35;
-  }
+  .tax-field-group label{margin-bottom:6px;line-height:1.35;}
   .tip-box{
     background:rgba(214,138,45,.07);
     border-left:3px solid var(--amber);
@@ -252,7 +275,6 @@
 
   .row-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;}
 
-  /* Leave Quota Card */
   .leave-quota-card{
     background:#FFFDF7;
     border:1px solid var(--line);
@@ -271,7 +293,6 @@
   .quota-item .q-count{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:var(--text);margin-top:2px;}
   .quota-item .q-remain{font-size:11px;color:var(--muted);}
 
-  /* Calendar */
   .monthbar{
     display:flex;align-items:center;justify-content:space-between;
     margin-bottom:12px;
@@ -340,11 +361,7 @@
     align-items:baseline;
     gap:3px;
   }
-  .day-num-month{
-    font-size:9px;
-    font-weight:600;
-    color:var(--muted);
-  }
+  .day-num-month{font-size:9px;font-weight:600;color:var(--muted);}
 
   .cell-content{
     display:flex;
@@ -385,11 +402,8 @@
   .ot-tag{color:var(--amber-dark);}
   .late-tag{color:var(--red);}
 
-  /* Summary Grid */
   .summary-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;margin-bottom:16px;}
-  .stat{
-    background:#FFFDF7;border:1px solid var(--line);border-radius:6px;padding:10px 12px;
-  }
+  .stat{background:#FFFDF7;border:1px solid var(--line);border-radius:6px;padding:10px 12px;}
   .stat .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
   .stat .v{font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;}
   .stat.deduct .v{color:var(--red);}
@@ -401,7 +415,6 @@
   .stat.total .k{color:#C9BC98;}
   .stat.total .v{font-size:26px;color:var(--amber);}
 
-  /* Expense Tracker */
   .expense-list{display:flex;flex-direction:column;gap:8px;}
   .expense-row{
     display:flex;align-items:center;gap:12px;
@@ -426,7 +439,6 @@
     background:var(--paper-2);border-radius:20px;padding:2px 9px;margin-right:6px;
   }
 
-  /* Expense Group (shared) */
   .expense-group-setup{display:flex;flex-wrap:wrap;gap:20px;padding-top:4px;}
   .expense-group-setup-col{flex:1;min-width:220px;}
   .expense-group-setup-col label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;}
@@ -441,7 +453,6 @@
   }
   .group-code:hover{background:#F5ECD0;}
 
-  /* Stamp */
   .stamp-wrap{position:absolute;top:16px;right:18px;}
   .stamp{
     font-family:'IBM Plex Mono',monospace;
@@ -458,7 +469,6 @@
   }
   .stamp.broken{border-color:var(--red);color:var(--red);}
 
-  /* TAX RESULT DASHBOARD CARD */
   .tax-dashboard{
     background:linear-gradient(140deg, #1A2430 0%, #253344 100%);
     color:#F1E9D2;
@@ -499,7 +509,6 @@
   }
   .tax-dash-item.highlight .val{color:var(--amber);font-size:23px;}
 
-  /* Modals */
   .modal-overlay{
     position:fixed;top:0;left:0;right:0;bottom:0;
     background:rgba(30,42,56,.65);
@@ -527,7 +536,6 @@
   .modal .form-group{margin-bottom:12px;}
   .modal-actions{display:flex;justify-content:space-between;gap:8px;margin-top:16px;}
 
-  /* Auth Screen */
   .auth-overlay{
     position:fixed;top:0;left:0;right:0;bottom:0;
     background:linear-gradient(135deg, var(--ink), var(--ink-2));
@@ -574,7 +582,6 @@
     line-height:1.3;
   }
 
-  /* ===== PIN Lock System ===== */
   @keyframes pinShake{
     10%,90%{transform:translateX(-1px);}
     20%,80%{transform:translateX(2px);}
@@ -590,13 +597,8 @@
     padding:16px;
   }
   .pin-overlay.open{display:flex;}
-  .pin-overlay.blocking{
-    background:linear-gradient(135deg, var(--ink), var(--ink-2));
-  }
-  .pin-overlay.dismissible{
-    background:rgba(30,42,56,.72);
-    backdrop-filter:blur(3px);
-  }
+  .pin-overlay.blocking{background:linear-gradient(135deg, var(--ink), var(--ink-2));}
+  .pin-overlay.dismissible{background:rgba(30,42,56,.72);backdrop-filter:blur(3px);}
   .pin-box{
     background:var(--card);
     border:2px solid var(--line);
@@ -635,19 +637,8 @@
     transform:scale(1.1);
   }
   .pin-dots.shake{animation:pinShake .4s ease;}
-  .pin-error{
-    color:var(--red);
-    font-size:12px;
-    min-height:16px;
-    margin:6px 0 4px;
-    font-weight:600;
-  }
-  .pin-keypad{
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:10px;
-    margin:14px 0 6px;
-  }
+  .pin-error{color:var(--red);font-size:12px;min-height:16px;margin:6px 0 4px;font-weight:600;}
+  .pin-keypad{display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;margin:14px 0 6px;}
   .pin-key{
     font-family:'IBM Plex Mono',monospace;
     font-size:19px;
@@ -666,28 +657,14 @@
   .pin-key.pin-key-del{font-size:16px;color:var(--muted);}
   .pin-key.pin-key-empty{visibility:hidden;cursor:default;}
   .pin-links{display:flex;flex-direction:column;gap:6px;margin-top:12px;}
-  .pin-links a{
-    font-size:12.5px;
-    color:var(--amber-dark);
-    text-decoration:underline;
-    cursor:pointer;
-    font-weight:600;
-  }
+  .pin-links a{font-size:12.5px;color:var(--amber-dark);text-decoration:underline;cursor:pointer;font-weight:600;}
   .pin-links a.pin-link-muted{color:var(--muted);}
-  .pin-lockout{
-    font-size:12px;color:var(--red);font-weight:700;margin-top:8px;
-  }
+  .pin-lockout{font-size:12px;color:var(--red);font-weight:700;margin-top:8px;}
   .pin-auth-panel .form-group{margin-bottom:12px;text-align:left;}
   .pin-auth-panel label{font-size:12px;}
 
-  /* Money mask: when body.pin-locked is on, applyMoneyMask() swaps each .money-mask
-     element's real textContent for the placeholder text directly (see JS), so this
-     class no longer needs to fake it with CSS. Just keep a pointer cursor as a hint. */
-  body.pin-locked .money-mask{
-    cursor:pointer;
-  }
+  body.pin-locked .money-mask{cursor:pointer;}
 
-  /* Payslip */
   .payslip-modal{
     max-width:680px;
     background:#FFF;
@@ -720,12 +697,7 @@
     padding-bottom:8px;
     border-bottom:1px dashed #C9BC98;
   }
-  .ps-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-bottom:14px;
-    font-size:12.5px;
-  }
+  .ps-table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:12.5px;}
   .ps-table th{background:#2B3A4D;color:#FFF;padding:6px 8px;font-weight:600;}
   .ps-table td{padding:5px 8px;border-bottom:1px solid #EEE;}
   .ps-table .right{text-align:right;}
@@ -752,12 +724,11 @@
     header{padding:16px 12px 20px;}
     header .wrap{flex-direction:column;align-items:flex-start;gap:10px;}
     h1{font-size:20px;}
-    .user-badge-wrap{width:100%;justify-content:space-between;}
-
+    .header-actions{width:100%;justify-content:space-between;}
+    .user-badge-wrap{flex:1;justify-content:space-between;}
     main{padding:14px 10px 60px;}
     .main-nav-tabs{gap:4px;}
     .tab-btn{font-size:12.5px;padding:8px 10px;}
-
     .card{padding:16px 14px;margin-bottom:14px;}
     .toolbar-group{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:6px;}
     .grid{grid-template-columns:1fr;gap:12px;}
@@ -788,29 +759,32 @@
       <p>ระบบบันทึกเวลาทำงาน คำนวณเงินเดือน & วางแผนภาษีบุคคลธรรมดาประจำปี</p>
     </div>
     
-    <div class="user-badge-wrap" id="userBadgeWrap" style="display:none;">
-      <div class="user-info">
-        <div class="user-name" id="hdr_userName">พนักงาน</div>
-        <div class="user-role" id="hdr_userRole">CLOUD ACCOUNT</div>
+    <div class="header-actions">
+      <button class="btn-line-connect" id="hdr_lineConnectBtn" style="display:none;" onclick="openLineConnectModal()">
+        💬 Connect LINE Notify
+      </button>
+
+      <div class="user-badge-wrap" id="userBadgeWrap" style="display:none;">
+        <div class="user-info">
+          <div class="user-name" id="hdr_userName">พนักงาน</div>
+          <div class="user-role" id="hdr_userRole">CLOUD ACCOUNT</div>
+        </div>
+        <button class="btn-ghost" id="hdr_lockBtn" style="display:none;padding:4px 8px;font-size:11.5px;color:#F1E9D2;border-color:rgba(255,255,255,.3);" onclick="handleLockButtonClick()" title="ซ่อน/แสดงยอดเงิน">🔒 ดูยอดเงิน</button>
+        <button class="btn-ghost" style="padding:4px 8px;font-size:11.5px;color:#F1E9D2;border-color:rgba(255,255,255,.3);" onclick="handleLogout()">ออกจากระบบ</button>
       </div>
-      <button class="btn-ghost" id="hdr_lockBtn" style="display:none;padding:4px 8px;font-size:11.5px;color:#F1E9D2;border-color:rgba(255,255,255,.3);" onclick="handleLockButtonClick()" title="ซ่อน/แสดงยอดเงิน">🔒 ซ่อนยอด</button>
-      <button class="btn-ghost" style="padding:4px 8px;font-size:11.5px;color:#F1E9D2;border-color:rgba(255,255,255,.3);" onclick="handleLogout()">ออกจากระบบ</button>
     </div>
   </div>
 </header>
 
 <main id="appMain" style="display:none;">
 
-  <!-- MAIN CATEGORY NAVIGATION TABS -->
   <div class="main-nav-tabs">
     <button class="tab-btn active" id="btnTabAttendance" onclick="switchMainTab('attendance')">📅 ลงเวลา & คำนวณเงินเดือน</button>
     <button class="tab-btn" id="btnTabTax" onclick="switchMainTab('tax')">📊 ระบบคำนวณ & วางแผนภาษี (PIT)</button>
     <button class="tab-btn" id="btnTabExpense" onclick="switchMainTab('expense')">💸 บันทึกรายจ่าย</button>
   </div>
 
-  <!-- CATEGORY 1: ATTENDANCE & PAYROLL PAGE -->
   <div id="attendanceView">
-    <!-- DATA & ACTIONS TOOLBAR -->
     <div class="toolbar">
       <div class="toolbar-group">
         <button class="btn-dark" onclick="openPayslipModal()">🖨️ พิมพ์สลิปเงินเดือน</button>
@@ -875,7 +849,7 @@
           <div>
             <label>วันที่ตัดยอด (เริ่มงวดใหม่)</label>
             <input id="s_payCutoffDay" type="number" min="1" max="28" step="1" placeholder="เช่น 21">
-            <p class="hint" style="margin:6px 0 0;">ค่าเริ่มต้น = 21 หมายถึง งวดเงินเดือนเริ่มวันที่ 21 ของเดือน ถึงวันที่ 20 ของเดือนถัดไป (วันสุดท้ายของงวดคือวันที่ 20)</p>
+            <p class="hint" style="margin:6px 0 0;">ค่าเริ่มต้น = 21 หมายถึง งวดเงินเดือนเริ่มวันที่ 21 ของเดือน ถึงวันที่ 20 ของเดือนถัดไป</p>
           </div>
         </div>
         
@@ -992,7 +966,7 @@
           </div>
         </div>
 
-        <div style="margin-top:14px;background:rgba(255,255,255,.08);border-radius:20px;overflow:hidden;height:10px;">
+        <div style="margin-top:14px;background:rgba(255,255,208);border-radius:20px;overflow:hidden;height:10px;">
           <div id="goal_progress_bar" style="height:100%;width:0%;background:var(--amber);transition:width .3s ease;"></div>
         </div>
         <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#B9AF95;margin-top:6px;">
@@ -1047,10 +1021,8 @@
     </section>
   </div>
 
-  <!-- CATEGORY 2: DEDICATED TAX PLANNING & DEDUCTION PAGE (PIT) -->
+  <!-- TAX VIEW -->
   <div id="taxView" style="display:none;">
-    
-    <!-- TAX SUMMARY DASHBOARD -->
     <div class="tax-dashboard">
       <div class="tax-dashboard-header">
         <div>
@@ -1061,241 +1033,88 @@
       </div>
 
       <div class="tax-dash-grid">
-        <div class="tax-dash-item">
-          <div class="label">รายได้รวมทั้งปี (Gross Income)</div>
-          <div class="val money-mask" id="td_gross">฿0</div>
-        </div>
-        <div class="tax-dash-item">
-          <div class="label">หักค่าใช้จ่าย 50% (สูงสุด 100,000)</div>
-          <div class="val money-mask" id="td_expense">฿0</div>
-        </div>
-        <div class="tax-dash-item">
-          <div class="label">รวมค่าลดหย่อนทั้งหมด (Total Deductions)</div>
-          <div class="val money-mask" id="td_totalDeduction">฿0</div>
-        </div>
-        <div class="tax-dash-item">
-          <div class="label">เงินได้สุทธิคำนวณภาษี (Net Taxable)</div>
-          <div class="val money-mask" id="td_netTaxable">฿0</div>
-        </div>
-        <div class="tax-dash-item highlight">
-          <div class="label">ภาษีที่ต้องจ่ายจริงทั้งปี</div>
-          <div class="val money-mask" id="td_annualTax">฿0</div>
-        </div>
-        <div class="tax-dash-item">
-          <div class="label">สถานะภาษี (ขอคืน / ชำระเพิ่ม)</div>
-          <div class="val money-mask" id="td_taxStatus" style="font-size:15px;color:var(--amber);">฿0</div>
-        </div>
+        <div class="tax-dash-item"><div class="label">รายได้รวมทั้งปี (Gross Income)</div><div class="val money-mask" id="td_gross">฿0</div></div>
+        <div class="tax-dash-item"><div class="label">หักค่าใช้จ่าย 50% (สูงสุด 100,000)</div><div class="val money-mask" id="td_expense">฿0</div></div>
+        <div class="tax-dash-item"><div class="label">รวมค่าลดหย่อนทั้งหมด (Total Deductions)</div><div class="val money-mask" id="td_totalDeduction">฿0</div></div>
+        <div class="tax-dash-item"><div class="label">เงินได้สุทธิคำนวณภาษี (Net Taxable)</div><div class="val money-mask" id="td_netTaxable">฿0</div></div>
+        <div class="tax-dash-item highlight"><div class="label">ภาษีที่ต้องจ่ายจริงทั้งปี</div><div class="val money-mask" id="td_annualTax">฿0</div></div>
+        <div class="tax-dash-item"><div class="label">สถานะภาษี (ขอคืน / ชำระเพิ่ม)</div><div class="val money-mask" id="td_taxStatus" style="font-size:15px;color:var(--amber);">฿0</div></div>
       </div>
     </div>
 
-    <!-- TAX INPUT FORM -->
     <section class="card">
-      
-      <!-- หมวดที่ 1: รายได้พึงประเมิน & ลดหย่อนส่วนตัวและครอบครัว -->
       <div class="section-divider" style="margin-top:0;">📌 หมวดที่ 1: รายได้พึงประเมิน & สิทธิ์ลดหย่อนส่วนตัวและครอบครัว</div>
-      <p class="hint">ข้อมูลเงินได้และสิทธิ์พื้นฐานทางครอบครัวตามกฎหมายสรรพากร</p>
-
       <div class="grid">
         <div class="tax-field-group">
           <label>1.1 รายได้รวมทั้งปี (เงินเดือน + โบนัส + OT) (บาท)</label>
           <input type="number" id="t_income" placeholder="เช่น 360000" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ดูได้จาก <strong>หนังสือรับรองการหักภาษี ณ ที่จ่าย (50 ทวิ)</strong> ช่อง "รวมเงินที่จ่าย" ที่ HR ออกให้ตอนสิ้นปี หรือดูจากรวมยอด Gross Pay ในสลิปเงินเดือนเดือนธันวาคม
-          </div>
         </div>
-
         <div class="tax-field-group">
           <label>1.2 ภาษีหัก ณ ที่จ่าย ที่ถูกหักสะสมทั้งปี (บาท)</label>
           <input type="number" id="t_withheld" placeholder="เช่น 2500" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>หนังสือรับรอง 50 ทวิ</strong> ช่อง "ภาษีที่หักและนำส่งไว้" หรือยอดรวมภาษีหักสะสมในสลิปเงินเดือนเดือนสุดท้ายของปี
-          </div>
         </div>
-
         <div class="tax-field-group">
           <label>1.3 ลดหย่อนส่วนตัว (อัตโนมัติ 60,000 บาท)</label>
           <input type="number" id="t_personal" value="60000" readonly style="background:#EFE8D3;">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> สิทธิ์พื้นฐานตามกฎหมาย สรรพากรให้ทุกคนอัตโนมัติ 60,000 บาท ไม่ต้องเตรียมเอกสารเพิ่มเติม
-          </div>
         </div>
-
         <div class="tax-field-group">
           <label>1.4 คู่สมรส (ไม่มีรายได้) (60,000 บาท)</label>
           <select id="t_spouse" onchange="calculateFullTax()">
             <option value="0">ไม่มี / คู่สมรสมีรายได้</option>
             <option value="60000">คู่สมรสจดทะเบียน และไม่มีรายได้ในปีภาษีนี้ (60,000 บาท)</option>
           </select>
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ต้องจดทะเบียนสมรสตามกฎหมายถูกต้อง และคู่สมรสต้องไม่มีรายได้ตลอดปี เอกสารอ้างอิง: <strong>ใบทะเบียนสมรส (คร.2/คร.3)</strong>
-          </div>
         </div>
-
         <div class="tax-field-group">
-          <label>1.5 จำนวนบุตร (คนละ 30,000 บ. / คนที่ 2 ขึ้นไปเกิดปี 61+ ได้ 60,000 บ.)</label>
-          <input type="number" id="t_children" min="0" value="0" placeholder="ระบุจำนวนบุตร" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> บุตรต้องชอบด้วยกฎหมาย อายุไม่เกิน 20 ปี (หรือ 20-25 ปีหากกำลังศึกษา) เอกสารอ้างอิง: <strong>สูติบัตรบุตร</strong> หรือ <strong>ทะเบียนบ้าน</strong>
-          </div>
+          <label>1.5 จำนวนบุตร (คนละ 30,000 บ.)</label>
+          <input type="number" id="t_children" min="0" value="0" oninput="calculateFullTax()">
         </div>
-
         <div class="tax-field-group">
           <label>1.6 ค่าเลี้ยงดูบิดามารดา (คนละ 30,000 บาท สูงสุด 4 คน)</label>
-          <input type="number" id="t_parents" min="0" max="4" value="0" placeholder="จำนวนพ่อแม่ (0-4)" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> บิดามารดาต้องมีอายุ 60 ปีขึ้นไป และมีรายได้ทั้งปีไม่เกิน 30,000 บาท เอกสารอ้างอิง: <strong>ฟอร์ม ล.ย.01</strong> และเลขบัตรประชาชนพ่อแม่ (พี่น้องห้ามใช้สิทธิ์ซ้ำกัน)
-          </div>
+          <input type="number" id="t_parents" min="0" max="4" value="0" oninput="calculateFullTax()">
         </div>
-
         <div class="tax-field-group">
           <label>1.7 อุปการะผู้พิการ / ทุพพลภาพ (คนละ 60,000 บาท)</label>
-          <input type="number" id="t_disabled" min="0" value="0" placeholder="จำนวนผู้พิการที่ดูแล" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>บัตรประจำตัวผู้พิการ</strong> ที่ระบุชื่อเราเป็นผู้ดูแล หรือ <strong>หนังสือรับรองการเป็นผู้ดูแลผู้พิการ</strong> จากกรมส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ
-          </div>
+          <input type="number" id="t_disabled" min="0" value="0" oninput="calculateFullTax()">
         </div>
       </div>
 
-      <!-- หมวดที่ 2: ประกัน การออม & การลงทุน -->
       <div class="section-divider">📌 หมวดที่ 2: ประกัน การออม & การลงทุน</div>
-      <p class="hint">กลุ่มหลักทรัพย์ ประกันภัย และกองทุนเกษียณอายุเพื่ออนาคต</p>
-
       <div class="grid">
-        <div class="tax-field-group">
-          <label>2.1 ประกันสังคม (จ่ายตามจริง สูงสุด 9,000 บาท)</label>
-          <input type="number" id="t_sso" placeholder="เช่น 9000" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>แอปพลิเคชัน SSO Connect</strong> หรือยอดรวมหักประกันสังคมในหนังสือรับรอง 50 ทวิ / สลิปเงินเดือนรวม 12 เดือน
-          </div>
-        </div>
-
-        <div class="tax-field-group">
-          <label>2.2 เบี้ยประกันชีวิตทั่วไป / ประกันออมทรัพย์ (สูงสุด 100,000 บาท)</label>
-          <input type="number" id="t_lifeIns" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>หนังสือรับรองการชำระเบี้ยประกันภัย</strong> ที่ขอจากแอปพลิเคชันบริษัทประกัน (เช่น AIA, TLFA, FWD, เมืองไทยประกันชีวิต)
-          </div>
-        </div>
-
-        <div class="tax-field-group">
-          <label>2.3 เบี้ยประกันสุขภาพตนเอง (สูงสุด 25,000 บาท)</label>
-          <input type="number" id="t_healthIns" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>หนังสือรับรองเบี้ยประกันสุขภาพ</strong> จากแอป/เว็บประกันภัย (หมายเหตุ: รวมกับข้อ 2.2 แล้วต้องไม่เกิน 100,000 บาท)
-          </div>
-        </div>
-
-        <div class="tax-field-group">
-          <label>2.4 เบี้ยประกันสุขภาพบิดามารดา (สูงสุด 15,000 บาท)</label>
-          <input type="number" id="t_parentsHealth" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>หนังสือรับรองการชำระเบี้ยประกันภัย</strong> ที่ระบุบิดา/มารดาเป็นผู้เอาประกันภัย และมีชื่อเราเป็นผู้ชำระเบี้ย
-          </div>
-        </div>
-
-        <div class="tax-field-group">
-          <label>2.5 กองทุนสำรองเลี้ยงชีพ (PVD) / กบข. (ตามจ่ายจริง)</label>
-          <input type="number" id="t_pvd" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ดูได้จาก <strong>สลิปเงินเดือน</strong> (ช่องสะสม PVD) หรือขอ <strong>หนังสือรับรองการจ่ายเงินสะสม PVD</strong> จาก HR หรือแอป บลจ. จัดการกองทุน
-          </div>
-        </div>
-
-        <div class="tax-field-group">
-          <label>2.6 กองทุนรวมเพื่อการเลี้ยงชีพ (RMF) (สูงสุด 30% ไม่เกิน 500k)</label>
-          <input type="number" id="t_rmf" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ดูได้จาก <strong>หนังสือรับรองการซื้อหน่วยลงทุน RMF</strong> หรือกดดาวน์โหลดเอกสารภาษีในแอปธนาคาร/บลจ. ที่คุณซื้อ (เช่น Streaming, InnovestX, K-MyFunds)
-          </div>
-        </div>
-
-        <div class="tax-field-group">
-          <label>2.7 กองทุนรวมเพื่อการออม (SSF) / Thai ESG (ตามจ่ายจริง)</label>
-          <input type="number" id="t_ssf" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ดูหนังสือรับรองซื้อหน่วยลงทุนจากแอป บลจ. หรือล็อกอินเว็บบอร์ด <strong>TSD EveryNet</strong> ของศูนย์รับฝากหลักทรัพย์
-          </div>
-        </div>
-
-        <div class="tax-field-group">
-          <label>2.8 ประกันชีวิตแบบบำนาญ (สูงสุด 15% ไม่เกิน 200,000 บาท)</label>
-          <input type="number" id="t_pensionIns" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>หนังสือรับรองการชำระเบี้ยประกันภัยแบบบำนาญ</strong> ที่บริษัทประกันออกให้ทางอีเมลหรือแอปพลิเคชัน
-          </div>
-        </div>
+        <div class="tax-field-group"><label>2.1 ประกันสังคม (จ่ายตามจริง สูงสุด 9,000 บาท)</label><input type="number" id="t_sso" placeholder="เช่น 9000" oninput="calculateFullTax()"></div>
+        <div class="tax-field-group"><label>2.2 เบี้ยประกันชีวิตทั่วไป / ออมทรัพย์ (สูงสุด 100,000 บาท)</label><input type="number" id="t_lifeIns" oninput="calculateFullTax()"></div>
+        <div class="tax-field-group"><label>2.3 เบี้ยประกันสุขภาพตนเอง (สูงสุด 25,000 บาท)</label><input type="number" id="t_healthIns" oninput="calculateFullTax()"></div>
+        <div class="tax-field-group"><label>2.4 เบี้ยประกันสุขภาพบิดามารดา (สูงสุด 15,000 บาท)</label><input type="number" id="t_parentsHealth" oninput="calculateFullTax()"></div>
+        <div class="tax-field-group"><label>2.5 กองทุนสำรองเลี้ยงชีพ (PVD) / กบข.</label><input type="number" id="t_pvd" oninput="calculateFullTax()"></div>
+        <div class="tax-field-group"><label>2.6 กองทุนรวมเพื่อการเลี้ยงชีพ (RMF)</label><input type="number" id="t_rmf" oninput="calculateFullTax()"></div>
+        <div class="tax-field-group"><label>2.7 กองทุนรวมเพื่อการออม (SSF) / Thai ESG</label><input type="number" id="t_ssf" oninput="calculateFullTax()"></div>
+        <div class="tax-field-group"><label>2.8 ประกันชีวิตแบบบำนาญ (สูงสุด 200,000 บาท)</label><input type="number" id="t_pensionIns" oninput="calculateFullTax()"></div>
       </div>
 
-      <!-- หมวดที่ 3: อสังหาริมทรัพย์ & เงินบริจาค -->
       <div class="section-divider">📌 หมวดที่ 3: อสังหาริมทรัพย์ & เงินบริจาค</div>
-      <p class="hint">ดอกเบี้ยกู้บ้าน และเงินบริจาคสนับสนุนสังคม</p>
-
       <div class="grid">
-        <div class="tax-field-group">
-          <label>3.1 ดอกเบี้ยกู้ยืมเพื่อซื้อ/สร้างที่อยู่อาศัย (สูงสุด 100,000 บาท)</label>
-          <input type="number" id="t_homeLoan" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>หนังสือรับรองดอกเบี้ยกู้ยืมประจำปี</strong> ที่ธนาคารผู้ให้กู้ส่งให้ทางอีเมล/ไปรษณีย์ หรือกดดาวน์โหลดในแอปธนาคาร (เช่น ธอส., SCB, K-Bank)
-          </div>
-        </div>
-
-        <div class="tax-field-group">
-          <label>3.2 เงินบริจาคทั่วไป (หักตามจริง ไม่เกิน 10% ของเงินได้หลังหักลดหย่อน)</label>
-          <input type="number" id="t_donateGeneral" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>ใบเสร็จรับเงินบริจาค</strong> หรือตรวจสอบยอดผ่าน <strong>ระบบ e-Donation ของกรมสรรพากร (rd.go.th)</strong>
-          </div>
-        </div>
-
-        <div class="tax-field-group">
-          <label>3.3 เงินบริจาคเพื่อการศึกษา/กีฬา/โรงพยาบาลรัฐ (ได้สิทธิ์ 2 เท่า)</label>
-          <input type="number" id="t_donateEdu" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> สแกนบริจาคผ่าน QR Code e-Donation ข้อมูลจะส่งตรงเข้ากรมสรรพากรและคำนวณหักลดหย่อน 2 เท่าให้อัตโนมัติในระบบ
-          </div>
-        </div>
-
-        <div class="tax-field-group">
-          <label>3.4 เงินบริจาคพรรคการเมือง (ตามจ่ายจริง สูงสุด 10,000 บาท)</label>
-          <input type="number" id="t_donatePolitical" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>ใบเสร็จรับเงินบริจาคที่ออกโดยพรรคการเมือง</strong> ที่ได้รับอนุญาตตามกฎหมาย
-          </div>
-        </div>
+        <div class="tax-field-group"><label>3.1 ดอกเบี้ยกู้ยืมเพื่อซื้อบ้าน (สูงสุด 100,000 บาท)</label><input type="number" id="t_homeLoan" oninput="calculateFullTax()"></div>
+        <div class="tax-field-group"><label>3.2 เงินบริจาคทั่วไป</label><input type="number" id="t_donateGeneral" oninput="calculateFullTax()"></div>
+        <div class="tax-field-group"><label>3.3 เงินบริจาคการศึกษา/กีฬา/รพ.รัฐ (หักได้ 2 เท่า)</label><input type="number" id="t_donateEdu" oninput="calculateFullTax()"></div>
+        <div class="tax-field-group"><label>3.4 เงินบริจาคพรรคการเมือง (สูงสุด 10,000 บาท)</label><input type="number" id="t_donatePolitical" oninput="calculateFullTax()"></div>
       </div>
 
-      <!-- หมวดที่ 4: มาตรการกระตุ้นเศรษฐกิจรัฐบาล -->
       <div class="section-divider">📌 หมวดที่ 4: มาตรการกระตุ้นเศรษฐกิจของรัฐบาล</div>
-      <p class="hint">โครงการลดหย่อนตามนโยบายภาครัฐในแต่ละปีภาษี</p>
-
       <div class="grid">
-        <div class="tax-field-group">
-          <label>4.1 โครงการ Easy E-Receipt / ช้อปดีมีคืน (สูงสุด 50,000 บาท)</label>
-          <input type="number" id="t_easyReceipt" placeholder="ตามจ่ายจริง" oninput="calculateFullTax()">
-          <div class="tip-box">
-            <strong>💡 วิธีหาข้อมูล:</strong> ดูจาก <strong>ใบกำกับภาษีเต็มรูปแบบในรูปแบบอิเล็กทรอนิกส์ (e-Tax Invoice & e-Receipt)</strong> ที่ได้รับทางอีเมลจากร้านค้าที่ร่วมโครงการ
-          </div>
-        </div>
+        <div class="tax-field-group"><label>4.1 Easy E-Receipt (สูงสุด 50,000 บาท)</label><input type="number" id="t_easyReceipt" oninput="calculateFullTax()"></div>
       </div>
-
     </section>
   </div>
 
-  <!-- CATEGORY 3: EXPENSE TRACKER (รายจ่ายประจำ & รายจ่ายรายวัน) -->
+  <!-- EXPENSE VIEW -->
   <div id="expenseView" style="display:none;">
-
-    <!-- SHARED EXPENSE GROUP -->
     <section class="card">
       <h2>🔗 กลุ่มรายจ่ายร่วม</h2>
       <p class="hint">เชื่อมรายจ่ายกับอีกบัญชี (เช่น คู่รัก/ครอบครัว) เพื่อบันทึกและดูรายจ่ายร่วมกันแบบเรียลไทม์</p>
       <div id="expenseGroupPanel"></div>
     </section>
 
-    <!-- MONTHLY RECURRING EXPENSES -->
     <section class="card">
       <h2>🔁 รายจ่ายประจำ (รายเดือน)</h2>
-      <p class="hint">รายการที่จ่ายซ้ำทุกเดือนเป็นจำนวนคงที่ เช่น ค่าเช่าบ้าน ค่าผ่อนรถ ค่าอินเทอร์เน็ต ค่าประกัน — ระบบจะรวมยอดนี้ให้ทุกเดือนโดยอัตโนมัติ ไม่ต้องกรอกซ้ำ</p>
-
       <div class="grid" style="margin-bottom:14px;">
         <div><label>ชื่อรายการ</label><input id="e_m_name" type="text" placeholder="เช่น ค่าเช่าบ้าน"></div>
         <div><label>จำนวนเงิน/เดือน (บาท)</label><input id="e_m_amount" type="number" min="0" step="1" placeholder="0"></div>
@@ -1303,15 +1122,12 @@
       <div class="row-actions" style="justify-content:flex-start;margin-top:0;margin-bottom:16px;">
         <button class="btn-primary" onclick="addMonthlyExpense()">+ เพิ่มรายการประจำ</button>
       </div>
-
       <div class="expense-list" id="monthlyExpenseList"></div>
-
       <div class="summary-grid" style="margin-top:14px;">
         <div class="stat total"><div class="k">รวมรายจ่ายประจำ / เดือน</div><div class="v money-mask" id="e_monthly_total">฿0</div></div>
       </div>
     </section>
 
-    <!-- DAILY EXPENSES -->
     <section class="card">
       <div class="monthbar">
         <h2 style="margin:0;">🧾 รายจ่ายรายวัน</h2>
@@ -1321,7 +1137,6 @@
           <button onclick="shiftExpenseMonth(1)">›</button>
         </div>
       </div>
-      <p class="hint" style="margin-bottom:14px;">บันทึกรายจ่ายแต่ละวัน แยกตามหมวดหมู่ เพื่อดูภาพรวมการใช้จ่ายรายเดือน (แยกจากรายจ่ายประจำด้านบน)</p>
 
       <div class="grid" style="margin-bottom:14px;">
         <div><label>วันที่</label><input id="e_d_date" type="date"></div>
@@ -1352,17 +1167,14 @@
       </div>
     </section>
 
-    <!-- GRAND TOTAL -->
     <section class="card">
       <h2>📊 สรุปรายจ่ายรวมของเดือนนี้</h2>
-      <p class="hint">รายจ่ายประจำ + รายจ่ายรายวัน ของเดือนที่กำลังดูอยู่ในตารางด้านบน</p>
       <div class="summary-grid">
         <div class="stat"><div class="k">รายจ่ายประจำ</div><div class="v money-mask" id="e_sum_monthly">฿0</div></div>
         <div class="stat"><div class="k">รายจ่ายรายวัน</div><div class="v money-mask" id="e_sum_daily">฿0</div></div>
         <div class="stat total"><div class="k">รวมรายจ่ายทั้งหมด</div><div class="v money-mask" id="e_sum_grand">฿0</div></div>
       </div>
     </section>
-
   </div>
 
 </main>
@@ -1417,12 +1229,51 @@
   </div>
 </div>
 
-<!-- PIN LOCK OVERLAY -->
+<!-- LINE CONNECT MODAL -->
+<div class="modal-overlay" id="lineConnectModal" onclick="handleLineConnectOverlayClick(event)">
+  <div class="modal" style="max-width:440px;text-align:center;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <h3 style="margin:0;font-size:17px;color:var(--ink);display:flex;align-items:center;gap:6px;">
+        <span style="color:var(--line-green);font-size:22px;">💬</span> เชื่อมต่อ LINE Notify
+      </h3>
+      <button type="button" class="btn-ghost" style="padding:2px 8px;font-size:16px;" onclick="closeLineConnectModal()">✕</button>
+    </div>
+
+    <p class="hint" style="margin-top:0;margin-bottom:14px;text-align:left;">
+      สแกน QR Code เพื่อเพิ่มเพื่อนบอท จากนั้นส่งคำสั่งพร้อมรหัสยืนยัน 6 หลักในแชท เพื่อเปิดใช้งานการลงเวลา OT และเช็คยอดเงินเดือนผ่าน LINE
+    </p>
+
+    <div style="background:#FFF;padding:12px;border-radius:12px;display:inline-block;border:1px solid var(--line);box-shadow:0 4px 12px rgba(0,0,0,.06);margin-bottom:10px;">
+      <img src="https://qr-official.line.me/gs/M_2009939632_GW.png" alt="LINE Bot QR Code" style="width:160px;height:160px;display:block;border-radius:6px;" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https://line.me/R/ti/p/@2009939632'">
+    </div>
+    <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:14px;">บอท: Salary Notify</div>
+
+    <div style="background:#FFFDF7;border:1.5px dashed var(--amber);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+      <div style="font-size:11.5px;color:var(--muted);font-weight:600;">รหัสยืนยันตัวตน 6 หลัก (Pairing Code)</div>
+      <div id="modal_line_code" class="mono" style="font-size:30px;font-weight:700;color:var(--amber-dark);letter-spacing:0.18em;margin:4px 0;">------</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
+        <button type="button" class="btn-primary" style="padding:5px 12px;font-size:12px;" onclick="generateNewLineLinkCode()">🔄 สุ่มรหัสใหม่</button>
+        <button type="button" class="btn-dark" style="padding:5px 12px;font-size:12px;" onclick="copyLineBindCommand()">📋 คัดลอกคำสั่ง</button>
+      </div>
+    </div>
+
+    <div style="background:rgba(214,138,45,.08);padding:10px 12px;border-radius:8px;text-align:left;font-size:12px;line-height:1.5;color:var(--text);margin-bottom:14px;">
+      <strong>📝 ขั้นตอนการเปิดใช้งาน:</strong><br>
+      1. ใช้ LINE สแกน QR Code ด้านบนเพื่อเพิ่มเพื่อน<br>
+      2. ส่งคำสั่งด้านล่างนี้ในแชทบอท:<br>
+      <div style="margin-top:6px;background:#FFF;padding:7px 9px;border-radius:6px;border:1px solid var(--line);word-break:break-all;">
+        <code class="mono" id="modal_line_cmd" style="color:var(--ink);font-weight:700;">ผูกบัญชี ...</code>
+      </div>
+    </div>
+
+    <button type="button" class="btn-ghost" style="width:100%;justify-content:center;" onclick="closeLineConnectModal()">ปิดหน้าต่าง</button>
+  </div>
+</div>
+
+<!-- PIN OVERLAY -->
 <div class="pin-overlay" id="pinOverlay" onclick="handlePinOverlayClick(event)">
   <div class="pin-box">
     <button type="button" class="pin-close" id="pinCloseBtn" onclick="closePinOverlay()" style="display:none;">✕</button>
-
-    <!-- Numeric keypad panel -->
     <div id="pinPadPanel">
       <div class="pin-icon" id="pinIcon">🔒</div>
       <h2 id="pinTitle">ใส่รหัส PIN</h2>
@@ -1452,11 +1303,10 @@
       </div>
     </div>
 
-    <!-- Identity verification panel (used for the forgot-PIN flow) -->
     <div id="pinAuthPanel" class="pin-auth-panel" style="display:none;">
       <div class="pin-icon">🔑</div>
       <h2>ยืนยันตัวตนของคุณ</h2>
-      <p class="pin-subtitle">กรอกอีเมลและรหัสผ่านที่ใช้เข้าสู่ระบบ (Firebase) เพื่อยืนยันว่าเป็นคุณจริงๆ ก่อนตั้งรหัส PIN ใหม่</p>
+      <p class="pin-subtitle">กรอกอีเมลและรหัสผ่านที่ใช้เข้าสู่ระบบ (Firebase) เพื่อยืนยันตัวตนก่อนตั้งรหัส PIN ใหม่</p>
       <form id="pinAuthForm" onsubmit="handlePinReauthSubmit(event)">
         <div class="form-group">
           <label>อีเมล</label>
@@ -1581,7 +1431,6 @@
 
 <footer class="note">ข้อมูลถูกบันทึกและซิงค์ผ่าน Cloud Database (Firebase Firestore)</footer>
 
-<!-- FIREBASE MODULE SCRIPT -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { 
@@ -1597,14 +1446,15 @@
     getFirestore, 
     doc, 
     getDoc, 
-    setDoc,
-    updateDoc,
-    onSnapshot,
-    arrayUnion,
-    arrayRemove,
-    deleteField
+    setDoc, 
+    updateDoc, 
+    onSnapshot, 
+    arrayUnion, 
+    arrayRemove, 
+    deleteField 
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+  // อัปเดตคอนฟิกของโปรเจกต์หลัก market-7facf เรียบร้อยแล้ว
   const firebaseConfig = {
     apiKey: "AIzaSyBDIqntSdjumeFL3iOgB_Om8StrQfSCSzg",
     authDomain: "market-7facf.firebaseapp.com",
@@ -1618,19 +1468,39 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
+  const LINE_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw1XuwdJ4NY2VP8bFOTDfI7EAUdt6fGq0xCW7MTmDRxQ7iSdh2CIMuyknUfmSQzJe9s6w/exec";
+
+  async function sendLineNotification(msg) {
+    if (!LINE_WEBAPP_URL) return;
+    try {
+      await fetch(LINE_WEBAPP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ 
+          message: msg,
+          uid: currentUserUID 
+        })
+      });
+    } catch (err) {
+      console.warn("แจ้งเตือน LINE ไม่สำเร็จ:", err);
+    }
+  }
+
   let currentUserUID = null;
   let currentUserEmail = null;
+  let userUnsubscribe = null;
+  let currentLineLinkCode = '';
 
-  // ===== PIN lock system state =====
-  let userPinHash = null;         // hash currently stored in Firestore for this user (null = not set yet)
-  let pinBuffer = '';             // digits typed so far in the active pin pad
-  let pinStage = null;            // 'unlock' | 'setup1' | 'setup2' | 'change-current' | 'change-new1' | 'change-new2' | 'forgot-new1' | 'forgot-new2'
-  let pinFirstEntry = '';         // holds first entry during a "confirm new PIN" step
+  let userPinHash = null;
+  let pinBuffer = '';
+  let pinStage = null;
+  let pinFirstEntry = '';
   let pinAttempts = 0;
   let pinLockoutUntil = 0;
   let pinLockoutTimer = null;
   let pinAutoLockTimer = null;
-  const PIN_AUTO_LOCK_MS = 10 * 60 * 1000; // ล็อกยอดเงินอัตโนมัติทุก 10 นาที
+  const PIN_AUTO_LOCK_MS = 10 * 60 * 1000;
 
   let settings = {
     name: '',
@@ -1653,11 +1523,11 @@
 
   let taxInputsData = {};
   let entries = [];
-  let expensesMonthly = [];   // recurring: [{id, name, amount, addedBy?}]
-  let expensesDaily = [];     // one-off:   [{id, date, category, note, amount, addedBy?}]
-  let expenseGroupId = null;       // null = personal mode, otherwise the shared group code
-  let expenseGroupMembers = {};    // {uid: email}
-  let expenseGroupUnsub = null;    // onSnapshot unsubscribe fn for the active group listener
+  let expensesMonthly = [];
+  let expensesDaily = [];
+  let expenseGroupId = null;
+  let expenseGroupMembers = {};
+  let expenseGroupUnsub = null;
   let expenseViewDate = new Date();
   expenseViewDate.setDate(1);
   let viewDate = new Date();
@@ -1665,34 +1535,28 @@
   let isSettingsOpen = false;
   let viewDateInitialized = false;
   let currentPayrollData = null;
-  let salaryGoal = 30000;          // target take-home pay for the current pay period
-  let salaryGoalOtType = 'normal'; // 'normal' or 'offday' — which OT rate to use for the projection
+  let salaryGoal = 30000;
+  let salaryGoalOtType = 'normal';
   let goalSaveTimer = null;
 
   const thMonths = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
   const thMonthsAbbr = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 
-  // --- Payroll cutoff period helpers ---
-  // A "period" is labeled by the month/year in which it ENDS.
-  // e.g. with cutoffDay = 21, the period labeled September = 21 Aug - 20 Sep.
   function pad2(n) { return String(n).padStart(2, '0'); }
   function dateToStr(d) { return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
   function getPayCutoffDay() {
     const c = settings.payCutoffDay;
     return (c && c >= 1 && c <= 28) ? c : 21;
   }
-  // Returns {start, end} Date objects (both inclusive) for the pay period labeled (labelYear, labelMonth).
   function getPayPeriodRange(labelYear, labelMonth) {
     const cutoff = getPayCutoffDay();
     if (cutoff <= 1) {
-      // No real cutoff offset — period is just the calendar month itself.
       return { start: new Date(labelYear, labelMonth, 1), end: new Date(labelYear, labelMonth + 1, 0) };
     }
     const start = new Date(labelYear, labelMonth - 1, cutoff);
     const end = new Date(labelYear, labelMonth, cutoff - 1);
     return { start, end };
   }
-  // Given "today", figure out which period label (year, month) we're currently inside.
   function getCurrentPeriodLabel(refDate) {
     const cutoff = getPayCutoffDay();
     const d = refDate || new Date();
@@ -1749,18 +1613,21 @@
       document.getElementById('authScreen').classList.remove('open');
       document.getElementById('appMain').style.display = 'block';
       document.getElementById('userBadgeWrap').style.display = 'flex';
+      document.getElementById('hdr_lineConnectBtn').style.display = 'inline-flex';
 
       const shortName = user.email.split('@')[0];
       document.getElementById('hdr_userName').textContent = settings.name || shortName;
       document.getElementById('hdr_userRole').textContent = user.email;
 
-      await loadCloudUserData(user.uid);
+      setupUserDataListener(user.uid);
     } else {
+      if (userUnsubscribe) { userUnsubscribe(); userUnsubscribe = null; }
       currentUserUID = null;
       currentUserEmail = null;
       document.getElementById('authScreen').classList.add('open');
       document.getElementById('appMain').style.display = 'none';
       document.getElementById('userBadgeWrap').style.display = 'none';
+      document.getElementById('hdr_lineConnectBtn').style.display = 'none';
       document.getElementById('hdr_lockBtn').style.display = 'none';
       userPinHash = null;
       document.body.classList.remove('pin-locked');
@@ -1769,10 +1636,15 @@
     }
   });
 
-  async function loadCloudUserData(uid) {
-    try {
-      const userRef = doc(db, "users", uid);
-      const docSnap = await getDoc(userRef);
+  function setupUserDataListener(uid) {
+    if (userUnsubscribe) { userUnsubscribe(); }
+    const userRef = doc(db, "users", uid);
+
+    if (currentUserEmail) {
+      setDoc(userRef, { email: currentUserEmail }, { merge: true }).catch(() => {});
+    }
+
+    userUnsubscribe = onSnapshot(userRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         if (data.settings) settings = Object.assign(settings, data.settings);
@@ -1784,36 +1656,86 @@
         if (data.salaryGoal !== undefined) salaryGoal = data.salaryGoal;
         if (data.salaryGoalOtType) salaryGoalOtType = data.salaryGoalOtType;
         userPinHash = data.pinHash || null;
+
+        if (!data.lineLinkCode) {
+          const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+          setDoc(userRef, { lineLinkCode: generatedCode }, { merge: true }).catch(() => {});
+          currentLineLinkCode = generatedCode;
+        } else {
+          currentLineLinkCode = data.lineLinkCode;
+        }
+        renderLineLinkCodeUI();
+
+        if (!viewDateInitialized) {
+          const { labelYear, labelMonth } = getCurrentPeriodLabel(new Date());
+          viewDate = new Date(labelYear, labelMonth, 1);
+          expenseViewDate = new Date(labelYear, labelMonth, 1);
+          viewDateInitialized = true;
+        }
+
+        fillSettingsForm();
+        fillTaxForm();
+        fillGoalForm();
+        updateSettingsUI();
+        render();
+
+        if (expenseGroupId && !expenseGroupUnsub) {
+          attachExpenseGroupListener(expenseGroupId);
+        } else if (!expenseGroupId) {
+          renderExpenses();
+        }
+
+        calculateFullTax();
+        evaluatePinGate();
       }
-    } catch (e) {
-      console.error("Load Firestore error:", e);
-    }
-
-    if (!viewDateInitialized) {
-      const { labelYear, labelMonth } = getCurrentPeriodLabel(new Date());
-      viewDate = new Date(labelYear, labelMonth, 1);
-      expenseViewDate = new Date(labelYear, labelMonth, 1);
-      viewDateInitialized = true;
-    }
-
-    fillSettingsForm();
-    fillTaxForm();
-    fillGoalForm();
-    updateSettingsUI();
-    render();
-
-    if (expenseGroupId) {
-      attachExpenseGroupListener(expenseGroupId);
-    } else {
-      renderExpenses();
-    }
-
-    calculateFullTax();
-
-    evaluatePinGate();
+    });
   }
 
-  // ===================== PIN LOCK SYSTEM =====================
+  function openLineConnectModal() {
+    renderLineLinkCodeUI();
+    document.getElementById('lineConnectModal').classList.add('open');
+  }
+
+  function closeLineConnectModal() {
+    document.getElementById('lineConnectModal').classList.remove('open');
+  }
+
+  function handleLineConnectOverlayClick(e) {
+    if (e.target.id === 'lineConnectModal') closeLineConnectModal();
+  }
+
+  function renderLineLinkCodeUI() {
+    const codeEl = document.getElementById('modal_line_code');
+    const cmdEl = document.getElementById('modal_line_cmd');
+    const email = currentUserEmail || 'your-email@gmail.com';
+    const code = currentLineLinkCode || '------';
+    if (codeEl) codeEl.textContent = code;
+    if (cmdEl) cmdEl.textContent = `ผูกบัญชี ${email} ${code}`;
+  }
+
+  async function generateNewLineLinkCode() {
+    if (!currentUserUID) return;
+    const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+    try {
+      const userRef = doc(db, "users", currentUserUID);
+      await setDoc(userRef, { lineLinkCode: newCode }, { merge: true });
+      currentLineLinkCode = newCode;
+      renderLineLinkCodeUI();
+      alert(`สร้างรหัสยืนยันใหม่เรียบร้อยแล้ว: ${newCode}`);
+    } catch (e) {
+      alert('ไม่สามารถสร้างรหัสใหม่ได้: ' + e.message);
+    }
+  }
+
+  function copyLineBindCommand() {
+    if (!currentLineLinkCode || !currentUserEmail) return;
+    const cmd = `ผูกบัญชี ${currentUserEmail} ${currentLineLinkCode}`;
+    navigator.clipboard.writeText(cmd).then(() => {
+      alert(`คัดลอกคำสั่งเรียบร้อยแล้ว:\n${cmd}\n\nเปิด LINE วางส่งในห้องแชท Salary Notify ได้เลยครับ`);
+    }).catch(() => {
+      alert(`คำสั่งผูกบัญชีคือ:\n${cmd}`);
+    });
+  }
 
   async function hashPin(pin) {
     const enc = new TextEncoder().encode(pin + ':' + currentUserUID + ':sc-pin-v1');
@@ -1821,9 +1743,6 @@
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  // เรียกทุกครั้งหลังโหลดข้อมูลเสร็จ: ถ้าไม่เคยตั้ง PIN ไว้ ก็ใช้แอปได้ตามปกติเลย ไม่บังคับ
-  // ถ้าเคยตั้ง PIN ไว้แล้ว ยอดเงินจะถูกซ่อนไว้ก่อนโดยอัตโนมัติทุกครั้งที่เปิดแอปใหม่
-  // (เงียบๆ ไม่มีป็อปอัพมาบังคับ) จนกว่าผู้ใช้จะกดปุ่ม "ดูยอดเงิน" แล้วใส่ PIN เอง
   function evaluatePinGate() {
     if (!currentUserUID) return;
     renderPinSettingsUI();
@@ -1837,7 +1756,6 @@
     lockMoneyMask(unlockedFlag !== '1');
   }
 
-  // แสดง/ซ่อนตัวเลขเงิน + จัดการปุ่มในหัวข้อ และตัวจับเวลาอัตโนมัติ
   function lockMoneyMask(isLocked) {
     document.body.classList.toggle('pin-locked', isLocked);
     const lockBtn = document.getElementById('hdr_lockBtn');
@@ -1859,16 +1777,10 @@
     applyMoneyMask();
   }
 
-  // ซ่อนยอดเงินจริงๆ ในระดับ textContent (ไม่ใช่แค่ทาสีให้โปร่งใสด้วย CSS)
-  // เพราะการทาสีโปร่งใสอย่างเดียว ตัวเลขจริงยังฝังอยู่ใน DOM สามารถลาก-เลือกข้อความ
-  // (select/copy) หรือเปิด inspect element แล้วเห็นค่าจริงได้ทันทีแม้ตอนล็อกอยู่ — ถือเป็นช่องโหว่
-  // ฟังก์ชันนี้จึงสลับ textContent จริงเป็น "฿ ••••" ตรงๆ เมื่อ locked และเก็บค่าจริงไว้ใน data-real
-  // แล้วค่อยคืนค่ากลับตอนปลดล็อก เรียกซ้ำได้เรื่อยๆ ทุกครั้งที่มีการ render ข้อมูลใหม่ขณะล็อกอยู่ก็ปลอดภัย
   function applyMoneyMask() {
     const locked = document.body.classList.contains('pin-locked');
     document.querySelectorAll('.money-mask').forEach(el => {
       if (locked) {
-        // ถ้ายังไม่เคยเก็บค่าจริงไว้ (หรือค่าที่โชว์อยู่ไม่ใช่ mask placeholder) ให้เก็บของปัจจุบันไว้ก่อน
         if (el.dataset.real === undefined || (el.textContent !== '฿ ••••' && el.textContent !== '-฿ ••••')) {
           el.dataset.real = el.textContent;
         }
@@ -1881,7 +1793,6 @@
     });
   }
 
-  // กดปุ่มที่ header: ถ้ากำลังซ่อนอยู่ -> เปิดคีย์แพดให้ใส่ PIN เพื่อดู, ถ้ากำลังโชว์อยู่ -> ซ่อนกลับทันที
   function handleLockButtonClick() {
     if (!userPinHash) return;
     if (document.body.classList.contains('pin-locked')) {
@@ -1899,15 +1810,12 @@
     }
   }
 
-  // ซ่อนยอดเงินกลับทันที (จากปุ่ม header หรือเมื่อครบเวลาไม่ได้ใช้งาน) — ไม่มีป็อปอัพแทรก แค่ซ่อนเงียบๆ
   function lockMoneyView() {
     if (!currentUserUID || !userPinHash) return;
     sessionStorage.removeItem('scPinUnlocked_' + currentUserUID);
     lockMoneyMask(true);
   }
 
-  // นับถอยหลัง 10 นาทีนับจากการใช้งานล่าสุด (mouse/keyboard/scroll) ทุกครั้งที่ยอดเงินถูกปลดล็อกอยู่
-  // ถ้าไม่มีการใช้งานใดๆ เลยครบ 10 นาที ระบบจะซ่อนยอดเงินอัตโนมัติ ต้องใส่ PIN ใหม่ถึงจะดูได้อีกครั้ง
   function startPinAutoLockTimer() {
     if (pinAutoLockTimer) clearTimeout(pinAutoLockTimer);
     if (!currentUserUID || !userPinHash) return;
@@ -1917,9 +1825,9 @@
   let pinLastActivityPing = 0;
   function handleUserActivityForPin() {
     if (!userPinHash) return;
-    if (document.body.classList.contains('pin-locked')) return; // ซ่อนอยู่แล้ว ไม่ต้องรีเซ็ตนาฬิกา
+    if (document.body.classList.contains('pin-locked')) return;
     const now = Date.now();
-    if (now - pinLastActivityPing < 5000) return; // กันยิงถี่เกินไป
+    if (now - pinLastActivityPing < 5000) return;
     pinLastActivityPing = now;
     startPinAutoLockTimer();
   }
@@ -1931,8 +1839,6 @@
   }
   registerPinActivityListeners();
 
-  // แตะ/คลิกที่ยอดเงินตัวไหนก็ได้ที่กำลังถูกซ่อนอยู่ (฿ ••••) จะเด้งให้ใส่ PIN ทันที
-  // ใส่ถูกแล้วยอดเงินทุกจุดในหน้าจะโชว์พร้อมกันหมด (ปลดล็อกทั้งแอป ไม่ใช่แค่จุดที่กด)
   function registerMoneyMaskClickToUnlock() {
     document.addEventListener('click', (e) => {
       if (!userPinHash) return;
@@ -1950,11 +1856,10 @@
         showForgotLink: true,
         showCloseBtn: true
       });
-    }, true); // capture phase กันไม่ให้ click ทะลุไปโดน handler อื่นของ element เดิม
+    }, true);
   }
   registerMoneyMaskClickToUnlock();
 
-  // เปิด/ปิดการใช้งาน PIN + เปลี่ยนป้ายปุ่มในหน้าตั้งค่าตามสถานะปัจจุบัน
   function renderPinSettingsUI() {
     const setupBtn = document.getElementById('pin_setup_btn');
     const changeBtn = document.getElementById('pin_change_btn');
@@ -1967,7 +1872,7 @@
       changeBtn.style.display = 'inline-flex';
       forgotBtn.style.display = 'inline-flex';
       disableBtn.style.display = 'inline-flex';
-      hint.textContent = 'เปิดใช้งาน PIN อยู่ — ยอดเงินจะถูกซ่อนอัตโนมัติเมื่อไม่ได้ใช้งานเกิน 10 นาที จนกว่าจะใส่ PIN อีกครั้ง';
+      hint.textContent = 'เปิดใช้งาน PIN อยู่ — ยอดเงินจะถูกซ่อนอัตโนมัติเมื่อไม่ได้ใช้งานเกิน 10 นาที';
     } else {
       setupBtn.style.display = 'inline-flex';
       changeBtn.style.display = 'none';
@@ -1977,7 +1882,6 @@
     }
   }
 
-  // Called from the settings card — first-time, opt-in PIN setup.
   function startSetupPinFlow() {
     if (!currentUserUID) return;
     openPinPad({
@@ -1991,7 +1895,6 @@
     });
   }
 
-  // Called from the settings card — verify the current PIN, then set a new one.
   function startChangePinFlow() {
     if (!currentUserUID) return;
     if (!userPinHash) { startSetupPinFlow(); return; }
@@ -2006,7 +1909,6 @@
     });
   }
 
-  // Called from the settings card — verify current PIN, then remove PIN protection entirely.
   function startDisablePinFlow() {
     if (!currentUserUID || !userPinHash) return;
     openPinPad({
@@ -2035,7 +1937,6 @@
     }
   }
 
-  // "ลืมรหัส PIN?" — from the lock screen OR the settings card.
   function startForgotPinFlow() {
     closePinPadOnly();
     document.getElementById('pinPadPanel').style.display = 'none';
@@ -2053,7 +1954,6 @@
     document.getElementById('pinAuthPanel').style.display = 'none';
     document.getElementById('pinPadPanel').style.display = 'block';
     if (userPinHash) {
-      // กลับไปหน้าใส่ PIN ตามปกติ
       openPinPad({
         stage: 'unlock',
         blocking: document.body.classList.contains('pin-locked') && !sessionStorage.getItem('scPinUnlocked_' + currentUserUID),
@@ -2078,7 +1978,6 @@
       const cred = EmailAuthProvider.credential(email, password);
       await reauthenticateWithCredential(auth.currentUser, cred);
 
-      // ยืนยันตัวตนสำเร็จ → กลับไปที่คีย์แพดเพื่อให้ตั้ง PIN ใหม่ทันที ไม่ต้องรู้ PIN เดิม
       document.getElementById('pinAuthPanel').style.display = 'none';
       document.getElementById('pinPadPanel').style.display = 'block';
       openPinPad({
@@ -2130,7 +2029,7 @@
 
   function closePinOverlay(force) {
     const overlay = document.getElementById('pinOverlay');
-    if (overlay.classList.contains('blocking') && !force) return; // บังคับไว้ ปิดเองไม่ได้
+    if (overlay.classList.contains('blocking') && !force) return;
     overlay.classList.remove('open');
     pinStage = null;
     pinBuffer = '';
@@ -2145,7 +2044,7 @@
   function shakePinDots(message) {
     const dotsEl = document.getElementById('pinDots');
     dotsEl.classList.remove('shake');
-    void dotsEl.offsetWidth; // restart animation
+    void dotsEl.offsetWidth;
     dotsEl.classList.add('shake');
     document.getElementById('pinError').textContent = message || '';
     pinBuffer = '';
@@ -2326,11 +2225,8 @@
   function calculateFullTax() {
     const income = getNumInput('t_income', settings.salary * 12);
     const withheld = getNumInput('t_withheld', 0);
-    
-    // 1. Expense Deduction (50% max 100,000)
     const expense = Math.min(income * 0.5, 100000);
 
-    // 2. Category 1 Deductions
     const personal = 60000;
     const spouse = parseFloat(document.getElementById('t_spouse').value) || 0;
     const childrenCount = getNumInput('t_children', 0);
@@ -2340,7 +2236,6 @@
     const disabledCount = getNumInput('t_disabled', 0);
     const disabledDeduction = disabledCount * 60000;
 
-    // 3. Category 2 Deductions
     const sso = Math.min(getNumInput('t_sso', settings.sso * 12), 9000);
     const lifeIns = Math.min(getNumInput('t_lifeIns', 0), 100000);
     const healthIns = Math.min(getNumInput('t_healthIns', 0), 25000);
@@ -2352,29 +2247,23 @@
     const ssf = Math.min(getNumInput('t_ssf', 0), income * 0.30);
     const pensionIns = Math.min(getNumInput('t_pensionIns', 0), income * 0.15, 200000);
 
-    // 4. Category 3 Deductions
     const homeLoan = Math.min(getNumInput('t_homeLoan', 0), 100000);
     const donateGeneral = getNumInput('t_donateGeneral', 0);
     const donateEdu = getNumInput('t_donateEdu', 0) * 2;
     const donatePolitical = Math.min(getNumInput('t_donatePolitical', 0), 10000);
 
-    // 5. Category 4 Deductions
     const easyReceipt = Math.min(getNumInput('t_easyReceipt', 0), 50000);
 
-    // Total Deductions Before Donations
     const baseDeductions = personal + spouse + childrenDeduction + parentsDeduction + disabledDeduction
       + sso + combinedLifeHealth + parentsHealth + pvd + rmf + ssf + pensionIns + homeLoan + easyReceipt;
 
     const netBeforeDonation = Math.max(0, income - expense - baseDeductions);
-    
-    // Donation cap: 10% of net before donation
     const maxDonationAllowed = netBeforeDonation * 0.10;
     const actualDonation = Math.min(donateGeneral + donateEdu + donatePolitical, maxDonationAllowed);
 
     const totalDeductions = baseDeductions + actualDonation;
     const netTaxable = Math.max(0, income - expense - totalDeductions);
 
-    // PIT Progressive Brackets Calculation
     let annualTax = 0;
     let remain = netTaxable;
 
@@ -2398,7 +2287,6 @@
 
     const diff = annualTax - withheld;
 
-    // Update Dashboard UI
     document.getElementById('td_gross').textContent = fmtBaht(income);
     document.getElementById('td_expense').textContent = fmtBaht(expense);
     document.getElementById('td_totalDeduction').textContent = fmtBaht(totalDeductions);
@@ -2520,7 +2408,7 @@
   function onSalaryGoalChange() {
     salaryGoal = getNumInput('goal_amount', 0);
     const typeEl = document.getElementById('goal_ot_type');
-    salaryGoalOtType = typeEl ? typeEl.value : 'normal';
+    salaryGoalOtType = typeEl ? typeEl.value : salaryGoalOtType;
     renderSalaryGoal();
 
     if (!currentUserUID) return;
@@ -2535,8 +2423,6 @@
     }, 600);
   }
 
-  // Projects how many extra OT hours are needed this pay period to hit the salary goal,
-  // based on currentPayrollData (base salary + benefits + bonus + OT already logged - deductions).
   function renderSalaryGoal() {
     const goalEl = document.getElementById('goal_amount');
     if (!goalEl || !currentPayrollData) return;
@@ -2559,7 +2445,6 @@
     document.getElementById('goal_progress_pct').textContent = pct + '%';
     document.getElementById('goal_progress_amounts').textContent = `${fmtBaht(netTotal)} / ${fmtBaht(goal)}`;
 
-    // Remaining working days left in this pay period (tomorrow → period end, excluding the weekly off day)
     const y = viewDate.getFullYear();
     const m = viewDate.getMonth();
     const { end: periodEnd } = getPayPeriodRange(y, m);
@@ -2621,19 +2506,10 @@
       return;
     }
 
-    // สมมติฐาน: การจะทำโอทีได้ ผู้ใช้ต้องมาทำงานอยู่แล้วในวันนั้น ซึ่งถ้ามาทำงานก็จะได้รับ
-    // "สวัสดิการรายวัน" ของวันนั้นไปด้วยโดยอัตโนมัติ ไม่ว่าจะทำโอทีหรือไม่ก็ตาม ได้แก่
-    //   - ค่าเดินทาง + ค่าที่พัก (ต่อวันทำงาน)
-    //   - ค่าอาหาร OT (เฉพาะวันที่มีโอที)
-    // จึงนำสวัสดิการรายวันทั้งสองส่วนนี้ ที่จะเกิดขึ้นจริงในวันทำงานที่เหลือของงวด (remainingWorkDays)
-    // มาหักออกจากยอดขาดสุทธิก่อน เหลือเป็นส่วนที่ต้อง "ปิดด้วยค่าโอทีล้วนๆ" จริงๆ แล้วค่อยหารเป็นชั่วโมง
-    // (ไม่รวมโบนัสวันหยุด/โบนัสไม่ขาดงาน เพราะเป็นรายการที่ผูกกับเงื่อนไขพิเศษ ไม่ใช่สวัสดิการรายวันปกติ)
     const otMealPerDay = settings.otMeal || 0;
     const dailyAllowance = (settings.travel || 0) + (settings.housing || 0);
     const projectedAllowanceBenefit = remainingWorkDays * dailyAllowance;
 
-    // เงื่อนไขค่าอาหาร OT: ต้องทำโอทีเฉลี่ย >= 2 ชม./วัน ถึงจะนับว่าเข้าเงื่อนไข
-    // ใช้แผนแบบยังไม่รวมค่าอาหาร OT (remainingAfterAllowance) มาเช็คก่อน เพื่อไม่ให้เกิดการคำนวณวนกลับไปมา
     const remainingAfterAllowance = Math.max(0, remainingPay - projectedAllowanceBenefit);
     const neededHoursNoMeal = remainingAfterAllowance / (hourlyRate * otRate);
     const perDayNoMeal = remainingWorkDays > 0 ? (neededHoursNoMeal / remainingWorkDays) : 0;
@@ -2644,7 +2520,7 @@
     const remainingPayAfterBenefits = Math.max(0, remainingPay - projectedDailyBenefits);
 
     const neededHours = remainingPayAfterBenefits / (hourlyRate * otRate);
-    const neededHoursRounded = Math.ceil(neededHours * 10) / 10; // round up to nearest 0.1 ชม.
+    const neededHoursRounded = Math.ceil(neededHours * 10) / 10;
 
     remLabelEl.textContent = 'ต้องทำโอทีเพิ่มอีก';
     remHoursEl.classList.remove('money-mask');
@@ -2711,7 +2587,10 @@
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, p);
       const initialSettings = Object.assign({}, settings, { name, salary });
+      const initialLinkCode = Math.floor(100000 + Math.random() * 900000).toString();
       await setDoc(doc(db, "users", cred.user.uid), {
+        email,
+        lineLinkCode: initialLinkCode,
         settings: initialSettings,
         entries: [],
         createdAt: new Date().toISOString()
@@ -2724,6 +2603,7 @@
 
   async function handleLogout() {
     if (confirm('ต้องการออกจากระบบใช่หรือไม่?')) {
+      if (userUnsubscribe) { userUnsubscribe(); userUnsubscribe = null; }
       if (expenseGroupUnsub) { expenseGroupUnsub(); expenseGroupUnsub = null; }
       await signOut(auth);
     }
@@ -2803,6 +2683,13 @@
     await persistEntries();
     closeModal();
     render();
+
+    const thStatus = statusLabel[status] || status;
+    const empName = settings.name || (currentUserEmail ? currentUserEmail.split('@')[0] : 'พนักงาน');
+    let lineMsg = `📌 บันทึกเวลาทำงาน (${empName})\n📅 วันที่: ${date}\nสถานะ: ${thStatus}`;
+    if (ot > 0) lineMsg += `\n⏱️ ทำ OT: ${ot} ชม.`;
+    if (late > 0) lineMsg += `\n⚠️ สาย: ${late} นาที`;
+    sendLineNotification(lineMsg);
   }
 
   async function deleteModalEntry() {
@@ -2930,7 +2817,6 @@
       document.getElementById('monthLabel').textContent = thMonths[m] + ' ' + (y + 543);
     }
 
-    // Timezone-safe Annual Quota Tracker calculation
     const yearEntries = entries.filter(en => en.date && parseInt(en.date.split('-')[0], 10) === y);
     const usedSickYear = yearEntries.filter(e => e.status === 'leave_sick').length;
     const usedBizYear = yearEntries.filter(e => e.status === 'leave_business').length;
@@ -2949,7 +2835,6 @@
     document.getElementById('quota_vac_display').textContent = `${usedVacYear} / ${qVac} วัน`;
     document.getElementById('quota_vac_remain').textContent = `คงเหลือ ${Math.max(0, qVac - usedVacYear)} วัน`;
 
-    // Pay-period entries filtering (e.g. 21st of prev month through 20th of this month)
     const periodStartStr = dateToStr(periodStart);
     const periodEndStr = dateToStr(periodEnd);
     const monthEntries = entries.filter(en => en.date && en.date >= periodStartStr && en.date <= periodEndStr);
@@ -3021,9 +2906,6 @@
     const hourlyRate = settings.hours > 0 ? (dailyRate / settings.hours) : 0;
 
     const payableDays = actualWorkedDays + otherPaidLeaveDays;
-    
-    // Formula Requirements Update:
-    // Base salary = settings.salary
     const basePay = settings.salary;
     const offDayBonus = dailyRate * offDayWorkedDays;
     const allowancePay = (settings.travel + settings.housing) * actualWorkedDays;
@@ -3035,25 +2917,16 @@
     }, 0);
 
     const otMealPay = settings.otMeal * otMealDays;
-    // นโยบายเบี้ยขยัน: ลาประเภทใดก็ตาม (ป่วย/กิจ/ไม่รับเงิน/ขาดงาน) ตัดสิทธิ์เบี้ยขยันทันทีไม่มีเงื่อนไข
-    // ยกเว้นเฉพาะ "ลาพักร้อน" (leave_annual) เพียงอย่างเดียวที่ลาแล้วยังคงได้เบี้ยขยันตามปกติ
     const hasDisqualification = absentDays > 0 || unpaidLeaveDays > 0 || sickLeaveDays > 0 || businessLeaveDays > 0;
     const bonusPay = (!hasDisqualification && monthEntries.length > 0) ? settings.bonus : 0;
 
-    // Deductions Calculation
-    // Sick Leave Deduction: จำนวนวันลาป่วย * (เงินเดือน / 30)
     const sickDeduction = sickLeaveDays * dailyRate;
     const unpaidDeduction = (unpaidLeaveDays + absentDays) * dailyRate;
     const lateDeduction = lateDeductedHours * hourlyRate;
     const ssoDeduction = settings.sso !== undefined ? settings.sso : 750;
 
-    // Gross Income (เงินเดือน + สวัสดิการ)
     const grossPay = basePay + offDayBonus + allowancePay + otPay + otMealPay + bonusPay;
-    
-    // Total Deductions
     const totalDeductions = sickDeduction + unpaidDeduction + lateDeduction + ssoDeduction;
-
-    // Net Total = (เงินเดือน + สวัสดิการ) - (วันลาป่วย * (เงินเดือน/30)) - รายการหักอื่นๆ
     const netTotal = Math.max(0, grossPay - totalDeductions);
 
     currentPayrollData = { 
@@ -3111,20 +2984,17 @@
     applyMoneyMask();
   }
 
-  // ===================== EXPENSE TRACKER (รายจ่ายประจำ & รายจ่ายรายวัน) =====================
-
   function makeExpenseId() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   }
 
   function makeGroupCode() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I to avoid confusion
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let code = '';
     for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
     return code;
   }
 
-  // Persist expense data to the right place: the shared group doc if joined, otherwise the personal user doc.
   async function persistExpenses() {
     if (!currentUserUID) return;
     try {
@@ -3137,11 +3007,10 @@
       }
     } catch (e) {
       console.error("Save expenses error:", e);
-      alert('บันทึกข้อมูลไม่สำเร็จ กรุณาลองใหม่ (ตรวจสอบ Firestore rules หากอยู่ในกลุ่มร่วม)');
+      alert('บันทึกข้อมูลไม่สำเร็จ กรุณาลองใหม่');
     }
   }
 
-  // Live-sync expensesMonthly/expensesDaily from the shared group doc while joined to one.
   function attachExpenseGroupListener(code) {
     if (expenseGroupUnsub) { expenseGroupUnsub(); expenseGroupUnsub = null; }
     const groupRef = doc(db, "expenseGroups", code);
@@ -3181,10 +3050,9 @@
 
   async function createExpenseGroup() {
     if (!currentUserUID) return;
-    if (!confirm('สร้างกลุ่มรายจ่ายร่วมใหม่? ข้อมูลรายจ่ายปัจจุบันของคุณจะถูกย้ายเข้ากลุ่มนี้ (ยังเก็บสำเนาไว้ในบัญชีเดี่ยวเผื่อออกจากกลุ่มภายหลัง)')) return;
+    if (!confirm('สร้างกลุ่มรายจ่ายร่วมใหม่?')) return;
     try {
       let code = makeGroupCode();
-      // Avoid extremely unlikely collision with an existing code.
       for (let i = 0; i < 5; i++) {
         const existing = await getDoc(doc(db, "expenseGroups", code));
         if (!existing.exists()) break;
@@ -3203,7 +3071,7 @@
       expenseGroupId = code;
       attachExpenseGroupListener(code);
       renderExpenseGroupPanel();
-      alert(`สร้างกลุ่มสำเร็จ! รหัสกลุ่มคือ ${code}\nส่งรหัสนี้ให้อีกฝ่ายเพื่อกดเข้าร่วมกลุ่มได้เลย`);
+      alert(`สร้างกลุ่มสำเร็จ! รหัสกลุ่มคือ ${code}`);
     } catch (e) {
       console.error("Create group error:", e);
       alert('สร้างกลุ่มไม่สำเร็จ กรุณาลองใหม่');
@@ -3218,8 +3086,8 @@
     try {
       const groupRef = doc(db, "expenseGroups", code);
       const snap = await getDoc(groupRef);
-      if (!snap.exists()) { alert('ไม่พบกลุ่มรหัสนี้ กรุณาตรวจสอบอีกครั้ง'); return; }
-      if (!confirm('เข้าร่วมกลุ่มนี้? รายจ่ายของคุณในบัญชีเดี่ยวจะซ่อนไว้ชั่วคราว (ไม่หาย) จนกว่าจะออกจากกลุ่ม และคุณจะเห็น/แก้ไขรายจ่ายร่วมกับสมาชิกกลุ่มแทน')) return;
+      if (!snap.exists()) { alert('ไม่พบกลุ่มรหัสนี้'); return; }
+      if (!confirm('เข้าร่วมกลุ่มนี้?')) return;
       await updateDoc(groupRef, {
         members: arrayUnion(currentUserUID),
         [`memberEmails.${currentUserUID}`]: currentUserEmail
@@ -3231,13 +3099,13 @@
       input.value = '';
     } catch (e) {
       console.error("Join group error:", e);
-      alert('เข้าร่วมกลุ่มไม่สำเร็จ กรุณาลองใหม่ (ตรวจสอบ Firestore rules)');
+      alert('เข้าร่วมกลุ่มไม่สำเร็จ');
     }
   }
 
   async function leaveExpenseGroup() {
     if (!currentUserUID || !expenseGroupId) return;
-    if (!confirm('ออกจากกลุ่มรายจ่ายร่วม? คุณจะกลับไปเห็นเฉพาะรายจ่ายส่วนตัวของบัญชีนี้')) return;
+    if (!confirm('ออกจากกลุ่มรายจ่ายร่วม?')) return;
     const code = expenseGroupId;
     try {
       const groupRef = doc(db, "expenseGroups", code);
@@ -3324,6 +3192,10 @@
     document.getElementById('e_m_amount').value = '';
     await persistExpenses();
     renderExpenses();
+
+    const empName = settings.name || (currentUserEmail ? currentUserEmail.split('@')[0] : 'ผู้ใช้');
+    const monthlyMsg = `🔁 เพิ่มรายจ่ายประจำ (${empName})\nรายการ: ${name}\nยอดเงิน: ${fmtBaht(amount)}/เดือน`;
+    sendLineNotification(monthlyMsg);
   }
 
   async function deleteMonthlyExpense(id) {
@@ -3348,6 +3220,11 @@
     document.getElementById('e_d_amount').value = '';
     await persistExpenses();
     renderExpenses();
+
+    const catText = expenseCategoryLabel[category] || category;
+    const empName = settings.name || (currentUserEmail ? currentUserEmail.split('@')[0] : 'ผู้ใช้');
+    const expenseMsg = `💸 บันทึกรายจ่าย (${empName})\n📅 วันที่: ${date}\nหมวดหมู่: ${catText}\nรายการ: ${note || '-'}\nยอดเงิน: ${fmtBaht(amount)}`;
+    sendLineNotification(expenseMsg);
   }
 
   async function deleteDailyExpense(id) {
@@ -3359,14 +3236,12 @@
   function renderExpenses() {
     renderExpenseGroupPanel();
 
-    // Default the date picker to today, once.
     const dateEl = document.getElementById('e_d_date');
     if (dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0, 10);
 
     const isGroup = !!expenseGroupId;
     const showOwner = isGroup && Object.keys(expenseGroupMembers || {}).length > 1;
 
-    // --- Monthly recurring list ---
     const monthlyListEl = document.getElementById('monthlyExpenseList');
     if (expensesMonthly.length === 0) {
       monthlyListEl.innerHTML = '<div class="expense-empty">ยังไม่มีรายการรายจ่ายประจำ — เพิ่มรายการด้านบน เช่น ค่าเช่าบ้าน ค่าอินเทอร์เน็ต</div>';
@@ -3385,7 +3260,6 @@
     const monthlyTotal = expensesMonthly.reduce((sum, x) => sum + (x.amount || 0), 0);
     document.getElementById('e_monthly_total').textContent = fmtBaht(monthlyTotal);
 
-    // --- Daily expenses for the viewed month ---
     const ey = expenseViewDate.getFullYear();
     const em = expenseViewDate.getMonth();
     document.getElementById('expenseMonthLabel').textContent = thMonths[em] + ' ' + (ey + 543);
@@ -3420,14 +3294,13 @@
     document.getElementById('e_daily_count').textContent = dailyForMonth.length;
     document.getElementById('e_daily_total').textContent = fmtBaht(dailyTotal);
 
-    // --- Grand total for the viewed month ---
     document.getElementById('e_sum_monthly').textContent = fmtBaht(monthlyTotal);
     document.getElementById('e_sum_daily').textContent = fmtBaht(dailyTotal);
     document.getElementById('e_sum_grand').textContent = fmtBaht(monthlyTotal + dailyTotal);
     applyMoneyMask();
   }
 
-  // GLOBAL EXPORTS FOR INLINE HTML HANDLERS
+  // GLOBAL EXPORTS
   window.switchMainTab = switchMainTab;
   window.shiftExpenseMonth = shiftExpenseMonth;
   window.addMonthlyExpense = addMonthlyExpense;
@@ -3438,6 +3311,11 @@
   window.joinExpenseGroup = joinExpenseGroup;
   window.leaveExpenseGroup = leaveExpenseGroup;
   window.copyGroupCode = copyGroupCode;
+  window.openLineConnectModal = openLineConnectModal;
+  window.closeLineConnectModal = closeLineConnectModal;
+  window.handleLineConnectOverlayClick = handleLineConnectOverlayClick;
+  window.generateNewLineLinkCode = generateNewLineLinkCode;
+  window.copyLineBindCommand = copyLineBindCommand;
   window.onSalaryGoalChange = onSalaryGoalChange;
   window.calculateFullTax = calculateFullTax;
   window.saveTaxInputs = saveTaxInputs;
