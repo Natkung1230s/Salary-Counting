@@ -2890,7 +2890,17 @@
     const offDayWorkedDays = monthEntries.filter(en => en.status === 'offday_work').length;
     const actualWorkedDays = workedDays + offDayWorkedDays;
 
-    const sickLeaveDays = monthEntries.filter(en => en.status === 'leave_sick').length;
+    const sickLeaveEntries = monthEntries.filter(en => en.status === 'leave_sick');
+    const sickLeaveDays = sickLeaveEntries.length;
+    // นับสิทธิ์ลาป่วยแยกตามปีปฏิทิน: วันที่อยู่ในโควตาไม่หักเงินเดือน
+    // วันที่เกินโควตาที่ตั้งค่าไว้จะถูกหักตามอัตราเงินเดือนรายวัน
+    const sickQuota = Math.max(0, Number(settings.quotaSick !== undefined ? settings.quotaSick : 30));
+    const unpaidSickLeaveDays = sickLeaveEntries.filter(en => {
+      const year = en.date ? en.date.slice(0, 4) : '';
+      const sickRankInYear = entries.filter(e => e.status === 'leave_sick' && e.date && e.date.slice(0, 4) === year && e.date <= en.date).length;
+      return sickRankInYear > sickQuota;
+    }).length;
+    const paidSickLeaveDays = sickLeaveDays - unpaidSickLeaveDays;
     const businessLeaveDays = monthEntries.filter(en => en.status === 'leave_business').length;
     const annualLeaveDays = monthEntries.filter(en => en.status === 'leave_annual').length;
     const otherPaidLeaveDays = businessLeaveDays + annualLeaveDays;
@@ -2908,7 +2918,8 @@
     const payableDays = actualWorkedDays + otherPaidLeaveDays;
     const basePay = settings.salary;
     const offDayBonus = dailyRate * offDayWorkedDays;
-    const allowancePay = (settings.travel + settings.housing) * actualWorkedDays;
+    // จ่ายค่าเดินทาง/ค่าเช่าบ้านให้เฉพาะวันที่ทำงานและวันลาป่วยที่ยังอยู่ในสิทธิ์
+    const allowancePay = (settings.travel + settings.housing) * (actualWorkedDays + paidSickLeaveDays);
 
     const otPay = monthEntries.reduce((sum, en) => {
       if (!en.ot) return sum;
@@ -2920,7 +2931,8 @@
     const hasDisqualification = absentDays > 0 || unpaidLeaveDays > 0 || sickLeaveDays > 0 || businessLeaveDays > 0;
     const bonusPay = (!hasDisqualification && monthEntries.length > 0) ? settings.bonus : 0;
 
-    const sickDeduction = sickLeaveDays * dailyRate;
+    // หักเงินเดือนรายวันเฉพาะวันลาป่วยที่ใช้สิทธิเกินโควตาประจำปี
+    const sickDeduction = unpaidSickLeaveDays * dailyRate;
     const unpaidDeduction = (unpaidLeaveDays + absentDays) * dailyRate;
     const lateDeduction = lateDeductedHours * hourlyRate;
     const ssoDeduction = settings.sso !== undefined ? settings.sso : 750;
